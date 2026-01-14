@@ -231,10 +231,7 @@ function renderData(products, templates) {
 
 export async function loadArchivedProducts() {
     try {
-        const res = await fetch('/api/admin/products/archived', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-        });
-        const products = await res.json();
+        const products = await api.getArchivedProducts();
 
         const tbody = document.getElementById('archived-products-table-body');
         if (!tbody) return;

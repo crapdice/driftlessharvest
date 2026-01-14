@@ -486,28 +486,7 @@ router.get('/admin/delivery-windows', checkRole(['admin', 'super_admin']), (req,
     }
 });
 
-// POST /api/admin/products
-router.post('/admin/products', checkRole(['admin', 'super_admin']), async (req, res) => {
-    try {
-        const { name, category, price, image_url, tags, stock, is_active, farm_id } = req.body;
 
-        const info = db.prepare(`
-            INSERT INTO products (name, category, price, image_url, tags, stock, is_active, farm_id)
-            VALUES (@name, @category, @price, @image_url, @tags, @stock, @is_active, @farm_id)
-        `).run({
-            name, category, price, image_url,
-            tags: JSON.stringify(tags || []),
-            stock: parseInt(stock) || 0,
-            is_active: is_active === undefined ? 1 : (is_active ? 1 : 0),
-            farm_id: farm_id || null
-        });
-
-        res.json({ success: true, id: info.lastInsertRowid });
-    } catch (e) {
-        console.error("Failed to create product:", e);
-        res.status(500).json({ error: 'Failed to create product' });
-    }
-});
 
 // POST /api/admin/categories
 router.post('/admin/categories', checkRole(['admin', 'super_admin']), async (req, res) => {

@@ -88,6 +88,7 @@ export const api = {
 
     // Products & Inventory
     getProducts: () => request('/products'),
+    getArchivedProducts: () => request('/products/archived'),
     getProduct: (id) => request(`/products/${id}`),
     createProduct: (data) => request('/products', 'POST', data),
     updateProduct: (id, data) => request(`/products/${id}`, 'PUT', data),

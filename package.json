@@ -4,7 +4,7 @@
   "description": "A simple, maintainable web application for a local food operation in Viroqua, Wisconsin.",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server/index.js",
     "test": "node tests/run_smoke.js"
   },
   "engines": {

@@ -34,9 +34,8 @@ app.use((req, res, next) => {
 // Serve Admin Panel (Priority)
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
 
-// Serve static files from root (Customer App)
-// Note: We serve the parent directory to access index.html, js/, css/ etc.
-app.use(express.static(path.join(__dirname, '../')));
+// Serve static files from public/ (Customer App)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Debug Endpoint
 app.get('/api/admin/test', (req, res) => res.json({ status: 'ok', msg: 'Admin path works' }));
@@ -62,7 +61,7 @@ app.use((err, req, res, next) => {
 
 // SPA Fallback (Must be last get route)
 app.get(/^(?!\/api).+/, (req, res) => {
-    res.sendFile(path.join(__dirname, '../index.html'));
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 module.exports = app;

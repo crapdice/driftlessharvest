@@ -350,7 +350,8 @@ router.post('/admin/sync-payment/:id', checkRole(['admin', 'super_admin']), asyn
         });
 
         if (searchResult.data.length === 0) {
-            return res.status(404).json({ success: false, msg: 'No Stripe Payment found for this Order ID' });
+            console.log(`[Sync] No payment found for Order ${orderId}`);
+            return res.json({ success: false, msg: 'No Stripe Payment found for this Order ID' });
         }
 
         // 2. Analyze the latest attempt

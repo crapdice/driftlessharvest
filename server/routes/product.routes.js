@@ -73,6 +73,16 @@ router.post('/admin/products', checkRole(['admin', 'super_admin']), (req, res) =
     }
 });
 
+// GET /api/admin/products/archived (Fetch Archived)
+router.get('/admin/products/archived', checkRole(['admin', 'super_admin']), (req, res) => {
+    console.log(`[Product] GET /admin/products/archived called by ${req.user.email}`);
+    try {
+        const products = db.prepare('SELECT * FROM products WHERE is_archived = 1').all();
+        products.forEach(p => { try { p.tags = JSON.parse(p.tags) } catch (e) { p.tags = [] } });
+        res.json(products);
+    } catch (err) { res.status(500).json({ error: 'Failed' }); }
+});
+
 // GET /api/admin/products/:id - Fetch Single Product (Active or Archived)
 router.get('/admin/products/:id', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
@@ -141,14 +151,7 @@ router.delete('/admin/products/:id', checkRole(['admin', 'super_admin']), (req, 
     }
 });
 
-// GET /api/admin/products/archived (Fetch Archived)
-router.get('/admin/products/archived', checkRole(['admin', 'super_admin']), (req, res) => {
-    try {
-        const products = db.prepare('SELECT * FROM products WHERE is_archived = 1').all();
-        products.forEach(p => { try { p.tags = JSON.parse(p.tags) } catch (e) { p.tags = [] } });
-        res.json(products);
-    } catch (err) { res.status(500).json({ error: 'Failed' }); }
-});
+
 
 // Routes moved to top
 
