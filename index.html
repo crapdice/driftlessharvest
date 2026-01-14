@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Driftless Harvest — Viroqua, Wisconsin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Patrick+Hand&family=Permanent+Marker&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Work+Sans:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,700;1,300&family=Rubik:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script type="module">
+    import { THEMES } from './js/themes.js';
+
+    // determine theme from localStorage or default to 'nature'
+    const savedTheme = localStorage.getItem('harvest_theme') || 'sketch';
+    const activeTheme = THEMES[savedTheme] || THEMES['sketch'];
+
+    tailwind.config = {
+      theme: {
+        extend: activeTheme
+      }
+    };
+
+    // Set data-theme attribute for CSS hooks if needed
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+
+  <!-- APP ENTRY -->
+  <script type="module" src="./js/app.js?v=2"></script>
+</head>
+
+<body class="bg-nature-50 text-nature-900 font-sans antialiased selection:bg-harvest-green selection:text-white">
+  <header id="app-header"></header>
+  <main id="app"></main>
+  <footer id="app-footer"></footer>
+
+  <!-- Modals -->
+
+</body>
+
+</html>

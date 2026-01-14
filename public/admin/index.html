@@ -1,0 +1,2391 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Harvest Admin V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    gridTemplateColumns: {
+                        '7': 'repeat(7, minmax(0, 1fr))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-active {
+            border-bottom: 2px solid #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .tab-inactive {
+            color: #6b7280;
+        }
+
+        .tab-inactive:hover {
+            color: #111827;
+        }
+
+        /* Admin Custom Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Custom Scrollbar for Sidebar (Default) */
+        .sidebar-menu::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            /* Slate 300 */
+            border-radius: 4px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+            /* Slate 400 */
+        }
+
+        /* Terminal Theme Scrollbar (Black/Green) */
+        body.theme-terminal .sidebar-menu::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 1px solid #15803d;
+        }
+
+        body.theme-terminal .sidebar-menu::-webkit-scrollbar-thumb {
+            background: #000000;
+            /* As requested: Black */
+            border: 1px solid #22c55e;
+            /* Green border to define it */
+        }
+
+        body.theme-terminal .sidebar-menu::-webkit-scrollbar-thumb:hover {
+            background: #22c55e;
+            color: #000000;
+        }
+
+        /* Expandable Fields UX */
+        .expand-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        textarea.expand-on-focus:focus {
+            min-height: 200px !important;
+            height: auto !important;
+            z-index: 50;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* For input type=text that might need width expansion (optional/risky in grid) */
+        input[type="text"].expand-on-focus {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="text"].expand-on-focus:focus {
+            /* Pop out effect */
+            position: absolute;
+            z-index: 60;
+            width: auto;
+            min-width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            /* Ensure valid background */
+        }
+
+        /* Dark mode support for expanded input */
+        .dark input[type="text"].expand-on-focus:focus {
+            background-color: #1f2937;
+            /* gray-800 */
+        }
+
+        /* Toast Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Minimal Theme Overrides (Linear/Vercel Style) */
+        body.theme-minimal {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+            background-color: #ffffff !important;
+        }
+
+        /* Minimal: Layout & Borders */
+        body.theme-minimal .shadow-sm,
+        body.theme-minimal .shadow-md,
+        body.theme-minimal .shadow-lg,
+        body.theme-minimal .shadow-xl,
+        body.theme-minimal .shadow-2xl {
+            box-shadow: none !important;
+            border: 1px solid #e5e7eb !important;
+        }
+
+        body.theme-minimal .rounded-xl,
+        body.theme-minimal .rounded-lg,
+        body.theme-minimal .rounded-2xl {
+            border-radius: 6px !important;
+        }
+
+        /* Minimal: Navbar (White with Border) */
+        body.theme-minimal nav {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        body.theme-minimal nav .text-white {
+            color: #111827 !important;
+        }
+
+        body.theme-minimal nav .bg-gray-800 {
+            background-color: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            color: #111827 !important;
+        }
+
+        /* Minimal: Buttons (Solid Black Primary) */
+        body.theme-minimal .bg-gradient-to-r,
+        body.theme-minimal .bg-blue-600 {
+            background: #111827 !important;
+            border: 1px solid #111827 !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+
+        /* Minimal: Ghost/Secondary Buttons */
+        body.theme-minimal .bg-white {
+            /* Keep white but ensure border */
+            border-color: #e5e7eb !important;
+        }
+
+        /* Minimal: Hide non-essential colorful elements */
+        body.theme-minimal .from-green-500 {
+            background: #111827 !important;
+            /* Logo becomes black */
+            color: white !important;
+        }
+
+        body.theme-minimal .text-green-500 {
+            color: #111827 !important;
+            /* Text accents become black */
+        }
+
+        /* Terminal Theme Overrides (Retro Linux) */
+        body.theme-terminal {
+            font-family: 'Courier New', Courier, monospace !important;
+            background-color: #0c0c0c !important;
+            color: #22c55e !important;
+        }
+
+        /* Terminal: All Text Green */
+        body.theme-terminal .text-gray-500,
+        body.theme-terminal .text-gray-900,
+        body.theme-terminal .text-gray-400,
+        body.theme-terminal .text-white,
+        body.theme-terminal h1,
+        body.theme-terminal h2,
+        body.theme-terminal h3,
+        body.theme-terminal span,
+        body.theme-terminal div,
+        body.theme-terminal input,
+        body.theme-terminal select {
+            color: #22c55e !important;
+        }
+
+        /* Terminal: Containers & Elements (Strict Black) */
+        body.theme-terminal .bg-white,
+        body.theme-terminal .bg-gray-50,
+        body.theme-terminal .bg-gray-100,
+        body.theme-terminal .bg-gray-200,
+        body.theme-terminal .bg-gray-800,
+        body.theme-terminal .bg-gray-900,
+        body.theme-terminal .bg-blue-50,
+        body.theme-terminal .bg-green-50,
+        body.theme-terminal .bg-amber-50,
+        body.theme-terminal .bg-red-50,
+        body.theme-terminal nav,
+        body.theme-terminal .modal-content,
+        body.theme-terminal table,
+        body.theme-terminal thead,
+        body.theme-terminal tbody,
+        body.theme-terminal tr,
+        body.theme-terminal td,
+        body.theme-terminal th {
+            background-color: #000000 !important;
+            border-color: #22c55e !important;
+            box-shadow: none !important;
+        }
+
+        /* Terminal: Ensure Borders exist where shadows used to be */
+        body.theme-terminal .shadow-sm,
+        body.theme-terminal .shadow-md,
+        body.theme-terminal .shadow-lg,
+        body.theme-terminal .rounded-xl,
+        body.theme-terminal .rounded-lg {
+            border: 1px solid #22c55e !important;
+        }
+
+        /* Terminal: Pills & Badges specifically */
+        body.theme-terminal [class*="bg-"] {
+            background-color: #000000 !important;
+            border: 1px solid #22c55e !important;
+            color: #22c55e !important;
+        }
+
+        /* Terminal: Images (Grayscale + Green tint? Optional, but let's keep it simple first) */
+        /* body.theme-terminal img { filter: grayscale(100%) sepia(100%) hue-rotate(90deg) saturate(300%); } */
+
+        /* Terminal: Sharp Corners */
+
+        /* Terminal: Sharp Corners */
+        body.theme-terminal * {
+            border-radius: 0px !important;
+        }
+
+        /* Terminal: Interactive Elements */
+        body.theme-terminal button {
+            background-color: #000000 !important;
+            border: 1px solid #22c55e !important;
+            color: #22c55e !important;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        body.theme-terminal button:hover {
+            background-color: #22c55e !important;
+            color: #000000 !important;
+        }
+
+        /* Terminal: Inputs */
+        body.theme-terminal input,
+        body.theme-terminal select,
+        body.theme-terminal textarea {
+            background-color: #0c0c0c !important;
+            border: 1px solid #15803d !important;
+            color: #22c55e !important;
+        }
+
+        /* Fix Date Picker Icon in Terminal Mode */
+        body.theme-terminal input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            /* Invert to make it white/variable, then sepia/hue-rotate to green if we want, but invert is enough for visibility
+    */
+            cursor: pointer;
+        }
+
+        body.theme-terminal input:focus,
+        body.theme-terminal select:focus {
+            outline: 2px solid #22c55e !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Terminal: Force ALL SVG Icons to Green */
+        body.theme-terminal svg,
+        body.theme-terminal svg path {
+            stroke: #22c55e !important;
+            /* fill: #22c55e !important; Be careful with fill, some icons use none */
+        }
+
+        /* Terminal: Force all text colors to green overrides */
+        body.theme-terminal .text-gray-400,
+        body.theme-terminal .text-gray-500,
+        body.theme-terminal .text-gray-600,
+        body.theme-terminal .text-gray-700,
+        body.theme-terminal .text-gray-800,
+        body.theme-terminal .text-gray-900,
+        body.theme-terminal .text-blue-600,
+        body.theme-terminal .text-blue-800,
+        body.theme-terminal .text-red-600,
+        body.theme-terminal .text-amber-600,
+        body.theme-terminal .text-yellow-400 {
+            color: #22c55e !important;
+        }
+
+        /* Terminal: Borders for Everything */
+        body.theme-terminal .border,
+        body.theme-terminal .border-b,
+        body.theme-terminal .border-t,
+        body.theme-terminal .border-gray-100,
+        body.theme-terminal .border-gray-200,
+        body.theme-terminal .border-gray-300 {
+            border-color: #15803d !important;
+            /* Darker green for structural borders */
+        }
+
+        /* 🚜 JOHN DEERE THEME OVERRIDES 🚜 */
+        body.theme-johndeere {
+            background-color: #f4f6f0 !important;
+            /* Off-white crop background */
+            color: #367C2B !important;
+            /* JD Green */
+        }
+
+        /* Navbar: JD Green with Yellow Accent */
+        body.theme-johndeere nav {
+            background-color: #367C2B !important;
+            border-bottom: 4px solid #FFDE00 !important;
+            color: #FFDE00 !important;
+        }
+
+        body.theme-johndeere nav .text-white,
+        body.theme-johndeere nav .text-gray-200,
+        body.theme-johndeere nav .text-gray-400,
+        body.theme-johndeere nav svg {
+            color: #FFDE00 !important;
+            stroke: #FFDE00 !important;
+        }
+
+        /* Text Colors */
+        body.theme-johndeere h1,
+        body.theme-johndeere h2,
+        body.theme-johndeere h3,
+        body.theme-johndeere h4,
+        body.theme-johndeere strong,
+        body.theme-johndeere b,
+        body.theme-johndeere .text-gray-900,
+        body.theme-johndeere .text-gray-800,
+        body.theme-johndeere .text-gray-700 {
+            color: #367C2B !important;
+        }
+
+        /* Structural Borders: JD Green */
+        body.theme-johndeere .border,
+        body.theme-johndeere .border-b,
+        body.theme-johndeere .border-t {
+            border-color: #367C2B !important;
+        }
+
+        /* Cards: White with Green Border + Yellow Shadow */
+        body.theme-johndeere .bg-white,
+        body.theme-johndeere .modal-content {
+            border: 2px solid #367C2B !important;
+            box-shadow: 4px 4px 0px #FFDE00 !important;
+            /* Retro Pop Shadow */
+        }
+
+        /* Buttons: JD Yellow */
+        body.theme-johndeere button.bg-blue-600,
+        body.theme-johndeere button.bg-gray-900 {
+            background-color: #FFDE00 !important;
+            color: #111111 !important;
+            /* Black text on yellow for legibility */
+            border: 2px solid #367C2B !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            box-shadow: 2px 2px 0px #367C2B !important;
+        }
+
+        body.theme-johndeere button:hover {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px #367C2B !important;
+        }
+
+        /* Pills & Badges */
+        body.theme-johndeere .bg-blue-50,
+        body.theme-johndeere .bg-green-50,
+        body.theme-johndeere .bg-amber-50 {
+            background-color: #367C2B !important;
+            color: #FFDE00 !important;
+            border: 1px solid #FFDE00 !important;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-100 font-sans h-screen flex flex-col overflow-hidden dark:bg-gray-900 transition-colors duration-200">
+
+    <!-- Navbar -->
+    <!-- Navbar -->
+    <nav
+        class="bg-gray-900/90 backdrop-blur-md border-b border-white/10 px-6 py-3 flex justify-between items-center shadow-2xl shrink-0 relative z-30">
+        <!-- Brand -->
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-700 flex items-center justify-center text-white font-bold text-lg shadow-[0_4px_12px_rgba(16,185,129,0.3)] border border-white/10">
+                    H
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-lg font-bold tracking-tight text-white leading-tight">Harvest<span
+                            class="text-emerald-400">Admin</span></span>
+                    <span class="text-[10px] text-gray-400 tracking-wider font-medium">PREMIUM CONSOLE</span>
+                </div>
+            </div>
+
+            <a href="/" target="_blank"
+                class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all text-xs font-medium text-gray-300 hover:text-white group">
+                <span>View Store</span>
+                <svg class="w-3 h-3 text-gray-500 group-hover:text-emerald-400 transition-colors" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Right Controls -->
+        <div class="flex items-center gap-5">
+
+            <!-- Inventory Alert Indicator (Improved Visibility) -->
+            <div id="inventory-alert-indicator"
+                class="hidden flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-full animate-pulse mr-2"
+                title="Low Inventory Alert">
+                <div class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
+                <span class="text-[10px] font-bold text-rose-400 tracking-wide uppercase">Low Stock</span>
+            </div>
+
+            <!-- User Info (Populated by JS) -->
+            <div id="header-user-info" class="hidden items-center gap-4 pl-6 border-l border-white/10">
+                <div class="text-right hidden md:block">
+                    <div id="header-user-email" class="text-sm font-medium text-gray-200"></div>
+                    <div id="header-user-role" class="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                    </div>
+                </div>
+                <div
+                    class="w-9 h-9 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-400 shadow-sm relative">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <div
+                        class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full">
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- 3-State Theme Toggle -->
+            <button onclick="cycleTheme()"
+                class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all border border-gray-700 shadow-sm group relative overflow-hidden"
+                id="theme-toggle-btn" title="Cycle Theme: Default > Minimal > Dark">
+
+                <!-- Icon: Sun (Shows when in Default mode, click to go Minimal) -->
+                <span id="icon-state-default"
+                    class="text-yellow-400 absolute transition-all transform scale-100 opacity-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                </span>
+
+                <!-- Icon: Square (Shows when in Minimal mode, click to go Dark) -->
+                <span id="icon-state-minimal" class="text-white absolute transition-all transform scale-0 opacity-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"></path>
+                    </svg>
+                </span>
+
+                <!-- Icon: Moon (Shows when in Dark mode, click to go Terminal) -->
+                <span id="icon-state-dark" class="text-blue-300 absolute transition-all transform scale-0 opacity-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </span>
+
+                <!-- Icon: Terminal (Shows when in Terminal mode, click to go Default) -->
+                <span id="icon-state-terminal"
+                    class="text-green-500 absolute transition-all transform scale-0 opacity-0 font-mono font-bold text-lg">
+                    >_
+                </span>
+            </button>
+
+            <!-- Logout -->
+            <button onclick="logout()"
+                class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 transition-all font-medium">
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r flex flex-col shrink-0">
+            <nav class="sidebar-menu flex-1 p-4 space-y-2 overflow-y-auto">
+                <button onclick="setTab('dashboard')" id="nav-dashboard"
+                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span>📊</span> <span class="font-medium">Dashboard</span>
+                </button>
+                <button onclick="setTab('orders')" id="nav-orders"
+                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span>📦</span> <span class="font-medium">Orders</span>
+                </button>
+                <button onclick="setTab('customers')" id="nav-customers"
+                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span>👥</span> <span class="font-medium">Customers</span>
+                </button>
+                <button onclick="setTab('delivery')" id="nav-delivery"
+                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span>🚛</span> <span class="font-medium">Delivery</span>
+                </button>
+                <button onclick="setTab('inventory')" id="nav-inventory"
+                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                    <span>🔢</span> <span class="font-medium">Inventory</span>
+                </button>
+
+                <div class="border-t border-gray-200 my-2 pt-2 space-y-2">
+                    <button onclick="setTab('products')" id="nav-products"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🍎</span> <span class="font-medium">Products</span>
+                    </button>
+                    <button onclick="setTab('archived')" id="nav-archived"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-gray-50 transition-colors">
+                        <span>🗑️</span> <span class="font-medium">Archived</span>
+                    </button>
+                    <button onclick="setTab('categories')" id="nav-categories"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🏷️</span> <span class="font-medium">Categories</span>
+                    </button>
+                    <button onclick="setTab('templates')" id="nav-templates"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🎁</span> <span class="font-medium">Box Templates</span>
+                    </button>
+                    <button onclick="setTab('users')" id="nav-users"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🛡️</span> <span class="font-medium">User Management</span>
+                    </button>
+                    <button onclick="setTab('settings')" id="nav-settings"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>⚙️</span> <span class="font-medium">Admin Configuration</span>
+                    </button>
+
+                    <!-- Page Layout (Super Admin Only) -->
+                    <button onclick="setTab('layouts')" id="nav-layouts"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-transparent cursor-not-allowed transition-colors"
+                        disabled title="Requires Super Admin">
+                        <span>🎨</span> <span class="font-medium">Page Layout</span>
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Content -->
+        <main class="flex-1 overflow-auto bg-gray-50 p-8">
+
+
+
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800">Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Metric Cards -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="text-sm text-gray-500 mb-1">Total Revenue</div>
+                        <div id="stat-revenue" class="text-3xl font-bold text-gray-900">$0.00</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="text-sm text-gray-500 mb-1">Total Orders</div>
+                        <div id="stat-orders" class="text-3xl font-bold text-gray-900">0</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="text-sm text-gray-500 mb-1">Pending Orders</div>
+                        <div id="stat-pending" class="text-3xl font-bold text-orange-500">0</div>
+                    </div>
+                </div>
+                <!-- Active Carts Section -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        🛒 Active Customer Carts
+                        <span
+                            class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Real-time</span>
+                    </h3>
+                    <div id="active-carts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Carts injected here -->
+                        <div class="text-sm text-gray-400 italic">Loading active carts...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INVENTORY VIEW -->
+            <div id="view-inventory" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Inventory Management</h2>
+                    <div class="text-sm text-gray-500">Real-time stock updates</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <th onclick="window.sortInventory('id')"
+                                class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
+                                ID <span id="sort-arrow-id" class="invisible group-hover:visible ml-1">↕</span>
+                            </th>
+                            <th onclick="window.sortInventory('name')"
+                                class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
+                                Product <span id="sort-arrow-name" class="invisible group-hover:visible ml-1">↕</span>
+                            </th>
+                            <th onclick="window.sortInventory('farm_id')"
+                                class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
+                                Farm ID <span id="sort-arrow-farm_id"
+                                    class="invisible group-hover:visible ml-1">↕</span>
+                            </th>
+                            <th onclick="window.sortInventory('price')"
+                                class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
+                                Price <span id="sort-arrow-price" class="invisible group-hover:visible ml-1">↕</span>
+                            </th>
+                            <th onclick="window.sortInventory('stock')"
+                                class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
+                                Stock <span id="sort-arrow-stock" class="invisible group-hover:visible ml-1">↕</span>
+                            </th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                                Actions</th>
+                        </thead>
+                        <tbody id="inventory-list" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ORDERS VIEW -->
+            <div id="view-orders" class="hidden space-y-4">
+                <div
+                    class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Order Management</h2>
+                        <p class="text-sm text-gray-500">Track and manage customer orders.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
+                            <input type="search" placeholder="Search orders..." id="search-orders-input"
+                                name="search_orders_query" autocomplete="nop" role="searchbox" readonly
+                                onfocus="this.removeAttribute('readonly');" oninput="window.searchOrders(this.value)"
+                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                        <button onclick="loadOrders()"
+                            class="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 border border-blue-100 rounded-lg hover:bg-blue-50 transition-colors">Refresh
+                            Data</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Date
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer
+                                    Name</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Delivery
+                                    Address</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order
+                                    Status</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                                    Order Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CUSTOMERS VIEW -->
+            <div id="view-customers" class="hidden space-y-4">
+                <div
+                    class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800" id="customers-view-title">Customers</h2>
+                        <p class="text-sm text-gray-500">Manage customer accounts and roles.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
+                            <input type="text" placeholder="Search users..." oninput="window.searchUsers(this.value)"
+                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                        <button onclick="openUserModal()" id="btn-add-user"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-all hidden">
+                            + Add User
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Address
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-table-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRODUCTS VIEW -->
+            <div id="view-products" class="hidden space-y-6">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Product Inventory</h2>
+                        <p class="text-sm text-gray-500">Manage your product catalog and stock.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
+                            <input type="search" placeholder="Search products..." id="search-products-input"
+                                name="search_products_query_v2" autocomplete="nop" role="searchbox" readonly
+                                onfocus="this.removeAttribute('readonly');" oninput="window.searchProducts(this.value)"
+                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                        <button onclick="openProductModal()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2">
+                            <span class="text-lg leading-none">+</span> Add Product
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">Img
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Farm ID
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ARCHIVED PRODUCTS VIEW -->
+            <div id="view-archived" class="hidden space-y-6">
+                <div
+                    class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Archived Products</h2>
+                        <p class="text-sm text-gray-500">Restore or permanently delete items. (Stock is 0)</p>
+                    </div>
+                    <button onclick="loadArchivedProducts()"
+                        class="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 border border-blue-100 rounded-lg hover:bg-blue-50 transition-colors">Refresh</button>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">Img
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Farm ID
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category
+                                </th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archived-products-table-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- CATEGORIES VIEW -->
+            <div id="view-categories" class="hidden space-y-6">
+                <!-- Header & Actions -->
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Product Categories</h2>
+                        <p class="text-sm text-gray-500">Organize your products into categories.</p>
+                    </div>
+
+                    <div class="flex w-full md:w-auto gap-3">
+                        <div class="relative flex-grow md:flex-grow-0">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400">🏷️</span>
+                            </div>
+                            <input type="text" id="new-cat-name" placeholder="New Category Name"
+                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
+                        </div>
+                        <button onclick="addCategory()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
+                            <span class="text-lg leading-none">+</span> Add Category
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Categories Grid -->
+                <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+
+
+
+            <!-- TEMPLATES VIEW -->
+            <div id="view-templates" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Curated Box Templates</h2>
+                    <button onclick="openTemplateModal()"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm">Create
+                        Template</button>
+                </div>
+                <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards injected here -->
+                </div>
+            </div>
+
+            <!-- DELIVERY VIEW -->
+            <div id="view-delivery" class="hidden space-y-8">
+                <div class="grid grid-cols-12 gap-8 w-full">
+
+                    <!-- LEFT COLUMN: Upcoming Schedule -->
+                    <div class="col-span-12 xl:col-span-7 space-y-4">
+                        <h2 class="text-xl font-bold text-gray-800">Upcoming Delivery Schedule</h2>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                            <div id="delivery-calendar" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Dynamic Schedule Cards -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Delivery Windows -->
+                    <div class="col-span-12 xl:col-span-5 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-gray-800">Delivery Windows</h2>
+
+                            <!-- Add Window Inline Form -->
+                            <div class="flex gap-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
+                                <input type="date" id="new-win-label"
+                                    class="border-none bg-transparent text-xs px-2 py-1 outline-none w-36 text-gray-600 font-bold uppercase">
+                                <button onclick="addDeliveryWindow()"
+                                    class="bg-gray-900 text-white p-1 rounded hover:bg-black transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 7-col Micro Grid Container -->
+                        <!-- xl:grid-cols-7 ensures it fits 7 items in this 5-column space -->
+                        <div id="delivery-windows-grid" class="grid grid-cols-4 md:grid-cols-7 gap-2">
+                            <!-- Injected by delivery.js -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- SETTINGS/CONFIG VIEW (Redesigned) -->
+            <div id="view-settings" class="hidden pb-32 w-full max-w-7xl mx-auto space-y-8">
+
+                <!-- Standard Header (Non-sticky) -->
+                <div
+                    class="pt-6 pb-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+                            <div class="p-2 bg-gray-900 text-white rounded-lg shadow-sm">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            Site Configuration
+                        </h2>
+                        <p class="text-gray-500 mt-2 ml-1">Manage global settings, content, and system behaviors.</p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <button onclick="toggleAdvancedConfig()"
+                            class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-wider px-3 py-2 transition-colors">JSON
+                            Editor</button>
+                        <button onclick="restoreDefaults()"
+                            class="text-sm font-medium text-red-600 hover:bg-red-50 px-4 py-2.5 rounded-lg transition-colors">Restore
+                            Defaults</button>
+                        <button onclick="saveConfigForm()"
+                            class="flex-1 md:flex-none justify-center bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-bold text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                </path>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+                    <!-- LEFT COLUMN -->
+                    <div class="space-y-8">
+
+                        <!-- BRAND IDENTITY -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div
+                                class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg">⚙️ General</h3>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Business
+                                            Name</label>
+                                        <input type="text" id="cfg-bus-name"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 dark:text-white outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Location</label>
+                                        <input type="text" id="cfg-bus-loc"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 dark:text-white outline-none transition-all">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Farmer
+                                        Voice
+                                        (Quote)</label>
+                                    <textarea id="cfg-bus-voice" rows="3"
+                                        class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 dark:text-white outline-none transition-all"></textarea>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Trust
+                                        Signals (One per
+                                        line)</label>
+                                    <textarea id="cfg-bus-trust" rows="3"
+                                        class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-mono text-gray-600 dark:text-gray-300"></textarea>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Frontend
+                                        Theme</label>
+                                    <select id="cfg-theme-select" onchange="switchTheme(this.value)"
+                                        class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 dark:text-white outline-none transition-all">
+                                        <option value="nature">Organic Modernism (Nature)</option>
+                                        <option value="legacy">Classic Harvest (Legacy)</option>
+                                        <option value="sketch">Hand-Sketched (Minimal)</option>
+                                        <option value="journal">Field Journal (Editorial)</option>
+                                        <option value="heritage">Heritage (Intentional Imperfection)</option>
+                                        <option value="community">CSA Connection (Communal)</option>
+                                    </select>
+                                    <p class="text-[10px] text-gray-400 mt-1">Changing this will reload the page.</p>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Hero
+                                        Image</label>
+                                    <select id="cfg-hero-select"
+                                        class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 dark:text-white outline-none transition-all">
+                                        <option value="/assets/images/hero_rustic.png">Rustic (Default)</option>
+                                        <option value="/assets/images/hero_misty.png">Misty Morning</option>
+                                        <option value="/assets/images/hero_harvest.png">Bountiful Harvest</option>
+                                        <option value="/assets/images/hero_modern.png">Modern Garden</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MARKETING -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div
+                                class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg">📢 Marketing & Copy</h3>
+                            </div>
+                            <div class="p-6 space-y-6">
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Announcement
+                                        Bar</label>
+                                    <input type="text" id="cfg-anno-text"
+                                        class="w-full bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-100 outline-none font-medium">
+                                </div>
+
+                                <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Secondary CTA
+                                        (Footer)</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label
+                                                class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Headline</label>
+                                            <input type="text" id="cfg-sec-head"
+                                                class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 dark:text-white outline-none">
+                                        </div>
+                                        <div>
+                                            <label
+                                                class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Subhead</label>
+                                            <input type="text" id="cfg-sec-sub"
+                                                class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 dark:text-white outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- INVENTORY SETTINGS (NEW) -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ring-4 ring-gray-50 dark:ring-gray-700">
+                            <div
+                                class="bg-gray-900 border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                                <h3 class="font-bold text-white text-lg">📦 Inventory Actions</h3>
+                                <span
+                                    class="text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded font-mono">System</span>
+                            </div>
+                            <div class="p-6 space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-1">
+                                        <label class="block text-sm font-bold text-gray-900 dark:text-white mb-1">Low
+                                            Stock
+                                            Alert
+                                            Threshold</label>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Products below this
+                                            amount will
+                                            display a warning.
+                                        </p>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" id="cfg-inv-alert"
+                                                class="w-24 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-center font-mono font-bold text-lg focus:ring-2 focus:ring-blue-100 dark:text-white outline-none"
+                                                value="5">
+                                            <span class="text-sm text-gray-400">units</span>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="space-y-8">
+
+                        <!-- FEATURED PRODUCTS -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div
+                                class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg">🌟 Featured Products</h3>
+                            </div>
+                            <div class="p-6">
+                                <!-- Header & Toggle -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Layout
+                                        Preferences</label>
+                                    <div class="flex gap-4">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="cfg-feat-bento" class="sr-only peer">
+                                            <div
+                                                class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
+                                            </div>
+                                            <span
+                                                class="ml-2 text-xs font-medium text-gray-700 dark:text-gray-300">Bento
+                                                Grid</span>
+                                        </label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="cfg-feat-tooltips" class="sr-only peer">
+                                            <div
+                                                class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
+                                            </div>
+                                            <span class="ml-2 text-xs font-medium text-gray-700 dark:text-gray-300">Box
+                                                Tooltips</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Copy Config -->
+                                <div class="grid grid-cols-2 gap-4 mb-4 border-b border-gray-100 pb-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Section
+                                            Title</label>
+                                        <input type="text" id="cfg-feat-title" placeholder="Editor's Picks"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Subtitle</label>
+                                        <input type="text" id="cfg-feat-subtitle" placeholder="Seasonal Favorites"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Slot
+                                            1</label>
+                                        <select id="cfg-feat-1"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none"></select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Slot
+                                            2</label>
+                                        <select id="cfg-feat-2"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none"></select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Slot
+                                            3</label>
+                                        <select id="cfg-feat-3"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none"></select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Slot
+                                            4</label>
+                                        <select id="cfg-feat-4"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none"></select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Slot
+                                            5</label>
+                                        <select id="cfg-feat-5"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none"></select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Slot
+                                            6</label>
+                                        <select id="cfg-feat-6"
+                                            class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AUTH PAGES -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div
+                                class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg">🔐 Authentication Pages</h3>
+                            </div>
+                            <div class="p-0">
+                                <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                                    <h4 class="text-sm font-bold text-blue-600 uppercase mb-3 text-xs tracking-wider">
+                                        Login Page
+                                    </h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <input type="text" id="cfg-auth-login-headline" placeholder="Headline"
+                                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
+                                        <input type="text" id="cfg-auth-login-subhead" placeholder="Subhead"
+                                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
+                                        <input type="text" id="cfg-auth-login-image" placeholder="Image URL"
+                                            class="col-span-2 w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm font-mono text-gray-500 dark:text-gray-400">
+                                    </div>
+                                </div>
+                                <div class="p-6">
+                                    <h4 class="text-sm font-bold text-green-600 uppercase mb-3 text-xs tracking-wider">
+                                        Signup
+                                        Page</h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <input type="text" id="cfg-auth-signup-headline" placeholder="Headline"
+                                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
+                                        <input type="text" id="cfg-auth-signup-subhead" placeholder="Subhead"
+                                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
+                                        <input type="text" id="cfg-auth-signup-image" placeholder="Image URL"
+                                            class="col-span-2 w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm font-mono text-gray-500 dark:text-gray-400">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PAGE CONTENT -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div
+                                class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                                <h3 class="font-bold text-gray-900 dark:text-white text-lg">📄 Page Content</h3>
+                            </div>
+                            <div class="p-0">
+                                <!-- HOW IT WORKS -->
+                                <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h4 class="font-bold text-sm text-gray-800 dark:text-white">How It Works</h4>
+                                    </div>
+                                    <input type="text" id="cfg-how-title" placeholder="Section Title"
+                                        class="w-full mb-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
+                                    <textarea id="cfg-how-steps" rows="3" placeholder="Steps (one per line)"
+                                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm resize-none dark:text-white"></textarea>
+                                </div>
+
+                                <!-- FARMS -->
+                                <div class="p-6">
+                                    <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3">Our Farms</h4>
+                                    <input type="text" id="cfg-farms-title" placeholder="Section Title"
+                                        class="w-full mb-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
+                                    <textarea id="cfg-farms-intro" rows="2" placeholder="Intro Text"
+                                        class="w-full mb-4 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm resize-none dark:text-white"></textarea>
+
+                                    <div id="cfg-farms-list" class="space-y-2 mb-3"></div>
+
+                                    <button onclick="addFarm()"
+                                        class="w-full py-2 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors text-sm font-bold">+
+                                        Add Farm</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Experiments -->
+                        <div
+                            class="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 opacity-75 hover:opacity-100 transition-opacity">
+                            <h3
+                                class="font-bold text-gray-700 dark:text-gray-300 text-sm uppercase tracking-wider mb-4">
+                                🧪
+                                Experiments (A/B)</h3>
+                            <div class="flex items-center gap-2 mb-4">
+                                <input type="checkbox" id="cfg-ab-enabled">
+                                <label for="cfg-ab-enabled" class="text-sm font-medium dark:text-gray-300">Enable
+                                    Experiments</label>
+                            </div>
+                            <div id="cfg-experiments-list" class="space-y-4"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- HIDDEN JSON EDITOR -->
+                <div id="config-json-container"
+                    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+                    <div
+                        class="bg-white w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                            <h3 class="font-bold">Raw Config Editor</h3>
+                            <button onclick="toggleAdvancedConfig()"
+                                class="text-gray-500 hover:text-gray-800">&times;</button>
+                        </div>
+                        <textarea id="config-editor"
+                            class="flex-1 w-full bg-gray-900 text-green-400 font-mono text-sm p-6 resize-none outline-none"></textarea>
+                        <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+                            <button onclick="toggleAdvancedConfig()"
+                                class="mr-3 px-4 py-2 text-gray-500 hover:bg-gray-200 rounded">Cancel</button>
+                            <button onclick="saveRawConfig()"
+                                class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save Raw
+                                JSON</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <!-- LAYOUT EDITOR VIEW -->
+            <div id="view-layouts" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Page Layout Editor</h2>
+                    <div class="text-sm text-gray-500">Drag to reorder home page sections</div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Canvas -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="font-bold text-gray-700 mb-4">Home Page Order</h3>
+                        <ul id="layout-list" class="space-y-3">
+                            <!-- Draggable Items Injected Here -->
+                            <li class="text-gray-400 italic">Loading layout...</li>
+                        </ul>
+                        <div class="mt-6 flex justify-end">
+                            <button onclick="saveLayout()"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
+                                <span>ðŸ’¾</span> Save Layout
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Instructions / Preview -->
+                    <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
+                        <h3 class="font-bold text-gray-700">How it works</h3>
+                        <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections on
+                            the home page.</p>
+                        <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+                            <li><strong>Hero</strong>: The main welcome banner.</li>
+                            <li><strong>Featured Products</strong>: The row of 3 highlighted items.</li>
+                            <li><strong>Trust Signals</strong>: The 4-column selling points.</li>
+                            <li><strong>Narrative</strong>: The "Farmer Voice" quote section.</li>
+                        </ul>
+                        <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-100">
+                            <strong>Note:</strong> Changes apply immediately after saving.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- TEMPLATE MODAL -->
+    <!-- TEMPLATE MODAL -->
+    <div id="template-modal"
+        class="hidden fixed inset-0 bg-gray-900/60 z-50 items-center justify-center backdrop-blur-sm transition-all pb-10">
+        <div
+            class="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden ring-1 ring-black/5 m-4">
+
+            <!-- Header -->
+            <div
+                class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <span class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                        </span>
+                        <span id="tmpl-modal-title">Create Template</span>
+                    </h3>
+                    <p class="text-sm text-gray-500 ml-11 mt-0.5">Define curated box contents and pricing.</p>
+                </div>
+                <button onclick="closeTemplateModal()"
+                    class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-8 overflow-y-auto bg-gray-50/50 flex-1">
+                <input type="hidden" id="t-id">
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- LEFT COLUMN: Image & Status -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Image Preview -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Box
+                                Image</label>
+
+                            <div
+                                class="aspect-square rounded-lg bg-gray-100 mb-4 overflow-hidden relative border border-gray-100 group">
+                                <img id="t-preview-img" src="/images/placeholder.jpg" class="w-full h-full object-cover"
+                                    onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                                <div
+                                    class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                </div>
+                            </div>
+
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <input type="text" id="t-image"
+                                    oninput="document.getElementById('t-preview-img').src = this.value || '/images/placeholder.jpg'"
+                                    class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    placeholder="Image URL...">
+                            </div>
+                        </div>
+
+                        <!-- Visibility -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Visibility</label>
+                            <label
+                                class="flex items-start gap-3 p-3 border border-blue-100 bg-blue-50/30 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                                <input type="checkbox" id="t-active" class="mt-1 accent-blue-600 w-4 h-4">
+                                <div>
+                                    <span class="block text-sm font-bold text-gray-900">Active in Store</span>
+                                    <span class="block text-xs text-gray-500 mt-0.5">Template is visible to
+                                        customers.</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Details & Builder -->
+                    <div class="lg:col-span-2 space-y-6">
+
+                        <!-- Basic Information -->
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                            <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
+                            </h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Template Name</label>
+                                    <input type="text" id="t-name"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                        placeholder="e.g. Soup Starter">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                                    <input type="text" id="t-desc"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder-gray-400"
+                                        placeholder="Brief description...">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Display Price</label>
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold">
+                                            $</div>
+                                        <input type="number" id="t-price" step="0.01"
+                                            class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-medium">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Builder -->
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <h4 class="font-bold text-gray-800 text-sm">Box Contents</h4>
+                                <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Add items to configure
+                                    bundle</span>
+                            </div>
+
+                            <!-- Add Bar -->
+                            <div class="flex gap-2 p-1 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="relative flex-1">
+                                    <input type="hidden" id="t-product-select">
+                                    <button onclick="window.toggleProductDropdown()" id="dropdown-trigger"
+                                        class="w-full text-left px-3 py-2 text-sm bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-100 outline-none flex items-center justify-between transition-shadow hover:bg-gray-50">
+                                        <span id="dropdown-label" class="text-gray-500 truncate mr-2">Select
+                                            Product...</span>
+                                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    <div id="dropdown-options"
+                                        class="hidden absolute top-full left-0 w-[400px] mt-1 bg-white border border-gray-100 rounded-lg shadow-xl max-h-80 overflow-y-auto z-50 divide-y divide-gray-50">
+                                        <!-- Options injected by JS -->
+                                    </div>
+                                </div>
+                                <div class="w-px bg-gray-300 my-1"></div>
+                                <input type="number" id="t-qty-input" value="1" min="1"
+                                    class="w-20 bg-transparent border-0 px-3 py-2 text-sm text-center focus:ring-0 outline-none font-mono"
+                                    placeholder="Qty">
+                                <button onclick="addTemplateItem()"
+                                    class="bg-gray-900 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-black shadow-sm transition-all m-1">Add</button>
+                            </div>
+
+                            <!-- List -->
+                            <div class="border border-gray-200 rounded-xl overflow-hidden min-h-[120px] bg-gray-50/30">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase">
+                                        <tr>
+                                            <th class="px-4 py-2 font-semibold">Image</th>
+                                            <th class="px-4 py-2 font-semibold w-full">Product Name</th>
+                                            <th class="px-4 py-2 font-semibold text-center">Qty</th>
+                                            <th class="px-4 py-2 font-semibold text-left">ID</th>
+                                            <th class="px-4 py-2 font-semibold text-left">Farm ID</th>
+                                            <th class="px-4 py-2 font-semibold text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="t-items-list" class="divide-y divide-gray-100 bg-white">
+                                        <!-- Dynamic Items -->
+                                    </tbody>
+                                </table>
+                                <p id="t-empty-msg"
+                                    class="text-center text-gray-400 text-sm py-8 italic flex flex-col items-center gap-2">
+                                    <svg class="w-8 h-8 opacity-20" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                    No items added yet
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-8 py-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 z-10">
+                <button onclick="closeTemplateModal()"
+                    class="px-5 py-2.5 rounded-lg text-gray-600 hover:text-gray-800 hover:bg-white border border-transparent hover:border-gray-200 transition-all font-medium text-sm">Cancel</button>
+                <button onclick="saveTemplate()"
+                    class="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Save Template
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 space-y-4 z-50"></div>
+
+
+
+    <!-- USER MODAL -->
+    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800" id="u-modal-title">Edit Customer</h3>
+                <button onclick="closeUserModal()"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="u-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="u-email"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <!-- Password (New User) -->
+                <div id="u-password-container" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="u-password" placeholder="Required for new user"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select id="u-role"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                        <option value="user">User (Member)</option>
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" id="u-phone" oninput="handleAdminPhoneInput(this)"
+                            placeholder="(555) 555-5555"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                        <input type="text" id="u-address"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <input type="text" id="u-city"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input type="text" id="u-state" maxlength="2" placeholder="WI" list="us-states-admin"
+                            oninput="this.value = this.value.toUpperCase()"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Zip</label>
+                        <input type="text" id="u-zip"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button onclick="closeUserModal()"
+                    class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+                <button onclick="saveUser()"
+                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm transition-all">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SCHEDULE/ORDER DETAILS MODAL -->
+    <div id="product-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-xl font-bold text-gray-800" id="p-modal-title">Edit Product</h3>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-8 overflow-y-auto bg-gray-50/50 flex-1">
+                <input type="hidden" id="p-id">
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <!-- LEFT COLUMN: Image & Status -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Image Preview -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Product
+                                Image</label>
+
+                            <div
+                                class="aspect-square rounded-lg bg-gray-100 mb-4 overflow-hidden relative border border-gray-100 group">
+                                <img id="p-preview-img" src="/images/placeholder.jpg" class="w-full h-full object-cover"
+                                    onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                                <div
+                                    class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                </div>
+                            </div>
+
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <input type="text" id="p-image"
+                                    oninput="document.getElementById('p-preview-img').src = this.value || '/images/placeholder.jpg'"
+                                    class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    placeholder="Image URL...">
+                            </div>
+                        </div>
+
+                        <!-- Visibility -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Visibility</label>
+                            <label
+                                class="flex items-start gap-3 p-3 border border-blue-100 bg-blue-50/30 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                                <input type="checkbox" id="p-active" class="mt-1 accent-blue-600 w-4 h-4">
+                                <div>
+                                    <span class="block text-sm font-bold text-gray-900">Active in Store</span>
+                                    <span class="block text-xs text-gray-500 mt-0.5">Product is visible to
+                                        customers.</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Farm ID Card -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Farm
+                                ID</label>
+                            <input type="text" id="p-farm-id" maxlength="100"
+                                class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                                placeholder="e.g. FARM-001">
+                            <p class="text-xs text-gray-400 mt-1.5">Optional. Used for tracking.</p>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Details -->
+                    <div class="lg:col-span-2 space-y-6">
+
+                        <!-- Main Info -->
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                            <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
+                            </h4>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Product Name</label>
+                                <input type="text" id="p-name"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                    placeholder="e.g. Honeycrisp Apples">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+                                    <div class="relative">
+                                        <select id="p-category"
+                                            class="w-full appearance-none px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-700 cursor-pointer">
+                                            <!-- Populated JS -->
+                                        </select>
+                                        <div class="absolute right-3 top-3 pointer-events-none text-gray-500">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Empty div to keep grid layout if needed, or just let it reflow -->
+                                <div>
+                                    <!-- Spacer for grid alignment if necessary, or just removed -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inventory & Pricing -->
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                            <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Inventory &
+                                Pricing</h4>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Price</label>
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold">
+                                            $</div>
+                                        <input type="number" id="p-price" step="0.01"
+                                            class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-medium">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Stock Level</label>
+                                    <input type="number" id="p-stock"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                </div>
+                                <div class="col-span-1 sm:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tags</label>
+                                    <input type="text" id="p-tags" placeholder="e.g. lb, organic, fresh"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                    <p class="text-xs text-gray-400 mt-1">Comma separated values.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button onclick="closeProductModal()"
+                    class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+                <button onclick="saveProduct()"
+                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm transition-all">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCHEDULE/ORDER DETAILS MODAL -->
+    <div id="schedule-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-xl font-bold text-gray-800" id="sched-modal-title">Orders</h3>
+                <button
+                    onclick="document.getElementById('schedule-modal').classList.add('hidden'); document.getElementById('schedule-modal').classList.remove('flex');"
+                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-0 overflow-y-auto flex-1">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b border-gray-100 sticky top-0">
+                        <tr>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Order #</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Customer</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Products</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sched-modal-body" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATE MODAL -->
+    <div id="date-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Select Delivery Date</h3>
+            <input type="hidden" id="date-order-id">
+            <div class="space-y-3" id="date-options">
+                <!-- Populated by JS -->
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button
+                    onclick="document.getElementById('date-modal').classList.add('hidden'); document.getElementById('date-modal').classList.remove('flex');"
+                    class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+                <button onclick="saveOrderDate()"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER EDIT MODAL -->
+    <!-- ORDER EDIT MODAL -->
+    <div id="order-edit-modal"
+        class="hidden fixed inset-0 bg-gray-900/60 z-50 items-center justify-center backdrop-blur-sm transition-opacity">
+        <div
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden ring-1 ring-black/5">
+            <!-- Modal Header -->
+            <div
+                class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <span class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                </path>
+                            </svg>
+                        </span>
+                        Edit Order Details
+                    </h3>
+                    <p class="text-sm text-gray-500 ml-11 mt-0.5">Modify order status, shipping info, and line items.
+                    </p>
+                </div>
+                <button
+                    onclick="document.getElementById('order-edit-modal').classList.add('hidden'); document.getElementById('order-edit-modal').classList.remove('flex');"
+                    class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-8 overflow-y-auto space-y-8 bg-gray-50/50">
+                <input type="hidden" id="oe-id">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- COLUMN 1: STATUS -->
+                    <div class="md:col-span-1 space-y-4">
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-full">
+                            <h4
+                                class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-wider flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Order Status
+                            </h4>
+                            <div class="space-y-3">
+                                <label class="block text-sm text-gray-500">Current Status</label>
+                                <div class="relative">
+                                    <select id="oe-status"
+                                        class="w-full appearance-none border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white font-semibold text-gray-700 cursor-pointer shadow-sm hover:border-blue-300 transition-colors">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Pending Payment">Pending Payment</option>
+                                        <option value="Paid">Paid</option>
+                                        <option value="Packed">Packed</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Canceled">Canceled</option>
+                                        <option value="Refunded">Refunded</option>
+                                    </select>
+                                    <div class="absolute right-3 top-3.5 text-gray-500 pointer-events-none">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">
+                                    Updating status to <span class="font-mono text-gray-600">Shipped</span> or <span
+                                        class="font-mono text-gray-600">Delivered</span> may trigger customer
+                                    notifications.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMN 2: SHIPPING -->
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm h-full">
+                            <h4
+                                class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-wider flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Shipping Address
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div class="col-span-1 sm:col-span-2">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Street
+                                        Address</label>
+                                    <input type="text" id="oe-address"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-300">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">City</label>
+                                    <input type="text" id="oe-city"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-300">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Zip
+                                        Code</label>
+                                    <input type="text" id="oe-zip"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-300 font-mono">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITEMS SECTION -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div
+                        class="bg-gray-50 border-b border-gray-100 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <h4 class="font-bold text-gray-800 uppercase text-xs tracking-wider flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                            Order Items
+                        </h4>
+
+                        <!-- Add Item Controls -->
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <div class="relative flex-1 sm:flex-initial">
+                                <select id="oe-product-select"
+                                    class="w-full sm:w-64 appearance-none border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium cursor-pointer">
+                                    <!-- Populated by JS -->
+                                </select>
+                                <div class="absolute right-2 top-2.5 text-gray-400 pointer-events-none">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <input type="number" id="oe-qty-input" value="1" min="1"
+                                class="w-16 border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-center focus:ring-2 focus:ring-blue-500 outline-none">
+                            <button onclick="addOrderItem()"
+                                class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black shadow-sm transition-all flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-white border-b border-gray-100 text-gray-500 uppercase text-xs">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold tracking-wider">Product</th>
+                                    <th class="px-6 py-3 font-semibold tracking-wider w-32 text-center">Qty</th>
+                                    <th class="px-6 py-3 font-semibold tracking-wider w-32 text-right">Price</th>
+                                    <th class="px-6 py-3 w-16"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="oe-items-body" class="divide-y divide-gray-50 bg-white"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="px-8 py-5 border-t border-gray-100 flex justify-between items-center bg-gray-50 z-10">
+                <div class="text-xs text-gray-400 font-medium">
+                    Changes are saved immediately to the database.
+                </div>
+                <div class="flex gap-3">
+                    <button
+                        onclick="document.getElementById('order-edit-modal').classList.add('hidden'); document.getElementById('order-edit-modal').classList.remove('flex');"
+                        class="px-5 py-2.5 text-gray-600 hover:text-gray-800 hover:bg-white border border-transparent hover:border-gray-200 rounded-lg transition-all font-medium text-sm">Cancel</button>
+                    <button onclick="saveOrderDetails()"
+                        class="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- State Suggestions -->
+    <datalist id="us-states-admin">
+        <option value="AL">
+        <option value="AK">
+        <option value="AZ">
+        <option value="AR">
+        <option value="CA">
+        <option value="CO">
+        <option value="CT">
+        <option value="DE">
+        <option value="FL">
+        <option value="GA">
+        <option value="HI">
+        <option value="ID">
+        <option value="IL">
+        <option value="IN">
+        <option value="IA">
+        <option value="KS">
+        <option value="KY">
+        <option value="LA">
+        <option value="ME">
+        <option value="MD">
+        <option value="MA">
+        <option value="MI">
+        <option value="MN">
+        <option value="MS">
+        <option value="MO">
+        <option value="MT">
+        <option value="NE">
+        <option value="NV">
+        <option value="NH">
+        <option value="NJ">
+        <option value="NM">
+        <option value="NY">
+        <option value="NC">
+        <option value="ND">
+        <option value="OH">
+        <option value="OK">
+        <option value="OR">
+        <option value="PA">
+        <option value="RI">
+        <option value="SC">
+        <option value="SD">
+        <option value="TN">
+        <option value="TX">
+        <option value="UT">
+        <option value="VT">
+        <option value="VA">
+        <option value="WA">
+        <option value="WV">
+        <option value="WI">
+        <option value="WY">
+    </datalist>
+    <!-- COMPONENT EDITOR MODAL -->
+    <div id="comp-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h3 class="font-bold text-gray-800" id="cm-title">Edit Component</h3>
+                    <p class="text-xs text-gray-500" id="cm-subtitle">Customize content & style</p>
+                </div>
+                <button onclick="closeComponentModal()"
+                    class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 space-y-6" id="cm-body">
+                <!-- TABS -->
+                <div class="flex space-x-1 border-b border-gray-200 mb-4" id="cm-tabs">
+                    <button onclick="setCompTab('content')" id="tab-comp-content"
+                        class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">Content</button>
+                    <button onclick="setCompTab('style')" id="tab-comp-style"
+                        class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Style</button>
+                    <button onclick="setCompTab('featured')" id="tab-comp-featured"
+                        class="hidden px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Products</button>
+                </div>
+
+                <!-- CONTENT TAB -->
+                <div id="view-comp-content" class="space-y-4">
+                    <!-- Dynamic Inputs Injected Here -->
+                </div>
+
+                <!-- STYLE TAB -->
+                <div id="view-comp-style" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vertical Spacing (Padding)</label>
+                        <select id="cm-style-padding"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                            <option value="py-8">Compact (py-8)</option>
+                            <option value="py-16">Standard (py-16)</option>
+                            <option value="py-20">Spacious (py-20)</option>
+                            <option value="py-24">Extra Large (py-24)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
+                        <select id="cm-style-bg" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                            <option value="bg-white">White</option>
+                            <option value="bg-paper">Paper (Off-White)</option>
+                            <option value="bg-stone">Stone (Light Grey)</option>
+                            <option value="bg-gray-50">Subtle Grey</option>
+                            <option value="bg-kale text-white">Kale Green (Dark)</option>
+                            <option value="bg-loam text-white">Loam Brown (Dark)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- FEATURED TAB -->
+                <div id="view-comp-featured" class="hidden space-y-4">
+                    <p class="text-sm text-gray-500 mb-4">Select up to 3 items to highlight.</p>
+                    <div class="space-y-3">
+                        <select id="cm-feat-1" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
+                        <select id="cm-feat-2" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
+                        <select id="cm-feat-3" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                <button onclick="closeComponentModal()"
+                    class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg text-sm">Cancel</button>
+                <button onclick="saveComponentContent()"
+                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 text-sm">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DETAIL MODAL -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800" id="cart-modal-title">Cart Details</h3>
+                    <p class="text-sm text-gray-500" id="cart-modal-subtitle">User email</p>
+                </div>
+                <button
+                    onclick="document.getElementById('cart-modal').classList.add('hidden'); document.getElementById('cart-modal').classList.remove('flex')"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="max-h-[60vh] overflow-y-auto p-6">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-100">
+                        <tr>
+                            <th class="pb-2 pl-2">Item</th>
+                            <th class="pb-2 text-center">Category</th>
+                            <th class="pb-2 text-center">Qty</th>
+                            <th class="pb-2 text-right">Unit Price</th>
+                            <th class="pb-2 text-right pr-2">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-modal-body" class="text-sm divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+            <div class="p-4 bg-gray-50 border-t border-gray-100 text-right">
+                <span class="text-gray-600 mr-2">Total Value:</span>
+                <span class="text-lg font-bold text-gray-900" id="cart-modal-total">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESCHEDULE MODAL -->
+    <div id="reschedule-modal"
+        class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800">Reschedule Delivery</h3>
+                <button
+                    onclick="document.getElementById('reschedule-modal').classList.add('hidden'); document.getElementById('reschedule-modal').classList.remove('flex')"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-500">Choose a new delivery window for this order.</p>
+                <input type="hidden" id="reschedule-order-id">
+                <div id="reschedule-options" class="space-y-2 max-h-60 overflow-y-auto">
+                    <!-- Dynamic Options -->
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
+                <button
+                    onclick="document.getElementById('reschedule-modal').classList.add('hidden'); document.getElementById('reschedule-modal').classList.remove('flex')"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium">Cancel</button>
+                <button onclick="window.saveReschedule()"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm">Save
+                    Change</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="fixed inset-0 bg-gray-900 z-[100] flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">Admin Login</h2>
+                <p class="text-gray-500 text-sm mt-2">Please sign in to continue</p>
+            </div>
+            <form onsubmit="handleLogin(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="login-email" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="login-password" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/modules/app.js"></script>
+    <script>
+        // 4-State Theme Logic: default -> minimal -> johndeere -> terminal -> default
+        const THEME_STATES = ['default', 'minimal', 'johndeere', 'terminal'];
+
+        function cycleTheme() {
+            const current = getCurrentTheme();
+            const idx = THEME_STATES.indexOf(current);
+            const next = THEME_STATES[(idx + 1) % THEME_STATES.length];
+            applyTheme(next);
+        }
+
+        function getCurrentTheme() {
+            return localStorage.getItem('admin_theme_v2') || 'default';
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const html = document.documentElement;
+
+            // Reset
+            body.classList.remove('theme-minimal', 'theme-terminal', 'theme-johndeere');
+            html.classList.remove('dark');
+
+            // Apply
+            if (theme === 'minimal') {
+                body.classList.add('theme-minimal');
+            } else if (theme === 'johndeere') {
+                body.classList.add('theme-johndeere');
+            } else if (theme === 'terminal') {
+                body.classList.add('theme-terminal');
+            }
+
+            // Save
+            localStorage.setItem('admin_theme_v2', theme);
+            updateThemeUI(theme);
+        }
+
+        function updateThemeUI(theme) {
+            // Icons
+            const icons = {
+                default: document.getElementById('icon-state-default'),
+                minimal: document.getElementById('icon-state-minimal'),
+                johndeere: document.getElementById('icon-state-default'), // Fallback to sun for JD
+                terminal: document.getElementById('icon-state-terminal')
+            };
+
+            // Reset all icons
+            Object.values(icons).forEach(icon => {
+                if (!icon) return;
+                icon.classList.remove('scale-100', 'opacity-100');
+                icon.classList.add('scale-0', 'opacity-0');
+            });
+
+            // Show active
+            if (icons[theme]) {
+                icons[theme].classList.remove('scale-0', 'opacity-0');
+                icons[theme].classList.add('scale-100', 'opacity-100');
+            }
+
+            // Button Context
+            const btn = document.getElementById('theme-toggle-btn');
+
+            // Minimal: Black button
+            if (theme === 'minimal') {
+                btn.classList.add('bg-black', 'text-white', 'border-black');
+                btn.classList.remove('bg-gray-800', 'border-green-500', 'text-green-500', 'bg-yellow-400', 'border-green-700', 'text-green-900');
+            }
+            // Terminal: Black button with Green Border
+            else if (theme === 'terminal') {
+                btn.classList.add('bg-black', 'text-green-500', 'border-green-500');
+                btn.classList.remove('bg-gray-800', 'text-white', 'border-black', 'bg-yellow-400', 'border-green-700', 'text-green-900');
+            }
+            // John Deere: Yellow Button
+            else if (theme === 'johndeere') {
+                btn.classList.add('bg-yellow-400', 'border-green-700', 'text-green-900');
+                btn.classList.remove('bg-gray-800', 'text-white', 'border-black', 'bg-black', 'border-green-500', 'text-green-500');
+            }
+            // Default: Gray button
+            else {
+                btn.classList.remove('bg-black', 'text-white', 'border-black', 'border-green-500', 'text-green-500', 'bg-yellow-400', 'border-green-700', 'text-green-900');
+                btn.classList.add('bg-gray-800');
+            }
+        }
+
+        // Init Theme
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme(getCurrentTheme());
+        });
+    </script>
+    <!-- UX Enhancements Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-resize textareas on focus/input
+            // AND Expand Inputs on focus
+            const expandable = document.querySelectorAll('textarea, input[type="text"]');
+
+            expandable.forEach(el => {
+                el.classList.add('expand-on-focus', 'expand-transition');
+
+                // Textarea specific height logic
+                if (el.tagName === 'TEXTAREA') {
+                    el.addEventListener('focus', function () {
+                        this.dataset.originalHeight = this.style.height;
+                    });
+                    el.addEventListener('blur', function () {
+                        this.scrollTop = 0;
+                    });
+                }
+
+                // Input specific logic (ensure parent relative for absolute positioning)
+                if (el.tagName === 'INPUT') {
+                    // Ensure parent has relative positioning for the absolute expansion to work near it
+                    const parent = el.parentElement;
+                    if (parent && getComputedStyle(parent).position === 'static') {
+                        parent.style.position = 'relative';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
