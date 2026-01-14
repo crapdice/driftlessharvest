@@ -3,6 +3,12 @@ node_modules/
 .env.*
 *.log
 *.map
-*.png
+
+# Ignore generated images but NOT public assets
+# Keep images in public/ folders
+!public/**/*.png
+!public/**/*.jpg
+
 server/data/config.json
 server/db/harvest.db
+
