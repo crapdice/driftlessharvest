@@ -4,9 +4,10 @@ import { setView } from '../modules/router.js';
 
 export function renderLogin() {
   const CONFIG = window.CONFIG || {};
-  const { headline, subhead } = CONFIG.auth?.login || {
+  const { headline, subhead, image } = CONFIG.auth?.login || {
     headline: "Fresh from the farm to your table.",
     subhead: "Join thousands of happy customers eating cleaner, greener, and better.",
+    image: "assets/hero_harvest.png"
   };
 
   return `
@@ -14,11 +15,15 @@ export function renderLogin() {
       <!--Image Side-->
       <div class="hidden lg:block w-1/2 relative overflow-hidden group">
         <!-- Hero Background with Slow Zoom Effect -->
-        <div class="absolute inset-0 bg-auth-farm bg-cover bg-center transition-transform duration-[20s] ease-linear scale-100 group-hover:scale-110"
-             style="background-image: url('assets/hero_harvest.png');"></div>
+        <div class="absolute inset-0 bg-nature-900/10 bg-cover bg-center transition-transform duration-[20s] ease-linear scale-100 group-hover:scale-110"
+             style="background-image: url('${image || 'assets/hero_harvest.png'}');"></div>
         
         <!-- Dark Overlay -->
         <div class="absolute inset-0 bg-nature-900/40 backdrop-blur-[1px]"></div>
+
+        <!-- Edge Fades -->
+        <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"></div>
+        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-nature-50 to-transparent pointer-events-none z-10"></div>
         
         <!-- Content Overlay -->
         <div class="relative h-full w-full flex items-center justify-center p-16 text-white">
@@ -92,9 +97,10 @@ export function renderLogin() {
 
 export function renderSignup() {
   const CONFIG = window.CONFIG || {};
-  const { headline, subhead } = CONFIG.auth?.signup || {
+  const { headline, subhead, image } = CONFIG.auth?.signup || {
     headline: "Real food from the Driftless hills.",
     subhead: "Join our community in Viroqua for weekly organic boxes.",
+    image: "assets/auth_farm.png"
   };
 
   return `
@@ -102,11 +108,15 @@ export function renderSignup() {
       <!--Image Side-->
       <div class="hidden lg:block w-1/2 relative overflow-hidden group">
          <!-- Hero Background with Slow Zoom Effect -->
-        <div class="absolute inset-0 bg-auth-farm bg-cover bg-center transition-transform duration-[20s] ease-linear scale-100 group-hover:scale-110"
-             style="background-image: url('assets/hero_rustic.png');"></div>
+        <div class="absolute inset-0 bg-nature-900/10 bg-cover bg-center transition-transform duration-[20s] ease-linear scale-100 group-hover:scale-110"
+             style="background-image: url('${image || 'assets/auth_farm.png'}');"></div>
         
         <!-- Dark Overlay -->
         <div class="absolute inset-0 bg-nature-900/40 backdrop-blur-[1px]"></div>
+
+        <!-- Edge Fades -->
+        <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"></div>
+        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-nature-50 to-transparent pointer-events-none z-10"></div>
         
         <div class="relative h-full w-full flex items-center justify-center p-16 text-white">
           <div class="max-w-xl">

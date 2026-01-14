@@ -1,9 +1,8 @@
-import { state } from './state.js';
+import { store } from '../store/index.js';
+import * as api from './api.js';
 import { setView } from './router.js';
 import { showToast } from '../utils.js';
-import { saveCart } from './cart.js'; // Cyclic dependency potential? 
-// cart.js imports state, router, layout, marketplace, utils, quantitycontrol. 
-// It does NOT import checkout. So this direction is safe.
+import { saveCart } from './cart.js'; // We might need to ensure this logic aligns with store
 
 let stripe;
 let elements;
@@ -12,7 +11,6 @@ let currentOrderId;
 export async function initCheckout() {
     // 1. Initialize Stripe
     if (!stripe) {
-        // We assume the key is in the public config, or hardcoded for dev if missing
         const key = window.CONFIG?.stripePublishableKey || 'pk_test_TYooMQauvdEDq54NiTphI7jx';
         if (!window.Stripe) {
             console.error("Stripe.js not loaded");
@@ -23,28 +21,12 @@ export async function initCheckout() {
 
     // 2. Create PaymentIntent (Server)
     try {
-        const res = await fetch('/api/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: state.cart, userEmail: state.user?.email })
-        });
+        const cart = store.getCart();
+        const user = store.getUser();
 
-        if (!res.ok) {
-            const err = await res.json();
-            // Handle Stock Errors (Specific UX)
-            if (res.status === 409 && err.failedItems) {
-                const names = err.failedItems.map(i => i.name).join(', ');
-                alert(`The following items are out of stock: ${names}. They will be removed.`);
-                const failIds = err.failedItems.map(i => i.id);
-                state.cart = state.cart.filter(item => !failIds.includes(item.id));
-                saveCart();
-                setView('cart');
-                return;
-            }
-            throw new Error(err.error || 'Failed to initialize payment');
-        }
+        const data = await api.createPaymentIntent(cart.items, user?.email);
 
-        const { clientSecret, orderId } = await res.json();
+        const { clientSecret, orderId } = data;
         currentOrderId = orderId;
 
         // 3. Mount Elements
@@ -59,6 +41,16 @@ export async function initCheckout() {
         }
 
     } catch (e) {
+        if (e.message.includes('stock')) {
+            // Handle 409 from API if caught properly by api.js
+            // But api.js throws Error(errorData.error).
+            // If we need specific handling:
+            alert(e.message); // Simple alert for now
+            store.loadCart(); // Reload to sync? Or we need to remove items manually?
+            setView('cart');
+            return;
+        }
+
         const el = document.getElementById("payment-element");
         if (el) el.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded">${e.message}</div>`;
     }
@@ -167,7 +159,7 @@ export async function placeOrder() {
         console.log("Saving Order Details Pre-Payment...", legacyShipping);
 
         try {
-            await updateBackendOrderDetails(currentOrderId, legacyShipping, deliveryWindow, email);
+            await api.updateOrderDetails(currentOrderId, legacyShipping, deliveryWindow, email);
         } catch (saveErr) {
             console.error("Failed to save order details pre-payment", saveErr);
         }
@@ -205,35 +197,11 @@ export async function placeOrder() {
     }
 }
 
-// Helper to reliably save data to our DB regardless of Stripe Webhook timing
-async function updateBackendOrderDetails(orderId, shipping, window, email) {
-    try {
-        await fetch('/api/orders/update-details', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            },
-            body: JSON.stringify({
-                orderId,
-                shipping,
-                delivery_window: window,
-                email: email
-            })
-        });
-    } catch (e) { console.warn("Failed to update backend details", e); }
-}
-
 async function triggerSuccessUI(email, btn) {
-    // 1. Immediately verify payment on server to update status
-    //    (Fixes "Pending Payment" / Missing Webhooks issue)
+    // 1. Immediately verify payment
     if (currentOrderId) {
         try {
-            console.log(`Verifying payment for Order ${currentOrderId}...`);
-            await fetch(`/api/orders/${currentOrderId}/verify-payment`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-            });
+            await api.verifyPayment(currentOrderId);
         } catch (e) { console.warn("Auto-verification failed", e); }
     }
 
@@ -258,8 +226,8 @@ async function triggerSuccessUI(email, btn) {
         content.classList.remove('translate-y-10', 'scale-95');
     });
 
-    state.cart = [];
-    saveCart(); // Sync empty cart
+    // Clear cart via store
+    store.clearCart();
 
     setTimeout(() => {
         overlay.classList.add('opacity-0');

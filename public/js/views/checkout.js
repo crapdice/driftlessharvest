@@ -1,20 +1,20 @@
-
-import { state } from '../modules/state.js';
+import { store } from '../store/index.js';
 import { renderCart } from './cart.js';
 import { renderReceipt } from './receipt.js';
 import { formatPhoneNumber } from '../utils.js';
+import * as api from '../modules/api.js';
 
 export function renderCheckout() {
-    if (state.cart.length === 0) return renderCart();
+    const cart = store.getCart().items;
+
+    if (cart.length === 0) return renderCart();
 
     // Pre-fill if logged in
-    const user = state.user || {};
+    const user = store.getUser() || {};
     const address = user.address || {};
 
     // Fetch delivery windows asynchronously
-    // Note: ideally this should be in a store/action, but for now we keep it here as in script.js
-    fetch('/api/delivery-windows')
-        .then(res => res.json())
+    api.fetchDeliveryWindows()
         .then(wins => {
             const container = document.getElementById('checkout-windows');
             if (container) {
@@ -198,7 +198,7 @@ export function renderCheckout() {
         <!-- Right Column: Sticky Summary -->
         <div class="lg:col-span-5 relative hidden lg:block">
             <div class="sticky top-32 bg-white p-8 rounded-2xl shadow-2xl border border-nature-100/50">
-                 ${renderReceipt(state.cart, state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0))}
+                 ${renderReceipt(cart, cart.reduce((sum, i) => sum + (i.price * i.qty), 0))}
                  
                  <!-- Trust Badges -->
                  <div class="mt-8 pt-8 border-t border-nature-100 flex justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">

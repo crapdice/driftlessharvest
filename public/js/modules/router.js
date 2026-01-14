@@ -1,8 +1,15 @@
+// import * as Views from '../views/index.js'; // REMOVED to break cycle
+// import { renderHeader, renderFooter } from '../views/layout.js'; // REMOVED to break cycle
 
-import { state } from './state.js';
-import * as Views from '../views/index.js'; // We will create this index file next
+let _Views = {};
+let _Layout = { renderHeader: () => '', renderFooter: () => '' };
 
-import { renderHeader, renderFooter } from '../views/layout.js';
+export function initRouter(views, layout) {
+    _Views = views;
+    _Layout = layout;
+    // Trigger initial route
+    router(true);
+}
 
 const ROUTES = {
     '/': 'renderHome',
@@ -22,7 +29,9 @@ const SCROLL_KEY_PREFIX = 'harvest_scroll_';
 // Save scroll on the CURRENT path
 function saveCurrentScroll() {
     const path = window.location.pathname;
-    sessionStorage.setItem(`${SCROLL_KEY_PREFIX}${path}`, window.scrollY);
+    try {
+        sessionStorage.setItem(`${SCROLL_KEY_PREFIX}${path}`, window.scrollY);
+    } catch (e) { /* ignore security errors */ }
 }
 
 // Global scroll listener
@@ -55,7 +64,9 @@ export function navigateTo(url) {
     // 2. Clear saved position for the page we are GOING TO (Reset to top for fresh nav)
     // Exception: If we wanted to "remember where I left off" even after navigating away, 
     // we would skip this. But standard web behavior is Top on fresh link click.
-    sessionStorage.removeItem(`${SCROLL_KEY_PREFIX}${url}`);
+    try {
+        sessionStorage.removeItem(`${SCROLL_KEY_PREFIX}${url}`);
+    } catch (e) { }
 
     history.pushState(null, null, url);
     router();
@@ -66,14 +77,19 @@ export function router(preserveScroll = false) {
 
     // Fallback to home
     const viewKey = ROUTES[path] || 'renderHome';
-    const viewFn = Views[viewKey] || Views.renderHome;
+    const viewFn = _Views[viewKey] || _Views.renderHome;
+
+    if (!viewFn) {
+        console.warn('View not found for:', path);
+        return;
+    }
 
     const globalPadding = (path === '/boxes') ? 'pt-[72px]' : '';
 
     // Render Layout
     const appHeader = document.getElementById('app-header');
     if (appHeader) {
-        appHeader.innerHTML = renderHeader();
+        appHeader.innerHTML = _Layout.renderHeader();
     }
 
     const appContainer = document.getElementById('app');
@@ -82,7 +98,7 @@ export function router(preserveScroll = false) {
           <div class="${globalPadding} min-h-screen">
             ${viewFn()}
           </div>
-          ${renderFooter()} 
+          ${_Layout.renderFooter()} 
       `;
     }
 

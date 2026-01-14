@@ -1,5 +1,4 @@
-
-import { state } from '../modules/state.js';
+import { store } from '../store/index.js';
 import { ProductCard } from '../components/product/ProductCard.js';
 import { BoxDetailsModal } from '../components/marketplace/BoxDetailsModal.js';
 
@@ -32,7 +31,8 @@ export function renderBoxes() {
       `;
   }
 
-  const cartTotal = state.cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+  const cart = store.getCart().items;
+  const cartTotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
   const isEditorial = isEditorialLayout(); // Local var for readability, but safe now
 
   // --- TEMPLATES RENDER ---

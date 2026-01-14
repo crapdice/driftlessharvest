@@ -1,14 +1,14 @@
-
-import { state } from '../modules/state.js';
+import { store } from '../store/index.js';
 import { setView } from '../modules/router.js';
 
 export function renderHeader() {
   const CONFIG = window.CONFIG || { business: {}, navigation: [] };
   // Safety check if CONFIG is not loaded yet
 
-  const authLink = state.user
+  const user = store.getUser();
+  const authLink = user
     ? `<div class="flex items-center gap-4">
-         ${state.user.role === 'admin' || state.user.role === 'super_admin'
+         ${user.role === 'admin' || user.role === 'super_admin'
       ? `<button onclick="window.location.href='/admin'" class="text-stone-500 font-medium hover:text-kale font-serif text-sm uppercase tracking-wide">Admin</button>`
       : ''}
          <button onclick="setView('dashboard')" class="text-gray-700 font-medium hover:text-green-600 flex items-center gap-1">
@@ -17,7 +17,7 @@ export function renderHeader() {
        </div>`
     : `<button onclick="setView('login')" class="hover:underline text-leaf font-semibold">Login</button>`;
 
-  const cartCount = state.cart.length;
+  const cartCount = store.getCart().items.length;
   // Enhanced Cart: Icon + Gold Badge
   const cartLink = `
     <button id="nav-cart-btn" onclick="setView('cart')" class="group relative p-2 ml-2 hover:bg-nature-50 rounded-full transition-colors" title="View Cart">

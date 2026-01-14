@@ -76,41 +76,7 @@
             color: #000000;
         }
 
-        /* Expandable Fields UX */
-        .expand-transition {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
 
-        textarea.expand-on-focus:focus {
-            min-height: 200px !important;
-            height: auto !important;
-            z-index: 50;
-            position: relative;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        /* For input type=text that might need width expansion (optional/risky in grid) */
-        input[type="text"].expand-on-focus {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        input[type="text"].expand-on-focus:focus {
-            /* Pop out effect */
-            position: absolute;
-            z-index: 60;
-            width: auto;
-            min-width: 100%;
-            max-width: 600px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            background-color: white;
-            /* Ensure valid background */
-        }
-
-        /* Dark mode support for expanded input */
-        .dark input[type="text"].expand-on-focus:focus {
-            background-color: #1f2937;
-            /* gray-800 */
-        }
 
         /* Toast Animation */
         @keyframes fadeIn {
@@ -548,28 +514,33 @@
                     class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                     <span>🚛</span> <span class="font-medium">Delivery</span>
                 </button>
-                <button onclick="setTab('inventory')" id="nav-inventory"
-                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span>🔢</span> <span class="font-medium">Inventory</span>
-                </button>
 
                 <div class="border-t border-gray-200 my-2 pt-2 space-y-2">
+
+                    <button onclick="setTab('inventory')" id="nav-inventory"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🔢</span> <span class="font-medium">Inventory</span>
+                    </button>
+
                     <button onclick="setTab('products')" id="nav-products"
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                         <span>🍎</span> <span class="font-medium">Products</span>
-                    </button>
-                    <button onclick="setTab('archived')" id="nav-archived"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-gray-50 transition-colors">
-                        <span>🗑️</span> <span class="font-medium">Archived</span>
-                    </button>
-                    <button onclick="setTab('categories')" id="nav-categories"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🏷️</span> <span class="font-medium">Categories</span>
                     </button>
                     <button onclick="setTab('templates')" id="nav-templates"
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                         <span>🎁</span> <span class="font-medium">Box Templates</span>
                     </button>
+                    <button onclick="setTab('categories')" id="nav-categories"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🏷️</span> <span class="font-medium">Categories</span>
+                    </button>
+                    <button onclick="setTab('archived')" id="nav-archived"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-gray-50 transition-colors">
+                        <span>🗑️</span> <span class="font-medium">Archived</span>
+                    </button>
+
+                </div>
+                <div class="border-t border-gray-200 my-2 pt-2 space-y-2">
                     <button onclick="setTab('users')" id="nav-users"
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                         <span>🛡️</span> <span class="font-medium">User Management</span>

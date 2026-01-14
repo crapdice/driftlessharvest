@@ -1,11 +1,12 @@
-
-import { state } from '../modules/state.js';
+import { store } from '../store/index.js';
 import { setView } from '../modules/router.js';
 import { CartProductItem } from '../components/cart/CartProductItem.js';
 import { CartBoxItem } from '../components/cart/CartBoxItem.js';
 
 export function renderCart() {
-  if (state.cart.length === 0) {
+  const cart = store.getCart().items;
+
+  if (cart.length === 0) {
     return `
       <section class="max-w-4xl mx-auto px-6 py-24 text-center space-y-6">
         <h2 class="text-4xl font-serif text-loam">Your Cart</h2>
@@ -15,10 +16,10 @@ export function renderCart() {
       `;
   }
 
-  const total = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
   // Helper to separate items but keep track of original index for deletion
-  const cartWithIndex = state.cart.map((item, index) => ({ ...item, originalIndex: index }));
+  const cartWithIndex = cart.map((item, index) => ({ ...item, originalIndex: index }));
   const boxes = cartWithIndex.filter(i => i.type === 'box');
   const products = cartWithIndex.filter(i => i.type !== 'box');
 
@@ -50,7 +51,7 @@ export function renderCart() {
            
            <div class="flex items-center gap-8">
              <div class="text-3xl font-serif text-loam font-medium">$${total.toFixed(2)}</div>
-             <button onclick="setView('checkout')" class="bg-kale text-paper px-10 py-4 rounded-full font-serif text-xl hover:bg-loam shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5">Proceed to Checkout</button>
+             <button onclick="setView('checkout')" class="bg-yellow-400 text-paper px-10 py-4 rounded-full font-serif text-xl hover:bg-loam shadow-sm hover:shadow-md transition-all transform hover:-translate-y-0.5">Proceed to Checkout</button>
            </div>
         </div>
       </div>

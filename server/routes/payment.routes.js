@@ -6,9 +6,12 @@ const InventoryService = require('../services/InventoryService');
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 
 // POST /api/create-payment-intent
+// POST /api/create-payment-intent
 router.post('/create-payment-intent', async (req, res) => {
     try {
-        if (!stripe) return res.status(503).json({ error: 'Payment service unavailable (Configuration missing)' });
+        if (!stripe) {
+            return res.status(503).json({ error: 'Payment service unavailable (Configuration missing)' });
+        }
 
         const { items, userEmail, shipping } = req.body;
 
@@ -17,7 +20,6 @@ router.post('/create-payment-intent', async (req, res) => {
         }
 
         // 1. Calculate Total & Validate Stock (Server-Side)
-        // Check Inventory Transaction
         const reserveTx = db.transaction(() => {
             const { failedItems, verifiedItems, total } = InventoryService.validateStock(items);
 
@@ -38,6 +40,7 @@ router.post('/create-payment-intent', async (req, res) => {
         try {
             orderDetails = reserveTx();
         } catch (e) {
+            console.error("Stock Reservation Failed:", e.message);
             if (e.failedItems) {
                 return res.status(409).json({ error: 'Some items are out of stock', failedItems: e.failedItems });
             }
@@ -46,17 +49,18 @@ router.post('/create-payment-intent', async (req, res) => {
 
         // Shipping object
         const shippingObj = shipping || {};
-        const contact = shippingObj.shipping_details || {};
 
         // Lookup delivery_date from label
         let deliveryDate = null;
         try {
             if (shippingObj.date) {
-                const win = db.prepare('SELECT date_value FROM delivery_windows WHERE date_label = ?').get(shippingObj.date);
-                if (win) deliveryDate = win.date_value;
+                const win = db.prepare('SELECT date_value FROM delivery_windows WHERE date_label = ? OR date_value = ?').get(shippingObj.date, shippingObj.date);
+                if (win) {
+                    deliveryDate = win.date_value;
+                }
             }
         } catch (e) {
-            console.warn("Could not lookup delivery date value:", e);
+            console.warn("Delivery date lookup failed:", e);
         }
 
         // 3. Create Draft Order (Pending Payment)
@@ -65,11 +69,11 @@ router.post('/create-payment-intent', async (req, res) => {
             VALUES ($email, $items, $total, $shipping, $status, $window, $date)
         `);
 
-        console.log("Debug: Running Insert with Named Params");
-
+        // Prepare Insert Object
+        // FIX: Ensure we use verifiedItems from the reservation scope
         const insertObj = {
             email: userEmail || 'guest',
-            items: JSON.stringify(verifiedItems),
+            items: JSON.stringify(orderDetails.verifiedItems),
             total: orderDetails.total,
             shipping: JSON.stringify({
                 name: `${shippingObj.firstName || ''} ${shippingObj.lastName || ''}`.trim(),
@@ -88,10 +92,6 @@ router.post('/create-payment-intent', async (req, res) => {
             date: deliveryDate || null
         };
 
-        console.log("Debug Insert Object KEYS:", Object.keys(insertObj));
-        try { require('fs').writeFileSync('debug_keys.log', JSON.stringify(Object.keys(insertObj)) + '\n' + JSON.stringify(insertObj)); } catch (e) { }
-        // console.log("Debug Insert Object VALUES:", insertObj); // Too verbose
-
         const result = stmt.run(insertObj);
         let orderId = result.lastInsertRowid;
 
@@ -101,7 +101,7 @@ router.post('/create-payment-intent', async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)
         `);
 
-        for (const item of verifiedItems) {
+        for (const item of orderDetails.verifiedItems) {
             insertItem.run(
                 orderId,
                 item.id,
@@ -116,14 +116,12 @@ router.post('/create-payment-intent', async (req, res) => {
         const paymentIntent = await stripe.paymentIntents.create({
             amount: Math.round(orderDetails.total * 100), // Cents
             currency: 'usd',
-            automatic_payment_methods: {
-                enabled: true,
-            },
+            automatic_payment_methods: { enabled: true },
             metadata: {
                 orderId: orderId.toString(),
                 userEmail: userEmail || 'guest'
             },
-            receipt_email: userEmail // Optional, Stripe allows null
+            receipt_email: (userEmail && userEmail.includes('@')) ? userEmail : null
         });
 
         res.json({
@@ -132,7 +130,7 @@ router.post('/create-payment-intent', async (req, res) => {
         });
 
     } catch (e) {
-        console.error("Payment Init Error STACK:", e);
+        console.error("Payment Init Error:", e);
         res.status(500).json({ error: 'Failed to initialize payment', details: e.message });
     }
 });

@@ -1,5 +1,4 @@
-
-import { state } from './modules/state.js';
+import { store } from './store/index.js';
 import * as Actions from './modules/actions.js';
 import * as Views from './views/index.js';
 import * as Layout from './views/layout.js';
@@ -8,7 +7,7 @@ import { AB } from './modules/ab_test.js';
 import { formatPhoneNumber, showToast } from './utils.js';
 
 // Bind Globals for HTML Event Handlers
-window.state = state;
+window.harvestStore = store;
 window.AB = AB;
 window.formatPhoneNumber = formatPhoneNumber;
 window.showToast = showToast;
@@ -31,6 +30,9 @@ window.renderHeaderCount = Layout.renderHeaderCount;
 // Bind Router Utils
 window.setView = Router.setView;
 window.navigateToSection = Router.navigateToSection;
+
+// Initialize Router Dependencies (Break Circular Dependency)
+Router.initRouter(Views, Layout);
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {

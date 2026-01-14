@@ -1,5 +1,4 @@
-
-import { state } from '../../modules/state.js';
+import { store } from '../../store/index.js';
 import { QuantityControl } from '../QuantityControl.js';
 
 /**
@@ -11,7 +10,8 @@ import { QuantityControl } from '../QuantityControl.js';
  * @returns {string} HTML string
  */
 export function ProductCard(item, layout = 'grid') {
-    const inCart = state.cart.find(c => String(c.id) === String(item.id));
+    const cart = store.getCart().items;
+    const inCart = cart.find(c => String(c.id) === String(item.id));
     const qtyInCart = inCart ? inCart.qty : 0;
 
     // item.stock is "Remaining Stock" (decremented by loadMarketplace)

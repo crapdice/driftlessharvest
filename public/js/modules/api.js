@@ -12,7 +12,8 @@ async function sendRequest(endpoint, method = 'GET', body = null) {
     const options = { method, headers };
     if (body) options.body = JSON.stringify(body);
 
-    const res = await fetch(`${API_BASE}${endpoint}`, options);
+    const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+    const res = await fetch(url, options);
     if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || `Request failed: ${res.status}`);
@@ -47,24 +48,45 @@ export function fetchBoxTemplates() {
     return sendRequest('/box-templates');
 }
 
-// Cart / Inventory
-export function reserveStock(productId, qty) {
-    return sendRequest('/cart/reserve', 'POST', { productId, qty });
+export function fetchDeliveryWindows() {
+    return sendRequest('/delivery-windows');
 }
 
+// Cart / Inventory
+// Cart / Inventory
+export function checkStock(productId, qty) {
+    return sendRequest('/cart/check-stock', 'POST', { productId, qty });
+}
+
+export function checkTemplateStock(templateId) {
+    return sendRequest('/cart/check-template-stock', 'POST', { templateId });
+}
+
+export function syncCart(items, guestId) {
+    return sendRequest('/cart/sync', 'POST', { items, guestId });
+}
+
+// Deprecated / No-op endpoints (kept if needed for legacy compatibility, but better removed if unused)
 export function releaseStock(productId, qty) {
     return sendRequest('/cart/release', 'POST', { productId, qty });
 }
 
-export function reserveTemplate(templateId) {
-    return sendRequest('/cart/reserve-template', 'POST', { templateId });
-}
-
-export function releaseTemplate(templateId, qty) {
-    return sendRequest('/cart/release-template', 'POST', { templateId, qty });
-}
-
 // Orders
+// Orders & Checkout
+export function createPaymentIntent(items, userEmail) {
+    return sendRequest('/create-payment-intent', 'POST', { items, userEmail });
+}
+
+export function updateOrderDetails(orderId, shipping, deliveryWindow, email) {
+    return sendRequest('/orders/update-details', 'POST', {
+        orderId, shipping, delivery_window: deliveryWindow, email
+    });
+}
+
+export function verifyPayment(orderId) {
+    return sendRequest(`/orders/${orderId}/verify-payment`, 'POST');
+}
+
 export function placeOrder(orderData) {
     return sendRequest('/orders', 'POST', orderData);
 }

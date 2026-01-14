@@ -13,13 +13,21 @@ const phoneSchema = z.string()
     .pipe(z.string())
     .optional();
 
+const addressSchema = z.object({
+    street: z.string().trim().optional(),
+    city: z.string().trim().optional(),
+    state: z.string().trim().optional(),
+    zip: z.string().trim().optional(),
+    phone: phoneSchema
+}).optional();
+
 // --- Route Schemas ---
 
 const signupSchema = z.object({
     email: emailSchema,
     password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-    firstName: z.string().trim().min(1, { message: "First name is required" }),
-    lastName: z.string().trim().min(1, { message: "Last name is required" }),
+    firstName: z.string().trim().optional(),
+    lastName: z.string().trim().optional(),
     phone: phoneSchema
 });
 
@@ -35,7 +43,10 @@ const updateProfileSchema = z.object({
     phone: phoneSchema,
     address: z.string().trim().optional(),
     city: z.string().trim().optional(),
+    state: z.string().trim().optional(),
     zip: z.string().trim().optional(),
+    billingAddress: addressSchema,
+    shippingAddress: addressSchema,
     password: z.string().min(8).optional().or(z.literal(''))
 });
 

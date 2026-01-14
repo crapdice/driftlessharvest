@@ -1,0 +1,33 @@
+{
+  "user": {
+    "id": 1768324221706,
+    "email": "zackerymiller33@gmail.com",
+    "password": "$2b$10$Ebgv8YrelYS.CXR2maO4buNXesuavoOBrMTKYLT516G.VLqrhKZVy",
+    "first_name": "ZACKERY",
+    "last_name": "MILLER",
+    "phone": "",
+    "default_address_id": null,
+    "created_at": "2026-01-13T17:10:21.706Z",
+    "is_customer": 0,
+    "is_admin": 1,
+    "admin_type_id": 1
+  },
+  "addresses": [
+    {
+      "id": 4,
+      "user_email": "zackerymiller33@gmail.com",
+      "name": "ZACKERY MILLER",
+      "street": "",
+      "city": "",
+      "zip": "",
+      "state": "",
+      "phone": "8477160978",
+      "user_id": 1768324221706,
+      "created_at": "2026-01-14 05:15:34",
+      "type": "billing",
+      "is_default": 0,
+      "first_name": "ZACKERY",
+      "last_name": "MILLER"
+    }
+  ]
+}
