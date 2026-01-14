@@ -168,16 +168,18 @@ try {
     console.log(`[Startup] Existing admin lookup: ${existingAdmin ? `Found ID ${existingAdmin.id}` : 'Not found'}`);
 
     if (existingAdmin) {
+        // Note: 'role' column may not exist in older schemas, only set is_admin and admin_type_id
         const result = db.prepare(`
                 UPDATE users 
-                SET password = ?, is_admin = 1, role = 'super_admin', admin_type_id = ? 
+                SET password = ?, is_admin = 1, admin_type_id = ? 
                 WHERE id = ?
             `).run(hashedPassword, typeId, existingAdmin.id);
         console.log(`[Startup] Admin password updated. Changes: ${result.changes}`);
     } else {
+        // Note: 'role' column may not exist in older schemas
         const result = db.prepare(`
-                INSERT INTO users (email, password, first_name, last_name, is_admin, role, admin_type_id)
-                VALUES (?, ?, 'Admin', 'User', 1, 'super_admin', ?)
+                INSERT INTO users (email, password, first_name, last_name, is_admin, admin_type_id)
+                VALUES (?, ?, 'Admin', 'User', 1, ?)
             `).run(adminEmail, hashedPassword, typeId);
         console.log(`[Startup] Admin user created. Row ID: ${result.lastInsertRowid}`);
     }
