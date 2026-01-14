@@ -17,7 +17,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Create volume mount potential directory
-VOLUME /app/data
+# VOLUME /app/data (Managed by Railway UI)
 
 # Exposure
 EXPOSE 3000
