@@ -40,7 +40,61 @@ try {
         console.log('[Rescue] admin_types check failed (might be missing table):', e.message);
     }
 
-    // 2. Fix config.json if images are missing (Persistence Recovery)
+    // 2. Seed Products if empty
+    try {
+        const productCount = db.prepare('SELECT count(*) as c FROM products').get();
+        if (productCount.c === 0) {
+            console.log('[Rescue] Products table empty, seeding default products...');
+            const { SEED_PRODUCTS } = require('./seed_data');
+            const insertProduct = db.prepare(`
+                INSERT INTO products (name, category, price, image_url, tags, stock, is_active, is_archived)
+                VALUES (@name, @category, @price, @image_url, @tags, @stock, @is_active, 0)
+            `);
+            for (const p of SEED_PRODUCTS) {
+                insertProduct.run(p);
+            }
+            console.log(`[Rescue] Seeded ${SEED_PRODUCTS.length} products.`);
+        }
+    } catch (e) {
+        console.log('[Rescue] Product seeding failed:', e.message);
+    }
+
+    // 3. Seed Box Templates if empty
+    try {
+        const boxCount = db.prepare('SELECT count(*) as c FROM box_templates').get();
+        if (boxCount.c === 0) {
+            console.log('[Rescue] Box templates empty, seeding default templates...');
+            const { SEED_BOX_TEMPLATES } = require('./seed_data');
+            const insertBox = db.prepare(`
+                INSERT INTO box_templates (name, description, base_price, image_url, is_active, items)
+                VALUES (@name, @description, @base_price, @image_url, @is_active, '[]')
+            `);
+            const insertBoxItem = db.prepare(`
+                INSERT INTO box_items (box_template_id, product_id, quantity)
+                VALUES (?, ?, 1)
+            `);
+
+            for (const box of SEED_BOX_TEMPLATES) {
+                const info = insertBox.run({
+                    name: box.name,
+                    description: box.description,
+                    base_price: box.base_price,
+                    image_url: box.image_url,
+                    is_active: box.is_active
+                });
+                const boxId = info.lastInsertRowid;
+                // Link products to box
+                for (const productIndex of box.items) {
+                    insertBoxItem.run(boxId, productIndex);
+                }
+            }
+            console.log(`[Rescue] Seeded ${SEED_BOX_TEMPLATES.length} box templates.`);
+        }
+    } catch (e) {
+        console.log('[Rescue] Box template seeding failed:', e.message);
+    }
+
+    // 4. Fix config.json if images are missing or empty (Persistence Recovery)
     const DATA_FILE = path.join(DATA_DIR, 'config.json');
     if (fs.existsSync(DATA_FILE)) {
         const configRaw = fs.readFileSync(DATA_FILE, 'utf8');
@@ -54,22 +108,22 @@ try {
             if (!config.auth.login) { config.auth.login = {}; changed = true; }
             if (!config.auth.signup) { config.auth.signup = {}; changed = true; }
 
-            // Check Paths
-            if (!config.auth.login.image) {
-                config.auth.login.image = '/assets/images/hero_rustic.png';
+            // Check Paths - fix both missing AND empty string values
+            if (!config.auth.login.image || config.auth.login.image === '') {
+                config.auth.login.image = '/images/login_hero.png';
                 changed = true;
             }
-            if (!config.auth.signup.image) {
-                config.auth.signup.image = '/assets/images/hero_misty.png';
+            if (!config.auth.signup.image || config.auth.signup.image === '') {
+                config.auth.signup.image = '/images/signup_hero.png';
                 changed = true;
             }
 
             // Ensure Featured Products (Fix blank home page sections)
             if (!config.featuredProducts || config.featuredProducts.length === 0) {
                 // Try to find ANY products to feature
-                const anyProd = db.prepare('SELECT id FROM products LIMIT 3').all();
+                const anyProd = db.prepare('SELECT id FROM products LIMIT 6').all();
                 if (anyProd.length > 0) {
-                    config.featuredProducts = anyProd.map(p => p.id);
+                    config.featuredProducts = anyProd.map(p => String(p.id));
                     changed = true;
                     console.log('[Rescue] Seeded featured products from DB.');
                 }

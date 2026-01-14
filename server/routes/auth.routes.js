@@ -68,7 +68,7 @@ router.post('/auth/login', validate(loginSchema), async (req, res) => {
         });
     } catch (err) {
         console.error('Login Error:', err);
-        res.status(500).json({ error: 'Login failed' });
+        res.status(500).json({ error: 'Login failed: ' + err.message });
     }
 });
 
@@ -105,7 +105,7 @@ router.post('/login', validate(loginSchema), async (req, res) => {
         });
     } catch (err) {
         console.error('Legacy Login Error:', err);
-        res.status(500).json({ error: 'Login failed' });
+        res.status(500).json({ error: 'Login failed: ' + err.message });
     }
 });
 

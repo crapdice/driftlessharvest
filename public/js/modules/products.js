@@ -32,6 +32,7 @@ export async function loadMarketplace() {
         isMarketplaceLoading = false;
         hasLoadedMarketplace = true; // Always mark loaded to stop spinner
         window.hasMarketplaceLoaded = true;
+        render(); // Force UI update to show content or empty state
     }
 }
 
