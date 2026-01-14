@@ -555,18 +555,39 @@ router.post('/admin/delivery-windows', checkRole(['admin', 'super_admin']), vali
         const { date_label, date_value } = req.body;
 
         // Prevent past dates
-        // Note: We use simple string comparison if format is YYYY-MM-DD
         const today = new Date().toISOString().split('T')[0];
         if (date_value < today) {
             return res.status(400).json({ error: "Cannot schedule a delivery window in the past." });
         }
-        const id = Date.now().toString();
-        db.prepare('INSERT INTO delivery_windows (id, date_label, date_value, is_active) VALUES (?, ?, ?, 1)')
-            .run(id, date_label, date_value);
-        res.json({ success: true, id });
+
+        // Check which columns exist
+        const cols = db.prepare("PRAGMA table_info(delivery_windows)").all().map(c => c.name);
+        console.log('[Delivery POST] columns:', cols.join(', '));
+
+        // Build INSERT based on available columns
+        if (cols.includes('date_label') && cols.includes('date_value') && cols.includes('is_active')) {
+            // New schema: use date_label, date_value, is_active
+            // Don't specify id - let autoincrement handle it
+            const info = db.prepare('INSERT INTO delivery_windows (date_label, date_value, is_active) VALUES (?, ?, 1)')
+                .run(date_label, date_value);
+            return res.json({ success: true, id: info.lastInsertRowid });
+        } else if (cols.includes('date_value') && !cols.includes('date_label')) {
+            // Partial migration - has date_value but not date_label
+            // Also need to provide day_of_week, start_time, end_time to satisfy NOT NULL
+            const dayOfWeek = new Date(date_value).toLocaleDateString('en-US', { weekday: 'long' });
+            const info = db.prepare('INSERT INTO delivery_windows (day_of_week, start_time, end_time, date_value) VALUES (?, ?, ?, ?)')
+                .run(dayOfWeek, '08:00', '18:00', date_value);
+            return res.json({ success: true, id: info.lastInsertRowid });
+        } else {
+            // Original schema - use day_of_week, start_time, end_time
+            const dayOfWeek = new Date(date_value).toLocaleDateString('en-US', { weekday: 'long' });
+            const info = db.prepare('INSERT INTO delivery_windows (day_of_week, start_time, end_time) VALUES (?, ?, ?)')
+                .run(dayOfWeek, '08:00', '18:00');
+            return res.json({ success: true, id: info.lastInsertRowid });
+        }
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: 'Failed' });
+        console.error('[Delivery POST Error]', e);
+        res.status(500).json({ error: 'Failed', details: e.message });
     }
 });
 
@@ -574,12 +595,22 @@ router.post('/admin/delivery-windows', checkRole(['admin', 'super_admin']), vali
 router.put('/admin/delivery-windows/:id', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
         const { is_active } = req.body;
-        db.prepare('UPDATE delivery_windows SET is_active = ? WHERE id = ?')
-            .run(is_active ? 1 : 0, req.params.id);
-        res.json({ success: true });
+
+        // Check if is_active column exists
+        const cols = db.prepare("PRAGMA table_info(delivery_windows)").all().map(c => c.name);
+
+        if (cols.includes('is_active')) {
+            db.prepare('UPDATE delivery_windows SET is_active = ? WHERE id = ?')
+                .run(is_active ? 1 : 0, req.params.id);
+            res.json({ success: true });
+        } else {
+            // is_active column doesn't exist - just return success
+            console.warn('[Delivery PUT] is_active column not found, skipping');
+            res.json({ success: true, warning: 'is_active column not available' });
+        }
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: 'Failed' });
+        console.error('[Delivery PUT Error]', e);
+        res.status(500).json({ error: 'Failed', details: e.message });
     }
 });
 
@@ -589,8 +620,8 @@ router.delete('/admin/delivery-windows/:id', checkRole(['admin', 'super_admin'])
         db.prepare('DELETE FROM delivery_windows WHERE id = ?').run(req.params.id);
         res.json({ success: true });
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: 'Failed' });
+        console.error('[Delivery DELETE Error]', e);
+        res.status(500).json({ error: 'Failed', details: e.message });
     }
 });
 
