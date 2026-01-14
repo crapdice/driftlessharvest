@@ -148,32 +148,42 @@ try {
     const bcrypt = require('bcryptjs');
     const adminEmail = 'admin@driftlessharvest.com';
     const hashedPassword = bcrypt.hashSync(targetPassword, 10);
+    console.log(`[Startup] Hashed password generated for: ${adminEmail}`);
 
     let typeId = null;
     try {
         // Ensure admin_types exist (created in migration 022)
         const superAdminType = db.prepare("SELECT id FROM admin_types WHERE name = 'superadmin'").get();
         typeId = superAdminType ? superAdminType.id : null;
-    } catch (e) { console.log("Warning: admin_types table missing during seed"); }
+        console.log(`[Startup] Admin type ID: ${typeId}`);
+    } catch (e) { console.log("[Startup] Warning: admin_types table missing during seed:", e.message); }
 
-    const existingAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
+    // Check user table columns
+    try {
+        const cols = db.prepare("PRAGMA table_info(users)").all();
+        console.log(`[Startup] Users table columns: ${cols.map(c => c.name).join(', ')}`);
+    } catch (e) { console.log('[Startup] Could not probe users table:', e.message); }
+
+    const existingAdmin = db.prepare('SELECT id, email FROM users WHERE email = ?').get(adminEmail);
+    console.log(`[Startup] Existing admin lookup: ${existingAdmin ? `Found ID ${existingAdmin.id}` : 'Not found'}`);
 
     if (existingAdmin) {
-        db.prepare(`
+        const result = db.prepare(`
                 UPDATE users 
                 SET password = ?, is_admin = 1, role = 'super_admin', admin_type_id = ? 
                 WHERE id = ?
             `).run(hashedPassword, typeId, existingAdmin.id);
-        console.log('[Startup] Admin password updated.');
+        console.log(`[Startup] Admin password updated. Changes: ${result.changes}`);
     } else {
-        db.prepare(`
+        const result = db.prepare(`
                 INSERT INTO users (email, password, first_name, last_name, is_admin, role, admin_type_id)
                 VALUES (?, ?, 'Admin', 'User', 1, 'super_admin', ?)
             `).run(adminEmail, hashedPassword, typeId);
-        console.log('[Startup] Admin user created.');
+        console.log(`[Startup] Admin user created. Row ID: ${result.lastInsertRowid}`);
     }
 } catch (e) {
     console.error('[Startup] Failed to seed admin user:', e.message);
+    console.error('[Startup] Full error:', e);
 }
 
 module.exports = db;
