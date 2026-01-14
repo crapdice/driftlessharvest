@@ -1,6 +1,5 @@
 {
     "meta": {
-        "inventoryAlertLevel": 5,
         "layouts": {
             "home": [
                 {
@@ -34,7 +33,12 @@
                 "heroMessaging": "A",
                 "primaryCTA": "B"
             }
-        }
+        },
+        "inventoryAlertLevel": 5,
+        "useBentoGrid": true,
+        "showBoxTooltips": true,
+        "featuredTitle": "Fresh from the farm to your table.",
+        "featuredSubtitle": "See What's In Season"
     },
     "experiments": {
         "heroMessaging": {
@@ -118,7 +122,8 @@
             "hero": {
                 "headline": "We connect you directly with seasonal produce, meats, and goods from family farms.",
                 "subhead": "Weekly harvest boxes from small farms in the Driftless hills - seasonal, honest, and close to home.",
-                "cta": "View Weekly Boxes"
+                "cta": "View Weekly Boxes",
+                "image": "/assets/images/hero_misty.png"
             }
         },
         "howItWorks": {
@@ -137,24 +142,28 @@
             ],
             "farmBoxes": [
                 {
-                    "name": "Three Sisters",
+                    "name": "Ridge Valley Farm",
                     "location": "Viroqua, WI",
-                    "notes": "Certified organic vegetables grown on ridges and valley floors just outside of town."
+                    "notes": "Certified organic vegetables grown on ridges and valley floors just outside of town.",
+                    "image": "/images/ridge_valley_farm.png"
                 },
                 {
-                    "name": "Kickapoo River Farms",
-                    "location": "Viroqua, WI",
-                    "notes": "Diversified vegetables and greens grown for local markets and community food programs."
-                },
-                {
-                    "name": "Maple House",
-                    "location": "Coon Valley, WI",
-                    "notes": "Organic produce grown on steep Driftless terrain using careful soil and crop management."
-                },
-                {
-                    "name": "Glacier Rock Farm Cooperative",
+                    "name": "Deep Root Tomatoes",
                     "location": "Westby, WI",
-                    "notes": "A farmer-owned cooperative producing dairy from small family farms in the Driftless region."
+                    "notes": "Specializing in heirloom tomatoes and greenhouse growing for extended seasons.",
+                    "image": "/images/deep_root_tomatoes.png"
+                },
+                {
+                    "name": "Coulee Creek Pastures",
+                    "location": "Coon Valley, WI",
+                    "notes": "Grass-fed beef and dairy produced through holistic grazing on steep terrain.",
+                    "image": "/images/coulee_creek_pasture.png"
+                },
+                {
+                    "name": "Hidden Hollow Orchard",
+                    "location": "Cashton, WI",
+                    "notes": "Heritage apples and cider from a family-owned orchard tucked in the hills.",
+                    "image": "/images/hidden_hollow_orchard.png"
                 }
             ]
         }
@@ -214,24 +223,49 @@
         "login": {
             "headline": "Fresh from the farm to your table.",
             "subhead": "Join thousands of happy customers eating cleaner, greener, and better.",
-            "imageUrl": "/images/login_hero.png"
+            "image": "/images/ridge_valley_farm.png"
         },
         "signup": {
             "headline": "Real food from the Driftless hills.",
             "subhead": "Join our community in Viroqua for weekly organic boxes, harvested from living soil just miles from your door.",
-            "imageUrl": "/images/signup_hero.png"
+            "image": ""
         }
     },
-    "featuredProducts": [],
+    "featuredProducts": [
+        "6",
+        "4",
+        "8",
+        "5",
+        "9",
+        "7"
+    ],
     "theme": {
+        "fontFamily": {
+            "serif": [
+                "\"Playfair Display\"",
+                "Georgia",
+                "serif"
+            ],
+            "sans": [
+                "\"Inter\"",
+                "ui-sans-serif",
+                "system-ui",
+                "sans-serif"
+            ]
+        },
         "colors": {
-            "paper": "#fbf8f3",
-            "stone": "#e8e4da",
-            "charcoal": "#1f1d1b",
-            "loam": "#4a3e36",
-            "kale": "#386641",
-            "root": "#bc4749",
-            "clay": "#d4cbb8"
+            "paper": "#f7f7f5",
+            "stone": "#e0e0d6",
+            "charcoal": "#23231d",
+            "loam": "#3e3e35",
+            "kale": "#2d4a22",
+            "root": "#782b2b",
+            "clay": "#a8a898"
+        },
+        "backgroundImage": {
+            "hero-rustic": "url('./assets/images/hero_rustic.png')",
+            "auth-farm": "url('./assets/images/auth_farm.png')"
         }
-    }
+    },
+    "stripePublishableKey": "pk_test_51SnP5wLt8otmUU9wVt91D9yQiwTYx2vQnYTqYJd6PB5BFG0H0Eyz9T6yRzLUcM2y72ag8SGweVcjNWe546zMz34X00K954NmzJ"
 }
