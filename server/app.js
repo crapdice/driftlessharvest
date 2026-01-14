@@ -37,6 +37,10 @@ app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
 // Serve static files from public/ (Customer App)
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Explicit static routes for assets (fallback for debugging)
+app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
 // Debug Endpoint
 app.get('/api/admin/test', (req, res) => res.json({ status: 'ok', msg: 'Admin path works' }));
 
@@ -60,7 +64,8 @@ app.use((err, req, res, next) => {
 });
 
 // SPA Fallback (Must be last get route)
-app.get(/^(?!\/api).+/, (req, res) => {
+// Exclude API routes and static asset file extensions
+app.get(/^(?!\/api)(?!.*\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot|webp|mp4|webm|json)$).+/, (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
