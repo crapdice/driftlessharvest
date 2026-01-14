@@ -1,0 +1,273 @@
+{
+  "meta": {
+    "layouts": {
+      "home": [
+        {
+          "id": "hero",
+          "enabled": true
+        },
+        {
+          "id": "featured_products",
+          "enabled": true
+        },
+        {
+          "id": "trust_signals",
+          "enabled": true
+        },
+        {
+          "id": "narrative",
+          "enabled": true
+        }
+      ]
+    },
+    "abTestingEnabled": true,
+    "assignmentStrategy": "localStorage",
+    "experimentDebug": false,
+    "exposureLogging": {
+      "enabled": true,
+      "mode": "console"
+    },
+    "winnerLockIn": {
+      "enabled": false,
+      "winners": {
+        "heroMessaging": "A",
+        "primaryCTA": "B"
+      }
+    },
+    "inventoryAlertLevel": 9,
+    "useBentoGrid": true,
+    "showBoxTooltips": true,
+    "featuredTitle": "Fresh from the farm to your table.",
+    "featuredSubtitle": "See What's In Season"
+  },
+  "experiments": {
+    "heroMessaging": {
+      "activeWhen": {
+        "months": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "variants": {
+        "A": {
+          "weight": 50,
+          "headline": "We connect you directly with seasonal produce, meats, and goods from family farms.",
+          "subhead": "Weekly harvest boxes from small farms in the Driftless hills - seasonal, honest, and close to home."
+        },
+        "B": {
+          "weight": 50,
+          "headline": "Real food from farms you can drive past.",
+          "subhead": "Seasonal food boxes grown within 40 miles of Viroqua."
+        }
+      }
+    },
+    "primaryCTA": {
+      "activeWhen": {
+        "months": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      "variants": {
+        "A": {
+          "weight": 50,
+          "label": "View Weekly Boxes"
+        },
+        "B": {
+          "weight": 50,
+          "label": "See What's In Season"
+        }
+      }
+    }
+  },
+  "business": {
+    "name": "Driftless Harvest",
+    "location": "Viroqua, Wisconsin",
+    "farmerVoice": "We farm the hills and valleys around Viroqua. What we grow changes with the season, the soil, and the weather - and we believe that transparency matters.",
+    "trustSignals": [
+      "Grown within 40 miles of Viroqua",
+      "Harvested weekly, never warehoused",
+      "No long-haul trucking",
+      "Seasonal by design - not forced"
+    ]
+  },
+  "navigation": [
+    {
+      "id": "home",
+      "label": "Home"
+    },
+    {
+      "id": "boxes",
+      "label": "Food Boxes"
+    },
+    {
+      "id": "how",
+      "label": "How It Works"
+    },
+    {
+      "id": "farms",
+      "label": "Our Farms"
+    }
+  ],
+  "pages": {
+    "home": {
+      "hero": {
+        "headline": "We connect you directly with seasonal produce, meats, and goods from family farms.",
+        "subhead": "Weekly harvest boxes from small farms in the Driftless hills - seasonal, honest, and close to home.",
+        "cta": "View Weekly Boxes",
+        "image": "/assets/images/hero_misty.png"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "paragraphs": [
+        "You choose a weekly food box. We harvest from our farms and partner farms during the week, based on what's ready and thriving.",
+        "Boxes are packed fresh and delivered directly to your door or made available for local pickup in Viroqua at a scheduled time.",
+        "Because we work with living soil and changing weather, contents vary week to week. Seasonality isn't a limitation here - it's how freshness happens."
+      ]
+    },
+    "farms": {
+      "title": "Our Farms",
+      "paragraphs": [
+        "The Driftless Region was never flattened by glaciers. Its hills, valleys, and soils demand careful, small-scale farming.",
+        "We work with farms in and around Viroqua that grow food suited to this landscape - diverse, seasonal, and rooted in place."
+      ],
+      "farmBoxes": [
+        {
+          "name": "Ridge Valley Farm",
+          "location": "Viroqua, WI",
+          "notes": "Certified organic vegetables grown on ridges and valley floors just outside of town.",
+          "image": "/images/ridge_valley_farm.png"
+        },
+        {
+          "name": "Deep Root Tomatoes",
+          "location": "Westby, WI",
+          "notes": "Specializing in heirloom tomatoes and greenhouse growing for extended seasons.",
+          "image": "/images/deep_root_tomatoes.png"
+        },
+        {
+          "name": "Coulee Creek Pastures",
+          "location": "Coon Valley, WI",
+          "notes": "Grass-fed beef and dairy produced through holistic grazing on steep terrain.",
+          "image": "/images/coulee_creek_pasture.png"
+        },
+        {
+          "name": "Hidden Hollow Orchard",
+          "location": "Cashton, WI",
+          "notes": "Heritage apples and cider from a family-owned orchard tucked in the hills.",
+          "image": "/images/hidden_hollow_orchard.png"
+        }
+      ]
+    }
+  },
+  "foodBoxes": [
+    {
+      "id": "family",
+      "enabled": true,
+      "name": "Family Harvest Box",
+      "price": 38,
+      "badge": "Best Value",
+      "targetCustomer": "Families & shared households",
+      "whatYouGet": [
+        "7-9 seasonal vegetables",
+        "Cooking greens",
+        "Roots or storage crops"
+      ],
+      "disclaimer": "Contents vary weekly based on harvest conditions."
+    },
+    {
+      "id": "viroqua",
+      "enabled": true,
+      "name": "Viroqua Summer Box",
+      "price": 32,
+      "badge": "Local Favorite",
+      "targetCustomer": "Intentional cooks & local food supporters",
+      "whatYouGet": [
+        "Seasonal vegetables grown around Viroqua",
+        "Salad greens or cooking greens",
+        "One rotating specialty item (herbs, alliums, or storage crop)"
+      ],
+      "disclaimer": "Contents reflect what's thriving locally that week and may change with weather and harvest conditions."
+    },
+    {
+      "id": "couple",
+      "enabled": true,
+      "name": "Couple's Box",
+      "price": 26,
+      "badge": "Most Popular",
+      "targetCustomer": "1-2 people",
+      "whatYouGet": [
+        "5-6 seasonal vegetables",
+        "Salad greens",
+        "One rotating item"
+      ],
+      "disclaimer": "Items rotate week to week."
+    }
+  ],
+  "announcement": {
+    "text": "🌱 Now Harvesting: Week of Jan 14"
+  },
+  "secondaryCTA": {
+    "headline": "Ready to taste the difference?",
+    "subhead": "We harvest specifically for your box. Order by Sunday night for Tuesday pickup."
+  },
+  "auth": {
+    "login": {
+      "headline": "Fresh from the farm to your table.",
+      "subhead": "Join thousands of happy customers eating cleaner, greener, and better.",
+      "imageUrl": "/images/login_hero.png",
+      "image": "/images/login_hero.png"
+    },
+    "signup": {
+      "headline": "Real food from the Driftless hills.",
+      "subhead": "Join our community in Viroqua for weekly organic boxes, harvested from living soil just miles from your door.",
+      "imageUrl": "/images/signup_hero.png",
+      "image": "/images/signup_hero.png"
+    }
+  },
+  "featuredProducts": [
+    "2",
+    "3",
+    "1",
+    "4",
+    "7",
+    "8"
+  ],
+  "theme": {
+    "fontFamily": {
+      "serif": [
+        "\"Playfair Display\"",
+        "Georgia",
+        "serif"
+      ],
+      "sans": [
+        "\"Inter\"",
+        "ui-sans-serif",
+        "system-ui",
+        "sans-serif"
+      ]
+    },
+    "colors": {
+      "paper": "#f7f7f5",
+      "stone": "#e0e0d6",
+      "charcoal": "#23231d",
+      "loam": "#3e3e35",
+      "kale": "#2d4a22",
+      "root": "#782b2b",
+      "clay": "#a8a898"
+    },
+    "backgroundImage": {
+      "hero-rustic": "url('./assets/images/hero_rustic.png')",
+      "auth-farm": "url('./assets/images/auth_farm.png')"
+    }
+  },
+  "stripePublishableKey": "pk_test_51SnP5wLt8otmUU9wVt91D9yQiwTYx2vQnYTqYJd6PB5BFG0H0Eyz9T6yRzLUcM2y72ag8SGweVcjNWe546zMz34X00K954NmzJ"
+}

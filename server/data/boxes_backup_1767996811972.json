@@ -1,0 +1,220 @@
+[
+  {
+    "id": 1,
+    "name": "Driftless Chef Box",
+    "description": "Perfect for the aspiring at home chef with a long box description in order to verify how the box contents layout. We are trying to avoid scroll bars in the box modal. < no scrolls. How many characters is that? That is the question. < still no scolls, how many characters is that?",
+    "base_price": 17.99,
+    "items": [
+      {
+        "id": 1,
+        "box_template_id": 1,
+        "product_id": 6,
+        "quantity": 1
+      },
+      {
+        "id": 2,
+        "box_template_id": 1,
+        "product_id": 5,
+        "quantity": 1
+      },
+      {
+        "id": 3,
+        "box_template_id": 1,
+        "product_id": 9,
+        "quantity": 1
+      },
+      {
+        "id": 4,
+        "box_template_id": 1,
+        "product_id": 1,
+        "quantity": 1
+      },
+      {
+        "id": 5,
+        "box_template_id": 1,
+        "product_id": 3,
+        "quantity": 1
+      },
+      {
+        "id": 6,
+        "box_template_id": 1,
+        "product_id": 7,
+        "quantity": 1
+      }
+    ],
+    "image_url": "https://images.unsplash.com/photo-1690067698023-54d7ba7a1619?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "is_active": 1
+  },
+  {
+    "id": 2,
+    "name": "The Kickapoo Kollection",
+    "description": "A variety of fresh, healthy produce direct from the farm",
+    "base_price": 29.99,
+    "items": [
+      {
+        "id": 7,
+        "box_template_id": 2,
+        "product_id": 2,
+        "quantity": 1
+      }
+    ],
+    "image_url": "https://images.unsplash.com/photo-1607237896259-191316556483?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "is_active": 1
+  },
+  {
+    "id": 3,
+    "name": "Saturday Market Select Box",
+    "description": "Curated to reflect the feel and quality of the Viroqua Saturday Farmers Market. This box highlights peak-season produce and distinctive items chosen for flavor and craftsmanship rather than volume. Think best-of-week vegetables, specialty greens, baked goods, or preserved items—assembled like a market walk, delivered to your door.",
+    "base_price": 79.99,
+    "items": [
+      {
+        "id": 8,
+        "box_template_id": 3,
+        "product_id": 1,
+        "quantity": 1
+      },
+      {
+        "id": 9,
+        "box_template_id": 3,
+        "product_id": 2,
+        "quantity": 1
+      },
+      {
+        "id": 10,
+        "box_template_id": 3,
+        "product_id": 5,
+        "quantity": 1
+      }
+    ],
+    "image_url": "https://images.unsplash.com/photo-1749997462936-c5d69337059f?q=80&w=2111&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "is_active": 1
+  },
+  {
+    "id": 4,
+    "name": "Ridge & Valley Artisan Box",
+    "description": "A mixed box emphasizing Vernon County’s independent makers and value-added foods alongside seasonal produce. Along with vegetables, expect rotating inclusions such as Amish baked goods, local honey, cheeses, ferments, or handcrafted pantry items. This box showcases the craftsmanship and rural ingenuity of the Driftless region.",
+    "base_price": 119.99,
+    "items": [
+      {
+        "id": 11,
+        "box_template_id": 4,
+        "product_id": 3,
+        "quantity": 1
+      }
+    ],
+    "image_url": "https://images.unsplash.com/photo-1658581754423-087ed5459550?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "is_active": 1
+  },
+  {
+    "id": 5,
+    "name": "Coulee Creek Essentials Box",
+    "description": "A smaller, practical box built for simplicity and consistency. Focused on staple vegetables and everyday cooking ingredients grown on nearby farms tucked into Vernon County’s coulees and side valleys. Ideal for individuals, couples, or anyone who wants local food without excess or experimentation.",
+    "base_price": 49.99,
+    "items": [
+      {
+        "id": 12,
+        "box_template_id": 5,
+        "product_id": 1,
+        "quantity": 1
+      },
+      {
+        "id": 13,
+        "box_template_id": 5,
+        "product_id": 3,
+        "quantity": 1
+      },
+      {
+        "id": 14,
+        "box_template_id": 5,
+        "product_id": 5,
+        "quantity": 1
+      },
+      {
+        "id": 15,
+        "box_template_id": 5,
+        "product_id": 4,
+        "quantity": 1
+      },
+      {
+        "id": 16,
+        "box_template_id": 5,
+        "product_id": 9,
+        "quantity": 2
+      },
+      {
+        "id": 17,
+        "box_template_id": 5,
+        "product_id": 6,
+        "quantity": 4
+      },
+      {
+        "id": 18,
+        "box_template_id": 5,
+        "product_id": 8,
+        "quantity": 1
+      }
+    ],
+    "image_url": "https://plus.unsplash.com/premium_photo-1663091415799-43432ca4ff5e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "is_active": 1
+  },
+  {
+    "id": 6,
+    "name": "Driftless Region Artisan Box",
+    "description": "Just high quality food, grown by real farmers. Your future self will thank you.",
+    "base_price": 88.33,
+    "items": [
+      {
+        "id": 19,
+        "box_template_id": 6,
+        "product_id": 1,
+        "quantity": 1
+      }
+    ],
+    "image_url": "./images/foodbox_generic.png",
+    "is_active": 1
+  },
+  {
+    "id": 7,
+    "name": "Rooted Firmly Box",
+    "description": "Curated collection of produce from ground",
+    "base_price": 22.99,
+    "items": [
+      {
+        "id": 20,
+        "box_template_id": 7,
+        "product_id": 2,
+        "quantity": 1
+      }
+    ],
+    "image_url": "https://plus.unsplash.com/premium_photo-1664299231810-29d1caf6f753?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "is_active": 1
+  },
+  {
+    "id": 8,
+    "name": "Old World Farmstand Box",
+    "description": "Echoing the simple, time-honored produce traditions of Amish and early settlers, this box focuses on straightforward, reliably delicious vegetables and farm goods—carrots, beets, cabbage, onions, and other staples tied to the area’s rural food heritage.",
+    "base_price": 49.99,
+    "items": [
+      {
+        "id": 21,
+        "box_template_id": 8,
+        "product_id": 4,
+        "quantity": 1
+      },
+      {
+        "id": 22,
+        "box_template_id": 8,
+        "product_id": 2,
+        "quantity": 4
+      },
+      {
+        "id": 23,
+        "box_template_id": 8,
+        "product_id": 6,
+        "quantity": 1
+      }
+    ],
+    "image_url": "./images/old-world-box.png",
+    "is_active": 1
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "vegetable",
+    "display_order": 1
+  },
+  {
+    "id": 2,
+    "name": "fruit",
+    "display_order": 2
+  },
+  {
+    "id": 3,
+    "name": "protein",
+    "display_order": 3
+  },
+  {
+    "id": 4,
+    "name": "pantry",
+    "display_order": 4
+  },
+  {
+    "id": 9,
+    "name": "General Store",
+    "display_order": 99
+  }
+]
