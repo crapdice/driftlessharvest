@@ -535,18 +535,32 @@ router.post('/admin/categories', checkRole(['admin', 'super_admin']), async (req
     try {
         const { name, description, image_url, is_active } = req.body;
 
-        const info = db.prepare(`
-            INSERT INTO categories (name, description, image_url, is_active)
-            VALUES (@name, @description, @image_url, @is_active)
-        `).run({
-            name, description, image_url,
-            is_active: is_active === undefined ? 1 : (is_active ? 1 : 0)
-        });
+        // Check which columns exist in categories table
+        const cols = db.prepare("PRAGMA table_info(categories)").all().map(c => c.name);
+        console.log('[Categories POST] columns:', cols.join(', '));
 
-        res.json({ success: true, id: info.lastInsertRowid });
+        if (cols.includes('description') && cols.includes('image_url') && cols.includes('is_active')) {
+            // Full schema
+            const info = db.prepare(`
+                INSERT INTO categories (name, description, image_url, is_active)
+                VALUES (@name, @description, @image_url, @is_active)
+            `).run({
+                name, description: description || '', image_url: image_url || '',
+                is_active: is_active === undefined ? 1 : (is_active ? 1 : 0)
+            });
+            res.json({ success: true, id: info.lastInsertRowid });
+        } else if (cols.includes('display_order')) {
+            // Minimal schema from migration 017: only name and display_order
+            const info = db.prepare('INSERT INTO categories (name, display_order) VALUES (?, 99)').run(name);
+            res.json({ success: true, id: info.lastInsertRowid });
+        } else {
+            // Fallback: just name
+            const info = db.prepare('INSERT INTO categories (name) VALUES (?)').run(name);
+            res.json({ success: true, id: info.lastInsertRowid });
+        }
     } catch (e) {
-        console.error("Failed to create category:", e);
-        res.status(500).json({ error: 'Failed to create category' });
+        console.error("[Categories POST Error]", e);
+        res.status(500).json({ error: 'Failed to create category', details: e.message });
     }
 });
 
