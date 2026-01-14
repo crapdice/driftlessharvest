@@ -214,7 +214,7 @@ document.addEventListener('click', (e) => {
     if (!btn) return;
 
     const action = btn.dataset.action;
-    const id = btn.dataset.id;
+    const id = parseInt(btn.dataset.id, 10); // Convert to number
 
     if (action === 'delete') deleteUser(id);
     if (action === 'reset-pwd') resetUserPassword(id);
