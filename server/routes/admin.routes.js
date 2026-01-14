@@ -578,23 +578,30 @@ router.post('/admin/delivery-windows', checkRole(['admin', 'super_admin']), vali
         const cols = db.prepare("PRAGMA table_info(delivery_windows)").all().map(c => c.name);
         console.log('[Delivery POST] columns:', cols.join(', '));
 
+        // Calculate day_of_week from date_value for NOT NULL constraint
+        const dayOfWeek = new Date(date_value + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
+
         // Build INSERT based on available columns
         if (cols.includes('date_label') && cols.includes('date_value') && cols.includes('is_active')) {
-            // New schema: use date_label, date_value, is_active
-            // Don't specify id - let autoincrement handle it
-            const info = db.prepare('INSERT INTO delivery_windows (date_label, date_value, is_active) VALUES (?, ?, 1)')
-                .run(date_label, date_value);
-            return res.json({ success: true, id: info.lastInsertRowid });
+            // New schema columns exist
+            if (cols.includes('day_of_week') && cols.includes('start_time') && cols.includes('end_time')) {
+                // Hybrid schema: has both old and new columns
+                const info = db.prepare('INSERT INTO delivery_windows (date_label, date_value, is_active, day_of_week, start_time, end_time) VALUES (?, ?, 1, ?, ?, ?)')
+                    .run(date_label, date_value, dayOfWeek, '08:00', '18:00');
+                return res.json({ success: true, id: info.lastInsertRowid });
+            } else {
+                // Pure new schema: only date_label, date_value, is_active
+                const info = db.prepare('INSERT INTO delivery_windows (date_label, date_value, is_active) VALUES (?, ?, 1)')
+                    .run(date_label, date_value);
+                return res.json({ success: true, id: info.lastInsertRowid });
+            }
         } else if (cols.includes('date_value') && !cols.includes('date_label')) {
             // Partial migration - has date_value but not date_label
-            // Also need to provide day_of_week, start_time, end_time to satisfy NOT NULL
-            const dayOfWeek = new Date(date_value).toLocaleDateString('en-US', { weekday: 'long' });
             const info = db.prepare('INSERT INTO delivery_windows (day_of_week, start_time, end_time, date_value) VALUES (?, ?, ?, ?)')
                 .run(dayOfWeek, '08:00', '18:00', date_value);
             return res.json({ success: true, id: info.lastInsertRowid });
         } else {
             // Original schema - use day_of_week, start_time, end_time
-            const dayOfWeek = new Date(date_value).toLocaleDateString('en-US', { weekday: 'long' });
             const info = db.prepare('INSERT INTO delivery_windows (day_of_week, start_time, end_time) VALUES (?, ?, ?)')
                 .run(dayOfWeek, '08:00', '18:00');
             return res.json({ success: true, id: info.lastInsertRowid });
