@@ -8,6 +8,7 @@ import * as api from './api.js';
 
 let isMarketplaceLoading = false;
 let hasLoadedMarketplace = false;
+window.hasMarketplaceLoaded = false; // Expose for UI logic
 
 export async function loadMarketplace() {
     if (isMarketplaceLoading || hasLoadedMarketplace) return;
@@ -30,6 +31,7 @@ export async function loadMarketplace() {
     } finally {
         isMarketplaceLoading = false;
         hasLoadedMarketplace = true; // Always mark loaded to stop spinner
+        window.hasMarketplaceLoaded = true;
     }
 }
 

@@ -21,6 +21,15 @@ runner.run();
 try {
     // 1. Ensure admin_types exist
     try {
+        // Ensure table exists (in case migrations disastrously failed)
+        db.prepare(`
+            CREATE TABLE IF NOT EXISTS admin_types (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                permissions TEXT
+            )
+        `).run();
+
         const hasTypes = db.prepare('SELECT count(*) as c FROM admin_types').get();
         if (hasTypes.c === 0) {
             db.prepare("INSERT INTO admin_types (name, permissions) VALUES ('superadmin', '*'), ('admin', 'read,write')").run();
