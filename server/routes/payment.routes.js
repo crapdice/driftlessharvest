@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const { checkRole } = require('../middleware/auth');
+const InventoryService = require('../services/InventoryService');
 const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STRIPE_SECRET_KEY) : null;
 
 // POST /api/create-payment-intent
@@ -16,74 +17,18 @@ router.post('/create-payment-intent', async (req, res) => {
         }
 
         // 1. Calculate Total & Validate Stock (Server-Side)
-        let total = 0;
-        const verifiedItems = [];
-
         // Check Inventory Transaction
         const reserveTx = db.transaction(() => {
-            const failedItems = [];
-
-            for (const item of items) {
-                if (item.type === 'box') {
-                    // Box Logic
-                    const template = db.prepare('SELECT base_price, name FROM box_templates WHERE id = ?').get(item.id);
-                    if (!template) {
-                        failedItems.push({ id: item.id, name: 'Unknown Box', error: 'Template not found' });
-                        continue;
-                    }
-
-                    // We need to check constituent items for the box
-                    // Since specific items might vary, we assume `item.items` from frontend reflects the template
-                    // But strictly looking at `box_items` is safer if boxes are static.
-                    const contents = db.prepare('SELECT product_id, quantity FROM box_items WHERE box_template_id = ?').all(item.id);
-
-                    for (const sub of contents) {
-                        const p = db.prepare('SELECT stock, name FROM products WHERE id = ?').get(sub.product_id);
-                        const required = sub.quantity * item.qty;
-                        if (!p || p.stock < required) {
-                            failedItems.push({ id: item.id, name: template.name, error: `Content ${p ? p.name : 'Unknown'} out of stock` });
-                            break; // Box fails
-                        }
-                    }
-
-                    if (failedItems.find(f => f.id === item.id)) continue;
-
-                    // Reserve logic (Decrement)
-                    for (const sub of contents) {
-                        db.prepare('UPDATE products SET stock = stock - ? WHERE id = ?').run(sub.quantity * item.qty, sub.product_id);
-                    }
-
-                    total += template.base_price * item.qty;
-                    verifiedItems.push({ ...item, price: template.base_price, name: template.name });
-
-                } else {
-                    // Product Logic
-                    const product = db.prepare('SELECT price, stock, name FROM products WHERE id = ?').get(item.id);
-                    if (!product) {
-                        failedItems.push({ id: item.id, name: 'Unknown Item', error: 'Not found' });
-                        continue;
-                    }
-
-                    if (product.stock < item.qty) {
-                        failedItems.push({ id: item.id, name: product.name, error: 'Insufficient stock' });
-                        continue;
-                    }
-
-                    // Decrement
-                    db.prepare('UPDATE products SET stock = stock - ? WHERE id = ?').run(item.qty, item.id);
-
-                    total += product.price * item.qty;
-                    verifiedItems.push({ ...item, price: product.price, name: product.name });
-                }
-            }
+            const { failedItems, verifiedItems, total } = InventoryService.validateStock(items);
 
             if (failedItems.length > 0) {
-                // Rollback implied if we throw, but we want to return specific errors?
-                // better-sqlite3 rollback on throw.
                 const err = new Error('Inventory Check Failed');
                 err.failedItems = failedItems;
                 throw err;
             }
+
+            // Reserve Logic
+            InventoryService.reserveStock(verifiedItems);
 
             return { total, verifiedItems };
         });
@@ -256,16 +201,7 @@ router.post('/webhook', async (req, res) => {
             const order = db.prepare('SELECT items FROM orders WHERE id = ?').get(orderId);
             if (order && order.items) {
                 const items = JSON.parse(order.items);
-                for (const item of items) {
-                    if (item.type === 'box') {
-                        const contents = db.prepare('SELECT product_id, quantity FROM box_items WHERE box_template_id = ?').all(item.id);
-                        for (const sub of contents) {
-                            db.prepare('UPDATE products SET stock = stock + ? WHERE id = ?').run(sub.quantity * item.qty, sub.product_id);
-                        }
-                    } else {
-                        db.prepare('UPDATE products SET stock = stock + ? WHERE id = ?').run(item.qty, item.id);
-                    }
-                }
+                InventoryService.releaseStock(items);
             }
         });
         cancelTx();

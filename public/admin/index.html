@@ -2360,7 +2360,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Auto-resize textareas on focus/input
             // AND Expand Inputs on focus
-            const expandable = document.querySelectorAll('textarea, input[type="text"]');
+            const expandable = document.querySelectorAll('textarea, input[type="text"]:not(#new-cat-name)');
 
             expandable.forEach(el => {
                 el.classList.add('expand-on-focus', 'expand-transition');

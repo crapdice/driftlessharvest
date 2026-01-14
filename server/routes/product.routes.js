@@ -53,20 +53,20 @@ router.get('/admin/products', checkRole(['admin', 'super_admin']), (req, res) =>
 router.post('/admin/products', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
         const { name, category, price, image_url, tags, stock, is_active, farm_id } = req.body;
-        const id = 'p-' + Date.now();
 
-        db.prepare(`
-      INSERT INTO products (id, name, category, price, image_url, tags, stock, is_active, farm_id)
-      VALUES (@id, @name, @category, @price, @image_url, @tags, @stock, @is_active, @farm_id)
+
+        const info = db.prepare(`
+      INSERT INTO products (name, category, price, image_url, tags, stock, is_active, farm_id)
+      VALUES (@name, @category, @price, @image_url, @tags, @stock, @is_active, @farm_id)
     `).run({
-            id, name, category, price, image_url,
+            name, category, price, image_url,
             tags: JSON.stringify(tags || []),
             stock: parseInt(stock) || 0,
             is_active: is_active === undefined ? 1 : (is_active ? 1 : 0),
             farm_id: farm_id || null
         });
 
-        res.json({ success: true, id });
+        res.json({ success: true, id: info.lastInsertRowid });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to create product' });
@@ -234,28 +234,29 @@ router.get('/admin/box-templates', checkRole(['admin', 'super_admin']), (req, re
 router.post('/admin/box-templates', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
         const { name, description, price, items, image_url, is_active } = req.body;
-        const id = 't-' + Date.now();
 
-        const insertBox = db.prepare('INSERT INTO box_templates (id, name, description, base_price, items, image_url, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        const insertBox = db.prepare('INSERT INTO box_templates (name, description, base_price, items, image_url, is_active) VALUES (?, ?, ?, ?, ?, ?)');
         const insertItem = db.prepare('INSERT INTO box_items (box_template_id, product_id, quantity) VALUES (?, ?, ?)');
 
         // Validate items exist? (Optional but good)
 
+        let newId;
         const txn = db.transaction(() => {
             // We keep 'items' column for legacy/read-fallback if needed, or empty array string
-            insertBox.run(id, name, description, price, '[]', image_url || '', is_active === undefined ? 1 : (is_active ? 1 : 0));
+            const info = insertBox.run(name, description, price, '[]', image_url || '', is_active === undefined ? 1 : (is_active ? 1 : 0));
+            newId = info.lastInsertRowid;
 
             if (Array.isArray(items)) {
                 for (const item of items) {
                     const pid = item.product_id || item.id || item.productId; // Frontend might send different formats
                     const qty = item.qty || item.quantity || 1;
-                    if (pid) insertItem.run(id, pid, qty);
+                    if (pid) insertItem.run(newId, pid, qty);
                 }
             }
         });
 
         txn();
-        res.json({ success: true, id });
+        res.json({ success: true, id: newId });
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: 'Failed' });
@@ -333,9 +334,8 @@ router.get('/categories', (req, res) => {
 router.post('/categories', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
         const { name } = req.body;
-        const id = 'c-' + Date.now();
-        db.prepare('INSERT INTO categories (id, name, display_order) VALUES (?, ?, 99)').run(id, name);
-        res.json({ success: true, id });
+        const info = db.prepare('INSERT INTO categories (name, display_order) VALUES (?, 99)').run(name);
+        res.json({ success: true, id: info.lastInsertRowid });
     } catch (err) { res.status(500).json({ error: 'Failed' }); }
 });
 
