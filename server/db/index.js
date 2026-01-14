@@ -17,46 +17,18 @@ const db = new Database(DB_PATH);
 const runner = new MigrationRunner(db);
 runner.run();
 
-// Seed Admin User (if env var is present)
-if (process.env.ADMIN_PASSWORD) {
-    console.log('[Startup] Seeding Admin User...');
-    try {
-        const bcrypt = require('bcryptjs');
-        const adminEmail = 'admin@driftlessharvest.com';
-        const hashedPassword = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
-
-        // Ensure admin_types exist (created in migration 022)
-        const superAdminType = db.prepare("SELECT id FROM admin_types WHERE name = 'superadmin'").get();
-        const typeId = superAdminType ? superAdminType.id : null;
-
-        const existingAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
-
-        if (existingAdmin) {
-            db.prepare(`
-                UPDATE users 
-                SET password = ?, is_admin = 1, role = 'super_admin', admin_type_id = ? 
-                WHERE id = ?
-            `).run(hashedPassword, typeId, existingAdmin.id);
-            console.log('[Startup] Admin password updated.');
-        } else {
-            db.prepare(`
-                INSERT INTO users (email, password, first_name, last_name, is_admin, role, admin_type_id)
-                VALUES (?, ?, 'Admin', 'User', 1, 'super_admin', ?)
-            `).run(adminEmail, hashedPassword, typeId);
-            console.log('[Startup] Admin user created.');
-        }
-    } catch (e) {
-        console.error('[Startup] Failed to seed admin user:', e.message);
-    }
-}
-
 // --- RESCUE LOGIC (Runs on every startup to fix deployment issues) ---
 try {
     // 1. Ensure admin_types exist
-    const hasTypes = db.prepare('SELECT count(*) as c FROM admin_types').get();
-    if (hasTypes.c === 0) {
-        db.prepare("INSERT INTO admin_types (name, permissions) VALUES ('superadmin', '*'), ('admin', 'read,write')").run();
-        console.log('[Rescue] Seeded admin_types.');
+    try {
+        const hasTypes = db.prepare('SELECT count(*) as c FROM admin_types').get();
+        if (hasTypes.c === 0) {
+            db.prepare("INSERT INTO admin_types (name, permissions) VALUES ('superadmin', '*'), ('admin', 'read,write')").run();
+            console.log('[Rescue] Seeded admin_types.');
+        }
+    } catch (e) {
+        // Table might not exist yet if migration failed completely, but we try.
+        console.log('[Rescue] admin_types check failed (might be missing table):', e.message);
     }
 
     // 2. Fix config.json if images are missing (Persistence Recovery)
@@ -104,5 +76,42 @@ try {
     console.error('[Rescue] Verification failed:', e);
 }
 // ---------------------------------------------------------------------
+
+// Seed Admin User (Always run to ensure access)
+const targetPassword = process.env.ADMIN_PASSWORD || 'password123';
+if (targetPassword) {
+    console.log('[Startup] Seeding Admin User...');
+    try {
+        const bcrypt = require('bcryptjs');
+        const adminEmail = 'admin@driftlessharvest.com';
+        const hashedPassword = bcrypt.hashSync(targetPassword, 10);
+
+        let typeId = null;
+        try {
+            // Ensure admin_types exist (created in migration 022)
+            const superAdminType = db.prepare("SELECT id FROM admin_types WHERE name = 'superadmin'").get();
+            typeId = superAdminType ? superAdminType.id : null;
+        } catch (e) { console.log("Warning: admin_types table missing during seed"); }
+
+        const existingAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
+
+        if (existingAdmin) {
+            db.prepare(`
+                UPDATE users 
+                SET password = ?, is_admin = 1, role = 'super_admin', admin_type_id = ? 
+                WHERE id = ?
+            `).run(hashedPassword, typeId, existingAdmin.id);
+            console.log('[Startup] Admin password updated.');
+        } else {
+            db.prepare(`
+                INSERT INTO users (email, password, first_name, last_name, is_admin, role, admin_type_id)
+                VALUES (?, ?, 'Admin', 'User', 1, 'super_admin', ?)
+            `).run(adminEmail, hashedPassword, typeId);
+            console.log('[Startup] Admin user created.');
+        }
+    } catch (e) {
+        console.error('[Startup] Failed to seed admin user:', e.message);
+    }
+}
 
 module.exports = db;

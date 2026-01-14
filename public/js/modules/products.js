@@ -24,12 +24,12 @@ export async function loadMarketplace() {
         store.setTemplates(templates || []);
 
         setMarketplaceData(products, templates || []);
-        hasLoadedMarketplace = true; // Mark as loaded even if empty to prevent loops
         render();
     } catch (e) {
         console.error("Failed to load marketplace data", e);
     } finally {
         isMarketplaceLoading = false;
+        hasLoadedMarketplace = true; // Always mark loaded to stop spinner
     }
 }
 
