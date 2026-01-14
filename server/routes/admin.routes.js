@@ -447,17 +447,36 @@ router.post('/admin/box-templates', checkRole(['admin', 'super_admin']), async (
 // GET /api/admin/delivery-schedule
 router.get('/admin/delivery-schedule', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
-        // Direct SQL Aggregation on the Source of Truth column
-        // Much faster and accurate than parsing JSON blobs
-        const schedule = db.prepare(`
-            SELECT delivery_window as date, count(*) as count 
-            FROM orders 
-            WHERE status IN ('Pending', 'Paid', 'Packed') 
-              AND delivery_window IS NOT NULL 
-              AND delivery_window != ''
-            GROUP BY delivery_window
-            ORDER BY delivery_date ASC
-        `).all();
+        // Check if delivery_date column exists
+        const cols = db.prepare("PRAGMA table_info(orders)").all().map(c => c.name);
+
+        let schedule;
+        if (cols.includes('delivery_date') && cols.includes('delivery_window')) {
+            // Full query with delivery_date sorting
+            schedule = db.prepare(`
+                SELECT delivery_window as date, count(*) as count 
+                FROM orders 
+                WHERE status IN ('Pending', 'Paid', 'Packed') 
+                  AND delivery_window IS NOT NULL 
+                  AND delivery_window != ''
+                GROUP BY delivery_window
+                ORDER BY delivery_date ASC
+            `).all();
+        } else if (cols.includes('delivery_window')) {
+            // Fallback without delivery_date column
+            schedule = db.prepare(`
+                SELECT delivery_window as date, count(*) as count 
+                FROM orders 
+                WHERE status IN ('Pending', 'Paid', 'Packed') 
+                  AND delivery_window IS NOT NULL 
+                  AND delivery_window != ''
+                GROUP BY delivery_window
+            `).all();
+        } else {
+            // No delivery columns at all - return empty
+            console.warn('[Delivery] orders table missing delivery columns');
+            schedule = [];
+        }
 
         res.json(schedule);
     } catch (e) {
