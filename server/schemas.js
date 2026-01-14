@@ -118,8 +118,10 @@ module.exports = {
     signupSchema,
     loginSchema,
     updateProfileSchema,
+    createUserSchema,
     updateUserSchema,
     orderStatusSchema,
     deliveryWindowSchema,
     createOrderSchema
 };
+
