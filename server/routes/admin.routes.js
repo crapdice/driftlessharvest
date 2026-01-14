@@ -489,19 +489,35 @@ router.get('/admin/delivery-schedule', checkRole(['admin', 'super_admin']), (req
 // GET /api/admin/delivery-windows
 router.get('/admin/delivery-windows', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
+        // Check if delivery_windows table exists
+        const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='delivery_windows'").all();
+        if (tables.length === 0) {
+            console.warn('[Delivery] delivery_windows table does not exist');
+            return res.json([]);
+        }
+
+        // Check which columns exist
+        const cols = db.prepare("PRAGMA table_info(delivery_windows)").all().map(c => c.name);
+        const hasDateValue = cols.includes('date_value');
+
         const today = new Date().toISOString().split('T')[0];
 
-        // 1. Auto-Archive: Deactivate past windows
-        db.prepare('UPDATE delivery_windows SET is_active = 0 WHERE date_value < ? AND is_active = 1').run(today);
+        if (hasDateValue) {
+            // 1. Auto-Archive: Deactivate past windows
+            db.prepare('UPDATE delivery_windows SET is_active = 0 WHERE date_value < ? AND is_active = 1').run(today);
 
-        // 2. Fetch: Show recent history (last 30 days) + future
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-        const windows = db.prepare('SELECT * FROM delivery_windows WHERE date_value >= ? ORDER BY date_value').all(thirtyDaysAgo);
-        res.json(windows);
+            // 2. Fetch: Show recent history (last 30 days) + future
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            const windows = db.prepare('SELECT * FROM delivery_windows WHERE date_value >= ? ORDER BY date_value').all(thirtyDaysAgo);
+            res.json(windows);
+        } else {
+            // No date_value column - just return all windows
+            const windows = db.prepare('SELECT * FROM delivery_windows').all();
+            res.json(windows);
+        }
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: 'Failed' });
+        console.error('[Delivery Windows Error]', e);
+        res.status(500).json({ error: 'Failed', details: e.message });
     }
 });
 
