@@ -20,15 +20,25 @@ export function getMarketplaceData() {
 const isEditorialLayout = () => window.CONFIG?.theme?.layout === 'editorial';
 
 export function renderBoxes() {
-  // Initial Load
-  if (availableProducts.length === 0 && typeof window.loadMarketplace === 'function') {
-    window.loadMarketplace();
-    return `
-      <div class="min-h-screen bg-nature-50 flex flex-col items-center justify-center">
-             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-nature-900 mb-4"></div>
-             <p class="text-nature-900/60 font-medium font-sans animate-pulse">Opening the journal...</p>
-          </div>
-      `;
+  // Initial Load (Only if not yet loaded)
+  if (availableProducts.length === 0 && availableTemplates.length === 0) {
+    if (typeof window.loadMarketplace === 'function' && !window.hasMarketplaceLoaded) {
+      window.loadMarketplace();
+      return `
+          <div class="min-h-screen bg-nature-50 flex flex-col items-center justify-center">
+                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-nature-900 mb-4"></div>
+                 <p class="text-nature-900/60 font-medium font-sans animate-pulse">Opening the journal...</p>
+              </div>
+          `;
+    } else if (window.hasMarketplaceLoaded) {
+      // Loaded but empty
+      return `
+          <div class="min-h-screen bg-nature-50 flex flex-col items-center justify-center p-6 text-center">
+                 <h2 class="text-3xl font-serif text-nature-900 mb-4">The Journal is Waiting</h2>
+                 <p class="text-nature-600 font-sans max-w-md">Our harvest is currently being prepared. Please check back soon for fresh provisions.</p>
+              </div>
+          `;
+    }
   }
 
   const cart = store.getCart().items;

@@ -46,17 +46,11 @@ router.post('/auth/login', validate(loginSchema), async (req, res) => {
         }
 
         // Resolve Role
-        let role = 'user';
+        let role = user.role || 'user'; // Default to DB role
         if (user.is_admin) {
             const type = db.prepare('SELECT name FROM admin_types WHERE id = ?').get(user.admin_type_id);
-            // Should map 'superadmin' -> 'super_admin' to match legacy middleware check?
-            // Middleware checks: ['admin', 'super_admin']. 
-            // DB types: 'superadmin', 'admin'.
-            // We need to ensure we send a token role that passes checkRole(['admin', 'super_admin'])
             if (type && type.name === 'superadmin') role = 'super_admin';
             else if (type) role = type.name;
-        } else {
-            role = user.role || 'user'; // Fallback to legacy column just in case, or default
         }
 
         const token = jwt.sign({ id: user.id, email: user.email, role: role }, JWT_SECRET, { expiresIn: '24h' });
@@ -89,13 +83,11 @@ router.post('/login', validate(loginSchema), async (req, res) => {
         }
 
         // Resolve Role
-        let role = 'user';
+        let role = user.role || 'user';
         if (user.is_admin) {
             const type = db.prepare('SELECT name FROM admin_types WHERE id = ?').get(user.admin_type_id);
             if (type && type.name === 'superadmin') role = 'super_admin';
             else if (type) role = type.name;
-        } else {
-            role = user.role || 'user';
         }
 
         const token = jwt.sign({ id: user.id, email: user.email, role: role }, JWT_SECRET, { expiresIn: '24h' });

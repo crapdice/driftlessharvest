@@ -50,4 +50,59 @@ if (process.env.ADMIN_PASSWORD) {
     }
 }
 
+// --- RESCUE LOGIC (Runs on every startup to fix deployment issues) ---
+try {
+    // 1. Ensure admin_types exist
+    const hasTypes = db.prepare('SELECT count(*) as c FROM admin_types').get();
+    if (hasTypes.c === 0) {
+        db.prepare("INSERT INTO admin_types (name, permissions) VALUES ('superadmin', '*'), ('admin', 'read,write')").run();
+        console.log('[Rescue] Seeded admin_types.');
+    }
+
+    // 2. Fix config.json if images are missing (Persistence Recovery)
+    const DATA_FILE = path.join(DATA_DIR, 'config.json');
+    if (fs.existsSync(DATA_FILE)) {
+        const configRaw = fs.readFileSync(DATA_FILE, 'utf8');
+        let config;
+        try { config = JSON.parse(configRaw); } catch (e) { console.error('[Rescue] Config parse error'); }
+
+        if (config) {
+            let changed = false;
+            // Ensure Auth Object
+            if (!config.auth) { config.auth = {}; changed = true; }
+            if (!config.auth.login) { config.auth.login = {}; changed = true; }
+            if (!config.auth.signup) { config.auth.signup = {}; changed = true; }
+
+            // Check Paths
+            if (!config.auth.login.image) {
+                config.auth.login.image = '/assets/images/hero_rustic.png';
+                changed = true;
+            }
+            if (!config.auth.signup.image) {
+                config.auth.signup.image = '/assets/images/hero_misty.png';
+                changed = true;
+            }
+
+            // Ensure Featured Products (Fix blank home page sections)
+            if (!config.featuredProducts || config.featuredProducts.length === 0) {
+                // Try to find ANY products to feature
+                const anyProd = db.prepare('SELECT id FROM products LIMIT 3').all();
+                if (anyProd.length > 0) {
+                    config.featuredProducts = anyProd.map(p => p.id);
+                    changed = true;
+                    console.log('[Rescue] Seeded featured products from DB.');
+                }
+            }
+
+            if (changed) {
+                fs.writeFileSync(DATA_FILE, JSON.stringify(config, null, 2));
+                console.log('[Rescue] Patched config.json with missing images/data.');
+            }
+        }
+    }
+} catch (e) {
+    console.error('[Rescue] Verification failed:', e);
+}
+// ---------------------------------------------------------------------
+
 module.exports = db;
