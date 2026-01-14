@@ -6,7 +6,13 @@ import { BentoGrid } from '../components/BentoGrid.js';
 import { store } from '../store/index.js';
 import * as api from './api.js';
 
+let isMarketplaceLoading = false;
+let hasLoadedMarketplace = false;
+
 export async function loadMarketplace() {
+    if (isMarketplaceLoading || hasLoadedMarketplace) return;
+    isMarketplaceLoading = true;
+
     try {
         const [products, templates] = await Promise.all([
             api.fetchProducts(),
@@ -18,9 +24,12 @@ export async function loadMarketplace() {
         store.setTemplates(templates || []);
 
         setMarketplaceData(products, templates || []);
+        hasLoadedMarketplace = true; // Mark as loaded even if empty to prevent loops
         render();
     } catch (e) {
         console.error("Failed to load marketplace data", e);
+    } finally {
+        isMarketplaceLoading = false;
     }
 }
 
