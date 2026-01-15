@@ -47,7 +47,7 @@ export function debounce(func, wait) {
         };
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
-    }; \
+    };
 }
 
 // Phone input handler for admin forms
