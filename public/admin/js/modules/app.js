@@ -139,7 +139,7 @@ function initMobileMenu() {
 
 function showLoginModal() {
     const modal = document.getElementById('login-modal');
-    if (modal) modal.classList.remove('hidden');
+    if (modal) modal.style.display = 'flex';
 }
 
 async function handleLogin(e) {
@@ -158,7 +158,7 @@ async function handleLogin(e) {
         if (res.ok) {
             localStorage.setItem('harvest_token', data.token);
             localStorage.setItem('harvest_user', JSON.stringify(data.user)); // Store User Info
-            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-modal').style.display = 'none';
             renderHeaderUser(); // Update UI
             setTab(currentTab);
         } else {
