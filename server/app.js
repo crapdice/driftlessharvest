@@ -53,6 +53,8 @@ app.use('/api', orderRoutes);
 app.use('/api', configRoutes);
 app.use('/api', generalRoutes);
 app.use('/api', paymentRoutes);
+app.use('/api', require('./routes/utilities.routes'));
+
 
 // Global Error Handler
 app.use((err, req, res, next) => {
