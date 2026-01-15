@@ -322,6 +322,14 @@ export async function saveUser() {
     }
 }
 
+// Make modal functions globally accessible
+window.openUserModal = openUserModal;
+window.saveUser = saveUser;
+window.closeUserModal = function () {
+    document.getElementById('user-modal').classList.add('hidden');
+    document.getElementById('user-modal').classList.remove('flex');
+};
+
 // Event Delegation for Table Actions
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
