@@ -117,7 +117,7 @@ function renderUsers(users, mode) {
                 <div contenteditable="true" 
                      data-field="phone" 
                      data-user-id="${u.id}"
-                     class="editable-cell phone-input px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                     class="editable-cell phone-input px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 min-w-[140px]"
                      oninput="handlePhoneInput(this, ${u.id})">${formatPhoneDisplay(u.phone)}</div>
             </td>
             <td class="p-4 text-sm">
