@@ -95,7 +95,7 @@ router.post('/admin/users', checkRole(['admin', 'super_admin']), validate(create
 // PUT /api/admin/users/:id
 router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(updateUserSchema), (req, res) => {
     try {
-        const { email, role, phone, firstName, lastName } = req.body;
+        const { email, role, phone } = req.body;
 
         let typeId = null;
         let isAdmin = 0;
@@ -114,16 +114,14 @@ router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(upd
 
         db.prepare(`
             UPDATE users 
-            SET email = @email, is_admin = @isAdmin, admin_type_id = @typeId, phone = @phone, first_name = @firstName, last_name = @lastName
+            SET email = @email, is_admin = @isAdmin, admin_type_id = @typeId, phone = @phone
             WHERE id = @id
         `).run({
             id: req.params.id,
             email,
             isAdmin,
             typeId,
-            phone: phone || '',
-            firstName: firstName || null,
-            lastName: lastName || null
+            phone: phone || ''
         });
 
         res.json({ success: true });

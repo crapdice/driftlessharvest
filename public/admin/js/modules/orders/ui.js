@@ -394,6 +394,7 @@ export function renderOrdersTable(orders, templatesCache, productsCache, activeS
                     <div class="flex flex-col">
                         <span class="text-sm text-gray-700 font-medium leading-tight">${street}</span>
                          <span class="text-xs text-gray-500 font-normal">${city}${state ? `, ${state}` : ''} ${zip}</span>
+                         ${shipping.phone ? `<span class="text-xs text-gray-400 font-mono mt-0.5">${shipping.phone}</span>` : ''}
                     </div>
                     <div class="flex items-center gap-2 mt-1">
                          <span class="text-xs text-indigo-600 font-medium bg-indigo-50 px-1.5 py-0.5 rounded">${shipDateDisplay}</span>
