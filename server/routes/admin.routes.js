@@ -135,21 +135,25 @@ router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(upd
 
         // Handle address update/creation if address fields are provided
         if (address || city || state || zip) {
+            // Get user's name for address
+            const user = db.prepare('SELECT first_name, last_name FROM users WHERE id = ?').get(req.params.id);
+            const fullName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'User';
+
             const existingAddress = db.prepare('SELECT id FROM addresses WHERE user_id = ?').get(req.params.id);
 
             if (existingAddress) {
                 // Update existing address
                 db.prepare(`
                     UPDATE addresses 
-                    SET street = ?, city = ?, state = ?, zip = ?
+                    SET name = ?, street = ?, city = ?, state = ?, zip = ?
                     WHERE user_id = ?
-                `).run(address || '', city || '', state || '', zip || '', req.params.id);
+                `).run(fullName, address || '', city || '', state || '', zip || '', req.params.id);
             } else {
                 // Create new address
                 db.prepare(`
-                    INSERT INTO addresses (user_id, street, city, state, zip, created_at)
-                    VALUES (?, ?, ?, ?, ?, datetime('now'))
-                `).run(req.params.id, address || '', city || '', state || '', zip || '');
+                    INSERT INTO addresses (user_id, name, street, city, state, zip, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+                `).run(req.params.id, fullName, address || '', city || '', state || '', zip || '');
             }
         }
 
