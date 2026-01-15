@@ -32,6 +32,69 @@ window.searchUsers = (query) => {
     renderUsers(usersCache, currentMode);
 };
 
+// Phone Formatting Functions
+function formatPhoneNumber(input) {
+    // Strip all non-digits
+    const digits = input.replace(/\D/g, '');
+
+    // Limit to 10 digits
+    const limited = digits.substring(0, 10);
+
+    // Format based on length
+    if (limited.length === 0) return '';
+    if (limited.length <= 3) return `(${limited}`;
+    if (limited.length <= 6) return `(${limited.slice(0, 3)}) ${limited.slice(3)}`;
+    return `(${limited.slice(0, 3)}) ${limited.slice(3, 6)}-${limited.slice(6)}`;
+}
+
+function formatPhoneDisplay(phone) {
+    if (!phone) return '';
+    return formatPhoneNumber(phone);
+}
+
+function getCursorPosition(element) {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        return preCaretRange.toString().length;
+    }
+    return 0;
+}
+
+function setCursorPosition(element, position) {
+    const range = document.createRange();
+    const sel = window.getSelection();
+    const textNode = element.firstChild;
+
+    if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+        const pos = Math.min(position, textNode.length);
+        range.setStart(textNode, pos);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+}
+
+window.handlePhoneInput = function (element, userId) {
+    const cursorPos = getCursorPosition(element);
+    const formatted = formatPhoneNumber(element.textContent);
+    element.textContent = formatted;
+
+    // Adjust cursor position after formatting
+    let newPos = cursorPos;
+    if (formatted.length > cursorPos) {
+        newPos = cursorPos;
+    } else {
+        newPos = formatted.length;
+    }
+
+    setCursorPosition(element, newPos);
+    markRowAsEdited(userId);
+};
+
 function renderUsers(users, mode) {
     const tbody = document.getElementById('customers-table-body');
     if (!tbody) return;
@@ -67,8 +130,8 @@ function renderUsers(users, mode) {
                 <div contenteditable="true" 
                      data-field="phone" 
                      data-user-id="${u.id}"
-                     class="editable-cell px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                     oninput="markRowAsEdited(${u.id})">${u.phone || ''}</div>
+                     class="editable-cell phone-input px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                     oninput="handlePhoneInput(this, ${u.id})">${formatPhoneDisplay(u.phone)}</div>
             </td>
             <td class="p-4 text-sm">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${u.order_count > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}">
@@ -77,11 +140,10 @@ function renderUsers(users, mode) {
             </td>
             <td class="p-4 text-sm text-gray-500">${new Date(u.created_at).toLocaleDateString()}</td>
             <td class="p-4 text-sm text-gray-600">
-                <div contenteditable="true" 
-                     data-field="address" 
-                     data-user-id="${u.id}"
-                     class="editable-cell px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 min-w-[200px]"
-                     oninput="markRowAsEdited(${u.id})">${addressText}</div>
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-700">${addressText || '<span class="text-gray-400 italic">No address</span>'}</span>
+                    ${(mode === 'admin') ? `<button onclick="openUserModal(${u.id})" class="text-xs text-blue-600 hover:text-blue-800">Edit</button>` : ''}
+                </div>
             </td>
             <td class="p-4 text-sm font-medium ${u.role?.includes('admin') ? 'text-purple-600' : 'text-gray-500'}">
                 ${u.role || 'user'}
