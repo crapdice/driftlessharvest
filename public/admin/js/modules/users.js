@@ -22,6 +22,16 @@ export async function loadUsers(mode = 'customer') {
     }
 }
 
+// Track edited rows
+const editedRows = new Set();
+
+// Search State
+let activeUserSearch = '';
+window.searchUsers = (query) => {
+    activeUserSearch = query.trim();
+    renderUsers(usersCache, currentMode);
+};
+
 function renderUsers(users, mode) {
     const tbody = document.getElementById('customers-table-body');
     if (!tbody) return;
@@ -39,70 +49,113 @@ function renderUsers(users, mode) {
         );
     }
 
-    // 2. Role Filter (Modified: User requested to see admins even in customer view if that's all there is)
-    // We will show all users by default for now, or we could just filter if the search is empty?
-    // User complaint was "no customers appearing because only admin have been customers".
-    // So we will REMOVE the explicit hide of admins.
+    tbody.innerHTML = filtered.map(u => {
+        const addr = u.address || {};
+        const addressText = addr.street ? `${addr.street}, ${addr.city || ''} ${addr.state || ''} ${addr.zip || ''}`.trim() : '';
 
-    /* 
-    const filteredByMode = filtered.filter(u => {
-        const isAdmin = (u.role === 'admin' || u.role === 'super_admin');
-        return (mode === 'admin') ? true : !isAdmin;
-    });
-    */
-    // rendering 'filtered' directly now (all roles visible)
-
-    tbody.innerHTML = filtered.map(u => `
-        <tr class="hover:bg-gray-50">
+        return `
+        <tr class="hover:bg-gray-50" data-user-id="${u.id}">
             <td class="p-4 font-mono text-xs text-gray-400">${String(u.id).slice(-6)}</td>
-            <td class="p-4 text-sm font-medium text-gray-900">${u.email}</td>
+            <td class="p-4 text-sm font-medium text-gray-900">
+                <div contenteditable="true" 
+                     data-field="email" 
+                     data-user-id="${u.id}"
+                     class="editable-cell px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                     oninput="markRowAsEdited(${u.id})">${u.email}</div>
+            </td>
+            <td class="p-4 text-sm text-gray-600">
+                <div contenteditable="true" 
+                     data-field="phone" 
+                     data-user-id="${u.id}"
+                     class="editable-cell px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                     oninput="markRowAsEdited(${u.id})">${u.phone || ''}</div>
+            </td>
+            <td class="p-4 text-sm">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${u.order_count > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}">
+                    ${u.order_count || 0}
+                </span>
+            </td>
             <td class="p-4 text-sm text-gray-500">${new Date(u.created_at).toLocaleDateString()}</td>
             <td class="p-4 text-sm text-gray-600">
-                ${renderAddress(u.address)}
+                <div contenteditable="true" 
+                     data-field="address" 
+                     data-user-id="${u.id}"
+                     class="editable-cell px-2 py-1 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300 min-w-[200px]"
+                     oninput="markRowAsEdited(${u.id})">${addressText}</div>
             </td>
             <td class="p-4 text-sm font-medium ${u.role?.includes('admin') ? 'text-purple-600' : 'text-gray-500'}">
                 ${u.role || 'user'}
             </td>
             <td class="p-4 text-right">
-                ${(mode === 'admin') ? renderAdminActions(u) : '<span class="text-gray-300 text-xs">View Only</span>'}
+                <div class="flex items-center justify-end gap-2">
+                    <button onclick="saveUserInline(${u.id})" 
+                            id="save-btn-${u.id}"
+                            class="hidden text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-full transition-colors">
+                        Save
+                    </button>
+                    ${(mode === 'admin') ? `
+                        <button data-action="reset-pwd" data-id="${u.id}" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition-colors">Reset Pwd</button>
+                        <button data-action="delete" data-id="${u.id}" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded-full transition-colors">Delete</button>
+                    ` : '<span class="text-gray-300 text-xs">View Only</span>'}
+                </div>
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 }
 
-// Search State
-let activeUserSearch = '';
-window.searchUsers = (query) => {
-    activeUserSearch = query.trim();
-    renderUsers(usersCache, currentMode);
+// Mark row as edited
+window.markRowAsEdited = function (userId) {
+    editedRows.add(userId);
+    const saveBtn = document.getElementById(`save-btn-${userId}`);
+    if (saveBtn) {
+        saveBtn.classList.remove('hidden');
+    }
 };
 
-function renderAddress(addr) {
-    if (!addr) return '<span class="text-gray-300 italic">No address</span>';
-    // Handle JSON object vs string legacy
-    let city = '', zip = '';
-    if (typeof addr === 'object') {
-        city = addr.city;
-        zip = addr.zip;
-    } else if (typeof addr === 'string' && addr.startsWith('{')) {
-        try {
-            const parsed = JSON.parse(addr);
-            city = parsed.city;
-            zip = parsed.zip;
-        } catch (e) { }
+// Save inline edits
+window.saveUserInline = async function (userId) {
+    const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+    if (!row) return;
+
+    const emailCell = row.querySelector('[data-field="email"]');
+    const phoneCell = row.querySelector('[data-field="phone"]');
+    const addressCell = row.querySelector('[data-field="address"]');
+
+    const email = emailCell.textContent.trim();
+    const phone = phoneCell.textContent.trim();
+    const addressText = addressCell.textContent.trim();
+
+    // Parse address (simple parsing - assumes format "street, city state zip")
+    const addressParts = addressText.split(',');
+    const street = addressParts[0]?.trim() || '';
+    const cityStateZip = addressParts[1]?.trim() || '';
+    const [city, ...rest] = cityStateZip.split(' ');
+    const state = rest[rest.length - 2] || '';
+    const zip = rest[rest.length - 1] || '';
+
+    try {
+        await api.updateUser(userId, {
+            email,
+            phone,
+            city: city || '',
+            state: state || '',
+            zip: zip || '',
+            address: street
+        });
+
+        showToast('User updated successfully');
+        editedRows.delete(userId);
+        const saveBtn = document.getElementById(`save-btn-${userId}`);
+        if (saveBtn) {
+            saveBtn.classList.add('hidden');
+        }
+
+        // Reload to refresh data
+        loadUsers(currentMode);
+    } catch (e) {
+        showToast(e.message || 'Failed to save', 'error');
     }
-
-    if (city) return `${city}, ${zip}`;
-    return '<span class="text-gray-300 italic">No address</span>';
-}
-
-function renderAdminActions(u) {
-    return `
-        <button data-action="reset-pwd" data-id="${u.id}" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition-colors mr-2">Reset Pwd</button>
-        <button data-action="delete" data-id="${u.id}" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded-full transition-colors mr-2">Delete</button>
-        <button data-action="edit" data-id="${u.id}" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Edit</button>
-    `;
-}
+};
 
 // User Actions
 export async function deleteUser(id) {

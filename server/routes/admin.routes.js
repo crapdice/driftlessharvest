@@ -16,34 +16,43 @@ router.get('/admin/stats', checkRole(['admin', 'super_admin']), (req, res) => {
 });
 
 // GET /api/admin/users
-// GET /api/admin/users
 router.get('/admin/users', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
-        // Join with admin_types to get role name
+        // Join with admin_types to get role name and count orders per user
         const users = db.prepare(`
             SELECT u.id, u.email, u.phone, u.created_at, u.is_admin, u.is_customer,
                    t.name as role_name,
-                   u.first_name, u.last_name
+                   u.first_name, u.last_name,
+                   COUNT(DISTINCT o.id) as order_count
             FROM users u
             LEFT JOIN admin_types t ON u.admin_type_id = t.id
+            LEFT JOIN orders o ON u.email = o.user_email
+            GROUP BY u.id
             ORDER BY u.created_at DESC
         `).all();
+
+        // Fetch addresses for each user
+        const addresses = db.prepare('SELECT user_email, street, city, state, zip FROM addresses').all();
+        const addressMap = {};
+        addresses.forEach(addr => {
+            if (!addressMap[addr.user_email]) {
+                addressMap[addr.user_email] = addr;
+            }
+        });
 
         const safeUsers = users.map(u => ({
             id: u.id,
             email: u.email,
-            phone: u.phone,
-            // Map back to 'role' legacy field expectation if possible, or use role_name
+            phone: u.phone || '',
             role: u.role_name || (u.is_admin ? 'admin' : 'user'),
             created_at: u.created_at,
-            // Address is now structural, we'll return empty for the list view or fetch separate if needed
-            address: {},
+            order_count: u.order_count || 0,
+            address: addressMap[u.email] || {},
             name: `${u.first_name || ''} ${u.last_name || ''}`.trim()
         }));
         res.json(safeUsers);
     } catch (e) {
         console.error('GET /admin/users Error:', e);
-        require('fs').writeFileSync('server_error.log', String(e) + '\n' + e.stack);
         res.status(500).json({ error: 'Failed to fetch users' });
     }
 });
