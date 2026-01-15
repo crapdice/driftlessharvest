@@ -27,7 +27,7 @@ This guide will help you put your website on the internet so others can see it. 
    *   **`ADMIN_PASSWORD`**: `YourSecurePasswordHere` (Pick a password for the admin panel).
    *   **`STRIPE_PUBLISHABLE_KEY`**: `pk_test_...` (Copy from your Stripe Dashboard).
    *   **`STRIPE_SECRET_KEY`**: `sk_test_...` (Copy from your Stripe Dashboard).
-   *   **`APP_NAME`**: `Driftless Harvest`
+   *   **`  `**: `Driftless Harvest`
 
 ### Step 4: Add Persistent Storage (Crucial!)
 *Since this app uses a file-based database (SQLite), you need a persistent volume or your data will disappear every time the site restarts.*
@@ -68,7 +68,7 @@ This guide will help you put your website on the internet so others can see it. 
 
 ### Step 4: Verify
 1. Once deployed, you will get a dashboard link.
-2. Click the screenshot/link to visit your site.
+2. Click the screenshot/link to visit your site
 3. *Reminder:* Any accounts you create or products you edit here will likely disappear after a few hours due to Vercel's serverless nature.
 
 ---
