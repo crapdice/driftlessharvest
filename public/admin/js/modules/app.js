@@ -84,8 +84,33 @@ function renderHeaderUser() {
                 else if (user.role === 'admin') roleEl.className = 'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
                 else roleEl.className = 'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-700 text-gray-400';
             }
+
+            // Enable super_admin-only features
+            initRoleBasedUI(user.role);
         } catch (e) {
             console.error("Failed to parse user info", e);
+        }
+    }
+}
+
+function initRoleBasedUI(role) {
+    // Enable utilities and layouts for super_admin only
+    if (role === 'super_admin') {
+        const utilitiesBtn = document.getElementById('nav-utilities');
+        const layoutsBtn = document.getElementById('nav-layouts');
+
+        if (utilitiesBtn) {
+            utilitiesBtn.disabled = false;
+            utilitiesBtn.classList.remove('text-gray-400', 'hover:bg-transparent', 'cursor-not-allowed');
+            utilitiesBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
+            utilitiesBtn.removeAttribute('title');
+        }
+
+        if (layoutsBtn) {
+            layoutsBtn.disabled = false;
+            layoutsBtn.classList.remove('text-gray-400', 'hover:bg-transparent', 'cursor-not-allowed');
+            layoutsBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
+            layoutsBtn.removeAttribute('title');
         }
     }
 }
@@ -152,6 +177,23 @@ window.logout = () => {
 };
 
 function setTab(tabName) {
+    // Check role-based access for super_admin-only tabs
+    const userStr = localStorage.getItem('harvest_user');
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            const superAdminOnlyTabs = ['utilities', 'layouts'];
+
+            if (superAdminOnlyTabs.includes(tabName) && user.role !== 'super_admin') {
+                alert('Access Denied: This feature requires Super Admin privileges.');
+                setTab('dashboard'); // Redirect to dashboard
+                return;
+            }
+        } catch (e) {
+            console.error("Failed to parse user info", e);
+        }
+    }
+
     currentTab = tabName;
     window.location.hash = tabName;
 
