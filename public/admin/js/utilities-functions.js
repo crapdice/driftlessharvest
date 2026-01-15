@@ -19,8 +19,8 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-async function cleanDatabase() {
-    if (!confirm('⚠️ WARNING: This will delete ALL orders and customer users (admin accounts will be preserved). This cannot be undone. Continue?')) {
+async function cleanOrders() {
+    if (!confirm('⚠️ WARNING: This will delete ALL orders, order items, carts, and payment records. This cannot be undone. Continue?')) {
         return;
     }
 
@@ -29,7 +29,7 @@ async function cleanDatabase() {
     }
 
     try {
-        const response = await fetch('/api/admin/utilities/clean-database', {
+        const response = await fetch('/api/admin/utilities/clean-orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,22 +40,59 @@ async function cleanDatabase() {
         const data = await response.json();
 
         if (response.ok) {
-            showToast('Database cleaned successfully');
+            showToast('Orders cleaned successfully');
             document.getElementById('db-stats').innerHTML = `
                 <div class="space-y-2">
-                    <p class="text-sm text-green-700 font-semibold">✅ Database cleaned successfully</p>
+                    <p class="text-sm text-green-700 font-semibold">✅ Orders cleaned successfully</p>
                     <div class="text-xs text-gray-600">
                         <p>• Deleted ${data.deleted.orders} orders</p>
                         <p>• Deleted ${data.deleted.orderItems} order items</p>
-                        <p>• Deleted ${data.deleted.users} customer users</p>
-                        <p>• Deleted ${data.deleted.addresses} addresses</p>
                         <p>• Deleted ${data.deleted.carts} active carts</p>
                         <p>• Deleted ${data.deleted.payments} payment records</p>
                     </div>
                 </div>
             `;
         } else {
-            throw new Error(data.error || 'Failed to clean database');
+            throw new Error(data.error || 'Failed to clean orders');
+        }
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+async function cleanUsers() {
+    if (!confirm('⚠️ WARNING: This will delete ALL customer users and their addresses (admin accounts will be preserved). This cannot be undone. Continue?')) {
+        return;
+    }
+
+    if (!confirm('Are you absolutely sure? This action is irreversible.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/admin/utilities/clean-users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast('Customer users cleaned successfully');
+            document.getElementById('db-stats').innerHTML = `
+                <div class="space-y-2">
+                    <p class="text-sm text-green-700 font-semibold">✅ Customer users cleaned successfully</p>
+                    <div class="text-xs text-gray-600">
+                        <p>• Deleted ${data.deleted.users} customer users</p>
+                        <p>• Deleted ${data.deleted.addresses} addresses</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            throw new Error(data.error || 'Failed to clean users');
         }
     } catch (error) {
         showToast(error.message, 'error');
@@ -201,6 +238,7 @@ window.viewDeliveryWindows = () => queryTable('delivery_windows');
 window.viewAddresses = () => queryTable('addresses');
 
 // Make functions globally available
-window.cleanDatabase = cleanDatabase;
+window.cleanOrders = cleanOrders;
+window.cleanUsers = cleanUsers;
 window.verifyDatabase = verifyDatabase;
 window.cleanTempFiles = cleanTempFiles;
