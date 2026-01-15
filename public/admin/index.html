@@ -1002,6 +1002,18 @@
                                 </div>
                                 <div>
                                     <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Modal
+                                        Orientation</label>
+                                    <select id="cfg-modal-orientation" onchange="saveModalOrientation(this.value)"
+                                        class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-blue-100 dark:text-white outline-none transition-all">
+                                        <option value="vertical">Vertical (2-Column)</option>
+                                        <option value="horizontal">Horizontal (1-Column)</option>
+                                    </select>
+                                    <p class="text-[10px] text-gray-400 mt-1">Changes apply immediately to user modals.
+                                    </p>
+                                </div>
+                                <div>
+                                    <label
                                         class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Hero
                                         Image</label>
                                     <select id="cfg-hero-select"
@@ -2606,6 +2618,46 @@
                 }
             });
         });
+    </script>
+
+    <!-- Modal Orientation Functions -->
+    <script>
+        function saveModalOrientation(orientation) {
+            localStorage.setItem('admin_modal_orientation', orientation);
+            applyModalOrientation();
+            showToast(`Modal orientation set to ${orientation}`, 'success');
+        }
+
+        function applyModalOrientation() {
+            const orientation = localStorage.getItem('admin_modal_orientation') || 'vertical';
+            const modalContent = document.querySelector('#user-modal .grid');
+
+            if (modalContent) {
+                if (orientation === 'horizontal') {
+                    // 1-column layout
+                    modalContent.classList.remove('md:grid-cols-2');
+                    modalContent.classList.add('grid-cols-1');
+                } else {
+                    // 2-column layout (default)
+                    modalContent.classList.remove('grid-cols-1');
+                    modalContent.classList.add('md:grid-cols-2');
+                }
+            }
+
+            // Update dropdown if on config page
+            const select = document.getElementById('cfg-modal-orientation');
+            if (select) {
+                select.value = orientation;
+            }
+        }
+
+        // Apply on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            applyModalOrientation();
+        });
+
+        // Make globally available
+        window.saveModalOrientation = saveModalOrientation;
     </script>
     <script src="/admin/js/utilities-functions.js"></script>
 
