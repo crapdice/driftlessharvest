@@ -88,4 +88,22 @@ router.post('/admin/utilities/clean-temp-files', checkRole(['super_admin']), (re
     }
 });
 
+// GET /api/admin/utilities/query/:table
+router.get('/admin/utilities/query/:table', checkRole(['admin', 'super_admin']), (req, res) => {
+    const { table } = req.params;
+    const allowedTables = ['users', 'orders', 'products', 'delivery_windows', 'addresses', 'categories', 'box_templates'];
+
+    if (!allowedTables.includes(table)) {
+        return res.status(400).json({ error: 'Invalid table' });
+    }
+
+    try {
+        const results = db.prepare(`SELECT * FROM ${table} LIMIT 100`).all();
+        res.json({ success: true, results, count: results.length });
+    } catch (error) {
+        console.error('[Utilities Query Error]', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

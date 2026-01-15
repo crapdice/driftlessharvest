@@ -196,6 +196,7 @@ function setTab(tabName) {
         case 'delivery': loadDelivery(); break;
         case 'templates': startProductPolling(); break; // Templates uses products & templates
         case 'settings': loadSettings(); break;
+        case 'utilities': break; // No data loading needed
 
         case 'layouts': loadLayouts(); break;
     }

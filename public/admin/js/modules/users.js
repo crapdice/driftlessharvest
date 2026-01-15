@@ -119,28 +119,40 @@ window.saveUserInline = async function (userId) {
 
     const emailCell = row.querySelector('[data-field="email"]');
     const phoneCell = row.querySelector('[data-field="phone"]');
-    const addressCell = row.querySelector('[data-field="address"]');
 
     const email = emailCell.textContent.trim();
     const phone = phoneCell.textContent.trim();
-    const addressText = addressCell.textContent.trim();
 
-    // Parse address (simple parsing - assumes format "street, city state zip")
-    const addressParts = addressText.split(',');
-    const street = addressParts[0]?.trim() || '';
-    const cityStateZip = addressParts[1]?.trim() || '';
-    const [city, ...rest] = cityStateZip.split(' ');
-    const state = rest[rest.length - 2] || '';
-    const zip = rest[rest.length - 1] || '';
+    // CLIENT-SIDE VALIDATION
+    const errors = [];
+
+    // Email validation
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push('Valid email required');
+        emailCell.classList.add('ring-2', 'ring-red-500');
+    } else {
+        emailCell.classList.remove('ring-2', 'ring-red-500');
+    }
+
+    // Phone validation (optional but format if provided)
+    if (phone && phone.replace(/\D/g, '').length > 0 && phone.replace(/\D/g, '').length !== 10) {
+        errors.push('Phone must be 10 digits');
+        phoneCell.classList.add('ring-2', 'ring-red-500');
+    } else {
+        phoneCell.classList.remove('ring-2', 'ring-red-500');
+    }
+
+    if (errors.length > 0) {
+        showToast(errors.join(', '), 'error');
+        return;
+    }
 
     try {
+        // Send only the fields that backend expects
         await api.updateUser(userId, {
             email,
-            phone,
-            city: city || '',
-            state: state || '',
-            zip: zip || '',
-            address: street
+            phone: phone.replace(/\D/g, ''), // Strip formatting
+            role: 'user' // Required field
         });
 
         showToast('User updated successfully');

@@ -112,6 +112,76 @@ async function cleanTempFiles() {
     }
 }
 
+// Database Query Functions
+async function queryTable(tableName) {
+    try {
+        const response = await fetch(`/api/admin/utilities/query/${tableName}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            displayQueryResults(tableName, data.results);
+        } else {
+            throw new Error(data.error || 'Failed to query table');
+        }
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+function displayQueryResults(tableName, results) {
+    const container = document.getElementById('query-results');
+
+    if (!results || results.length === 0) {
+        container.innerHTML = `<p class="text-sm text-gray-500">No results found in ${tableName}</p>`;
+        return;
+    }
+
+    const keys = Object.keys(results[0]);
+
+    container.innerHTML = `
+        <div class="mb-3 flex justify-between items-center">
+            <h4 class="font-semibold text-gray-800">${tableName.toUpperCase()} (${results.length} rows)</h4>
+            <button onclick="document.getElementById('query-results').innerHTML='<p class=\\'text-sm text-gray-500\\'>Click a button above to view database contents</p>'" 
+                    class="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+        </div>
+        <div class="overflow-x-auto max-h-96 overflow-y-auto border border-gray-200 rounded">
+            <table class="w-full text-xs">
+                <thead class="bg-gray-100 sticky top-0">
+                    <tr>
+                        ${keys.map(key => `<th class="p-2 text-left border-b font-semibold">${key}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${results.map((row, idx) => `
+                        <tr class="hover:bg-gray-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}">
+                            ${keys.map(key => {
+        let val = row[key];
+        // Truncate long values
+        if (typeof val === 'string' && val.length > 50) {
+            val = val.substring(0, 50) + '...';
+        }
+        return `<td class="p-2 border-b text-gray-700">${val !== null && val !== undefined ? val : '-'}</td>`;
+    }).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// Specific query functions
+window.viewAllUsers = () => queryTable('users');
+window.viewAllOrders = () => queryTable('orders');
+window.viewAllProducts = () => queryTable('products');
+window.viewDeliveryWindows = () => queryTable('delivery_windows');
+window.viewAddresses = () => queryTable('addresses');
+
 // Make functions globally available
 window.cleanDatabase = cleanDatabase;
 window.verifyDatabase = verifyDatabase;
