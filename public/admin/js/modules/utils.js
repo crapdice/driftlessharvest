@@ -47,5 +47,14 @@ export function debounce(func, wait) {
         };
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
-    };
+    }; \
 }
+
+// Phone input handler for admin forms
+export function handleAdminPhoneInput(inputElement) {
+    inputElement.value = formatPhoneNumber(inputElement.value);
+}
+
+// Make globally available
+window.handleAdminPhoneInput = handleAdminPhoneInput;
+
