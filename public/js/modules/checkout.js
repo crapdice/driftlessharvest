@@ -149,6 +149,8 @@ export async function placeOrder() {
         // ---------------------------------------------------------
         const legacyShipping = {
             name: billing.name,
+            firstName: firstName,
+            lastName: lastName,
             street: shipAddr,
             city: shipCity,
             state: shipState,
