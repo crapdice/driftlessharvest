@@ -182,8 +182,7 @@ export const controller = {
         container.innerHTML = '<div class="text-sm text-gray-400">Loading windows...</div>';
 
         const modal = document.getElementById('reschedule-modal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.style.display = 'flex';
 
         try {
             const allWindows = await api.getDeliveryWindows();
@@ -217,8 +216,7 @@ export const controller = {
         try {
             await api.updateOrderDelivery(id, selected.value);
             showToast("Order rescheduled");
-            document.getElementById('reschedule-modal').classList.add('hidden');
-            document.getElementById('reschedule-modal').classList.remove('flex');
+            document.getElementById('reschedule-modal').style.display = 'none';
             this.loadOrders();
         } catch (e) {
             showToast("Failed to reschedule", "error");
