@@ -99,6 +99,43 @@ async function cleanUsers() {
     }
 }
 
+async function seedDatabase() {
+    if (!confirm('🌱 This will create 5 dummy customer users and 5 dummy orders. Continue?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/admin/utilities/seed-database', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast('Database seeded successfully');
+            document.getElementById('db-stats').innerHTML = `
+                <div class="space-y-2">
+                    <p class="text-sm text-green-700 font-semibold">✅ Database seeded successfully</p>
+                    <div class="text-xs text-gray-600">
+                        <p>• Created ${data.created.users} customer users</p>
+                        <p>• Created ${data.created.addresses} addresses</p>
+                        <p>• Created ${data.created.orders} orders</p>
+                        <p>• Created ${data.created.orderItems} order items</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            throw new Error(data.error || 'Failed to seed database');
+        }
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
 async function verifyDatabase() {
     try {
         const response = await fetch('/api/admin/utilities/verify-database', {
@@ -240,5 +277,6 @@ window.viewAddresses = () => queryTable('addresses');
 // Make functions globally available
 window.cleanOrders = cleanOrders;
 window.cleanUsers = cleanUsers;
+window.seedDatabase = seedDatabase;
 window.verifyDatabase = verifyDatabase;
 window.cleanTempFiles = cleanTempFiles;
