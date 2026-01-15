@@ -292,8 +292,8 @@ export function openUserModal(userId = null) {
         document.getElementById('u-address').value = '';
     }
 
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    // Show modal using inline style for reliability
+    modal.style.display = 'flex';
 }
 
 export async function saveUser() {
@@ -316,8 +316,7 @@ export async function saveUser() {
 
         showToast(id ? 'User updated' : 'User created');
         const modal = document.getElementById('user-modal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        modal.style.display = 'none';
         loadUsers(currentMode);
     } catch (e) {
         showToast(e.message, "error");
@@ -328,8 +327,8 @@ export async function saveUser() {
 window.openUserModal = openUserModal;
 window.saveUser = saveUser;
 window.closeUserModal = function () {
-    document.getElementById('user-modal').classList.add('hidden');
-    document.getElementById('user-modal').classList.remove('flex');
+    const modal = document.getElementById('user-modal');
+    modal.style.display = 'none';
 };
 
 // Event Delegation for Table Actions
