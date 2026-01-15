@@ -1,5 +1,23 @@
 // Admin Utilities Functions
-// Add these to public/admin/js/modules/app.js
+// Standalone utilities script for admin panel
+
+// Toast notification function (local implementation)
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast px-6 py-4 rounded-lg shadow-lg text-white ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} mb-3`;
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 
 async function cleanDatabase() {
     if (!confirm('⚠️ WARNING: This will delete ALL orders and customer users (admin accounts will be preserved). This cannot be undone. Continue?')) {
@@ -15,7 +33,7 @@ async function cleanDatabase() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
             }
         });
 
@@ -48,7 +66,7 @@ async function verifyDatabase() {
     try {
         const response = await fetch('/api/admin/utilities/verify-database', {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
             }
         });
 
@@ -96,7 +114,7 @@ async function cleanTempFiles() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
             }
         });
 
@@ -117,7 +135,7 @@ async function queryTable(tableName) {
     try {
         const response = await fetch(`/api/admin/utilities/query/${tableName}`, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
             }
         });
 
