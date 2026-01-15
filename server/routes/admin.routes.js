@@ -101,10 +101,9 @@ router.post('/admin/users', checkRole(['admin', 'super_admin']), validate(create
 });
 
 // PUT /api/admin/users/:id
-// PUT /api/admin/users/:id
 router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(updateUserSchema), (req, res) => {
     try {
-        const { email, role, phone } = req.body;
+        const { email, role, phone, address, city, state, zip } = req.body;
 
         let typeId = null;
         let isAdmin = 0;
@@ -121,6 +120,7 @@ router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(upd
             typeId = null;
         }
 
+        // Update user record
         db.prepare(`
             UPDATE users 
             SET email = @email, is_admin = @isAdmin, admin_type_id = @typeId, phone = @phone
@@ -133,10 +133,30 @@ router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(upd
             phone: phone || ''
         });
 
+        // Handle address update/creation if address fields are provided
+        if (address || city || state || zip) {
+            const existingAddress = db.prepare('SELECT id FROM addresses WHERE user_id = ?').get(req.params.id);
+
+            if (existingAddress) {
+                // Update existing address
+                db.prepare(`
+                    UPDATE addresses 
+                    SET street = ?, city = ?, state = ?, zip = ?
+                    WHERE user_id = ?
+                `).run(address || '', city || '', state || '', zip || '', req.params.id);
+            } else {
+                // Create new address
+                db.prepare(`
+                    INSERT INTO addresses (user_id, street, city, state, zip, created_at)
+                    VALUES (?, ?, ?, ?, ?, datetime('now'))
+                `).run(req.params.id, address || '', city || '', state || '', zip || '');
+            }
+        }
+
         res.json({ success: true });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to update user' });
+        console.error('PUT /admin/users/:id Error:', err);
+        res.status(500).json({ error: 'Failed to update user', details: err.message });
     }
 });
 

@@ -315,7 +315,9 @@ export async function saveUser() {
         else await api.createUser(payload);
 
         showToast(id ? 'User updated' : 'User created');
-        document.getElementById('user-modal').classList.add('hidden');
+        const modal = document.getElementById('user-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
         loadUsers(currentMode);
     } catch (e) {
         showToast(e.message, "error");
