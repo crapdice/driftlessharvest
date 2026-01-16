@@ -8,7 +8,8 @@ import { loadSettings, saveSettings, restoreDefaults } from './settings.js';
 import {
     loadLayouts, saveLayout, toggleLayoutItem,
     handleDragStart, handleDragOver, handleDrop,
-    openComponentModal, closeComponentModal, setCompTab, saveComponentContent
+    openComponentModal, closeComponentModal, setCompTab, saveComponentContent,
+    undoLayout, redoLayout
 } from './layouts.js';
 import { initUtilities } from './utilities.js';
 import { initCategories } from './categories.js';
@@ -39,6 +40,8 @@ window.openComponentModal = openComponentModal;
 window.closeComponentModal = closeComponentModal;
 window.setCompTab = setCompTab;
 window.saveComponentContent = saveComponentContent;
+window.undoLayout = undoLayout;
+window.redoLayout = redoLayout;
 
 
 // Init

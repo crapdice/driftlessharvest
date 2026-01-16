@@ -193,28 +193,68 @@ export async function updateProductQty(productId, change) {
 function updateCartItemUI(productId) {
     const { availableProducts } = getMarketplaceData();
     const product = availableProducts ? availableProducts.find(p => String(p.id) === String(productId)) : null;
+
+    // Fallback to products state if marketplace data not available
+    const productFromState = product || store.state.products.find(p => String(p.id) === String(productId));
+    const stock = productFromState ? productFromState.stock : 0;
+
     const cartItem = store.getCart().items.find(c => String(c.id) === String(productId));
     const newQty = cartItem ? cartItem.qty : 0;
+    const price = cartItem ? cartItem.price : (productFromState ? productFromState.price : 0);
 
-    // Update Quantity Control if present
+    // Check if max stock reached
+    const maxReached = stock > 0 && newQty >= stock;
+
+    // Update Marketplace Quantity Control if present
     const ctrlContainer = document.getElementById(`ctrl-${productId}`);
     if (ctrlContainer) {
         const isEditorial = window.CONFIG?.theme?.layout === 'editorial';
-        const price = cartItem ? cartItem.price : (product ? product.price : 0);
 
         ctrlContainer.innerHTML = QuantityControl({
             id: productId,
             qty: newQty,
             price: price,
-            isStocked: (product ? product.stock : 0) > 0,
+            isStocked: stock > 0,
+            maxReached,
             layout: isEditorial ? 'editorial' : 'grid'
         });
     }
 
-    // Update Total
+    // Update Cart Page Quantity Control if present
+    const cartCtrlContainer = document.getElementById(`cart-ctrl-${productId}`);
+    if (cartCtrlContainer) {
+        cartCtrlContainer.innerHTML = QuantityControl({
+            id: productId,
+            qty: newQty,
+            price: price,
+            isStocked: true,
+            maxReached,
+            layout: 'compact'
+        });
+
+        // Update cart item total price
+        const cartTotalEl = document.getElementById(`cart-total-${productId}`);
+        if (cartTotalEl) {
+            cartTotalEl.innerText = `$${(price * newQty).toFixed(2)}`;
+        }
+    }
+
+    // Update marketplace cart total
     const totalEl = document.getElementById('marketplace-cart-total');
     if (totalEl) {
         totalEl.innerText = `$${store.getCart().total.toFixed(2)}`;
+    }
+
+    // Update cart page total (if on cart page)
+    updateCartPageTotal();
+}
+
+// Helper to update cart page total
+function updateCartPageTotal() {
+    const cart = store.getCart();
+    const cartPageTotal = document.querySelector('.text-3xl.font-serif.text-loam.font-medium');
+    if (cartPageTotal && window.location.hash.includes('cart')) {
+        cartPageTotal.innerText = `$${cart.total.toFixed(2)}`;
     }
 }
 

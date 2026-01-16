@@ -18,10 +18,19 @@ export function renderCart() {
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-  // Helper to separate items but keep track of original index for deletion
-  const cartWithIndex = cart.map((item, index) => ({ ...item, originalIndex: index }));
-  const boxes = cartWithIndex.filter(i => i.type === 'box');
-  const products = cartWithIndex.filter(i => i.type !== 'box');
+  // Enrich cart items with current stock data from products state
+  const products = store.getState().products;
+  const enrichedCart = cart.map((item, index) => {
+    const currentProduct = products.find(p => String(p.id) === String(item.id));
+    return {
+      ...item,
+      originalIndex: index,
+      stock: currentProduct ? currentProduct.stock : item.stock // Use current stock or fallback to cached
+    };
+  });
+
+  const boxes = enrichedCart.filter(i => i.type === 'box');
+  const productItems = enrichedCart.filter(i => i.type !== 'box');
 
   return `
       <section class="max-w-4xl mx-auto px-6 py-12">
@@ -37,11 +46,11 @@ export function renderCart() {
             </div>
         ` : ''}
 
-        ${products.length > 0 ? `
+        ${productItems.length > 0 ? `
             <div>
                 <h3 class="text-2xl font-serif text-loam mb-6 border-b border-clay pb-2">Market Products</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    ${products.map(p => CartProductItem(p)).join('')}
+                    ${productItems.map(p => CartProductItem(p)).join('')}
                 </div>
             </div>
         ` : ''}

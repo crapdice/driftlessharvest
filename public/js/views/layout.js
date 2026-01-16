@@ -18,17 +18,21 @@ export function renderHeader() {
     : `<button onclick="setView('login')" class="hover:underline text-leaf font-semibold">Login</button>`;
 
   const cartCount = store.getCart().items.length;
+
+  // Check if cart view is active
+  const isCartActive = window.location.pathname === '/cart';
+
   // Enhanced Cart: Icon + Gold Badge
   const cartLink = `
-    <button id="nav-cart-btn" onclick="setView('cart')" class="group relative p-2 ml-2 hover:bg-nature-50 rounded-full transition-colors" title="View Cart">
+    <button id="nav-cart-btn" onclick="${isCartActive ? '' : 'setView(\'cart\')'}" class="group relative p-2 ml-2 ${isCartActive ? 'bg-harvest-gold/20 cursor-default' : 'hover:bg-nature-50'} rounded-full transition-colors" title="${isCartActive ? 'Current Page' : 'View Cart'}" ${isCartActive ? 'disabled' : ''}>
         <!-- SVG Shopping Bag -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-nature-800 group-hover:text-harvest-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isCartActive ? 'text-harvest-gold' : 'text-nature-800 group-hover:text-harvest-gold'} transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
         
         <!-- Badge -->
         ${cartCount > 0
-      ? `<span class="absolute -top-1 -right-1 bg-harvest-gold text-nature-900 text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-sm animate-bounce-short">${cartCount}</span>`
+      ? `<span class="absolute -top-1 -right-1 bg-harvest-gold text-nature-900 text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-sm ${isCartActive ? '' : 'animate-bounce-short'}">${cartCount}</span>`
       : ''}
     </button>`;
 
