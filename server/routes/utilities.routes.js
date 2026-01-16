@@ -86,6 +86,27 @@ router.post('/admin/utilities/clean-users', checkRole(['super_admin']), (req, re
     }
 });
 
+// POST /api/admin/utilities/clean-analytics
+router.post('/admin/utilities/clean-analytics', checkRole(['super_admin']), (req, res) => {
+    try {
+        console.log('[Utilities] Starting analytics cleanup...');
+
+        const result = db.prepare('DELETE FROM analytics_events').run();
+
+        console.log('[Utilities] Analytics cleanup complete');
+
+        res.json({
+            success: true,
+            deleted: {
+                analytics_events: result.changes
+            }
+        });
+    } catch (error) {
+        console.error('[Utilities] Clean analytics error:', error);
+        res.status(500).json({ error: 'Failed to clean analytics', details: error.message });
+    }
+});
+
 // POST /api/admin/utilities/seed-users
 router.post('/admin/utilities/seed-users', checkRole(['super_admin']), (req, res) => {
     try {

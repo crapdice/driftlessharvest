@@ -49,6 +49,7 @@ export async function initUtilities() {
 function bindGlobalActions() {
     window.cleanOrders = cleanOrders;
     window.cleanUsers = cleanUsers;
+    window.cleanAnalytics = cleanAnalytics;
     window.cleanDatabase = cleanDatabase;
     window.seedUsers = seedUsers;
     window.seedOrders = seedOrders;
@@ -143,6 +144,45 @@ export async function cleanUsers(event) {
             refreshQuickStats();
         } else {
             throw new Error(data.error || 'Failed to clean users');
+        }
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+export async function cleanAnalytics() {
+    const confirmed = await confirmChoice({
+        title: 'Purge Analytics Data',
+        message: 'This will delete ALL analytics tracking events. This action is irreversible.',
+        confirmText: 'Purge Analytics',
+        icon: '📊'
+    });
+
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch('/api/admin/utilities/clean-analytics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast('Analytics data cleaned successfully');
+            updateMaintenanceOutput(`
+                <div class="space-y-2">
+                    <p class="text-[11px] text-purple-400 font-bold uppercase tracking-widest leading-none">✅ ANALYTICS PURGED</p>
+                    <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                        <p>• DELETED EVENTS: ${data.deleted.analytics_events}</p>
+                    </div>
+                </div>
+            `);
+        } else {
+            throw new Error(data.error || 'Failed to clean analytics');
         }
     } catch (error) {
         showToast(error.message, 'error');
