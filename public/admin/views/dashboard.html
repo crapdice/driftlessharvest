@@ -1,0 +1,29 @@
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800">Overview</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Metric Cards -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-sm text-gray-500 mb-1">Total Revenue</div>
+            <div id="stat-revenue" class="text-3xl font-bold text-gray-900">$0.00</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-sm text-gray-500 mb-1">Total Orders</div>
+            <div id="stat-orders" class="text-3xl font-bold text-gray-900">0</div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="text-sm text-gray-500 mb-1">Pending Orders</div>
+            <div id="stat-pending" class="text-3xl font-bold text-orange-500">0</div>
+        </div>
+    </div>
+    <!-- Active Carts Section -->
+    <div class="mt-8">
+        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            🛒 Active Customer Carts
+            <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Real-time</span>
+        </h3>
+        <div id="active-carts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Carts injected here -->
+            <div class="text-sm text-gray-400 italic">Loading active carts...</div>
+        </div>
+    </div>
+</div>

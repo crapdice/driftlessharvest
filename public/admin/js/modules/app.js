@@ -250,6 +250,9 @@ function setTab(tabName) {
             break;
 
         case 'layouts': loadLayouts(); break;
+        case 'analytics':
+            if (typeof loadAnalytics === 'function') loadAnalytics();
+            break;
     }
 }
 

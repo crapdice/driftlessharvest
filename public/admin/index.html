@@ -550,6 +550,10 @@
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                         <span>⚙️</span> <span class="font-medium">Admin Configuration</span>
                     </button>
+                    <button onclick="setTab('analytics')" id="nav-analytics"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>📊</span> <span class="font-medium">Analytics</span>
+                    </button>
                     <button onclick="setTab('utilities')" id="nav-utilities"
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-transparent cursor-not-allowed transition-colors"
                         disabled title="Requires Super Admin">
@@ -1340,6 +1344,105 @@
                         </ul>
                         <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-100">
                             <strong>Note:</strong> Changes apply immediately after saving.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS VIEW -->
+            <div id="view-analytics" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Analytics Dashboard</h2>
+                        <p class="text-sm text-gray-500">Track visitor behavior and conversion metrics</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="analytics-date-range" onchange="loadAnalytics()"
+                            class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                        </select>
+                        <button onclick="loadAnalytics()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-gray-500">Total Visits</div>
+                            <span class="text-2xl">📊</span>
+                        </div>
+                        <div id="stat-total-visits" class="text-3xl font-bold text-gray-900">-</div>
+                        <div id="stat-visits-change" class="text-xs text-gray-500 mt-1">Loading...</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-gray-500">Unique Visitors</div>
+                            <span class="text-2xl">👥</span>
+                        </div>
+                        <div id="stat-unique-visitors" class="text-3xl font-bold text-gray-900">-</div>
+                        <div id="stat-unique-change" class="text-xs text-gray-500 mt-1">Loading...</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-gray-500">Conversion Rate</div>
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <div id="stat-conversion-rate" class="text-3xl font-bold text-green-600">-</div>
+                        <div id="stat-conversion-change" class="text-xs text-gray-500 mt-1">Loading...</div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-gray-500">Mobile Traffic</div>
+                            <span class="text-2xl">📱</span>
+                        </div>
+                        <div id="stat-mobile-percentage" class="text-3xl font-bold text-blue-600">-</div>
+                        <div class="text-xs text-gray-500 mt-1">of all visitors</div>
+                    </div>
+                </div>
+
+                <!-- Traffic Sources & Device Breakdown -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Traffic Sources -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Traffic Sources</h3>
+                        <div id="traffic-sources-chart" class="space-y-3">
+                            <div class="text-center text-gray-400 py-8">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Device Types -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Device Breakdown</h3>
+                        <div id="device-chart" class="space-y-3">
+                            <div class="text-center text-gray-400 py-8">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New vs Returning & Conversion Funnel -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- New vs Returning -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">New vs Returning Visitors</h3>
+                        <div id="visitor-type-chart" class="space-y-3">
+                            <div class="text-center text-gray-400 py-8">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Funnel -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Conversion Funnel</h3>
+                        <div id="conversion-funnel" class="space-y-3">
+                            <div class="text-center text-gray-400 py-8">Loading...</div>
                         </div>
                     </div>
                 </div>
@@ -2508,6 +2611,178 @@
     </script>
     <script type="module" src="/admin/js/components/ChoiceModal.js"></script>
 
+    <!-- Analytics Functions -->
+    <script>
+        async function loadAnalytics() {
+            const dateRange = document.getElementById('analytics-date-range')?.value || 30;
+            const token = localStorage.getItem('harvest_token');
+
+            try {
+                const response = await fetch(`/api/admin/analytics/overview?days=${dateRange}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch analytics');
+                }
+
+                const data = await response.json();
+
+                // Update overview cards
+                document.getElementById('stat-total-visits').textContent = data.overview?.totalVisits?.toLocaleString() || '0';
+                document.getElementById('stat-unique-visitors').textContent = data.overview?.uniqueVisitors?.toLocaleString() || '0';
+                document.getElementById('stat-conversion-rate').textContent = `${data.overview?.conversionRate || 0}%`;
+                document.getElementById('stat-mobile-percentage').textContent = `${data.overview?.mobilePercentage || 0}%`;
+
+                // Render charts
+                renderTrafficSources(data.trafficSources || []);
+                renderDeviceBreakdown(data.devices || []);
+                renderVisitorTypes(data.visitorTypes || { new: 0, returning: 0 });
+                renderConversionFunnel(data.conversionFunnel || {});
+
+            } catch (error) {
+                console.error('[Analytics] Error loading data:', error);
+                // Show placeholder message
+                document.getElementById('stat-total-visits').textContent = 'N/A';
+                document.getElementById('stat-unique-visitors').textContent = 'N/A';
+                document.getElementById('stat-conversion-rate').textContent = 'N/A';
+                document.getElementById('stat-mobile-percentage').textContent = 'N/A';
+
+                document.getElementById('stat-visits-change').textContent = 'Analytics API not yet configured';
+                document.getElementById('stat-unique-change').textContent = '';
+                document.getElementById('stat-conversion-change').textContent = '';
+            }
+        }
+
+        function renderTrafficSources(sources) {
+            const container = document.getElementById('traffic-sources-chart');
+            if (!container) return;
+
+            if (!sources || sources.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 py-8">No data available</div>';
+                return;
+            }
+
+            const total = sources.reduce((sum, s) => sum + s.count, 0);
+
+            container.innerHTML = sources.map(source => {
+                const percentage = total > 0 ? ((source.count / total) * 100).toFixed(1) : 0;
+                return `
+                    <div class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-3 flex-1">
+                            <div class="w-24 text-sm font-medium text-gray-700 capitalize">${source.name}</div>
+                            <div class="flex-1 bg-gray-100 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-900 ml-4 w-16 text-right">${percentage}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDeviceBreakdown(devices) {
+            const container = document.getElementById('device-chart');
+            if (!container) return;
+
+            if (!devices || devices.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 py-8">No data available</div>';
+                return;
+            }
+
+            const total = devices.reduce((sum, d) => sum + d.count, 0);
+            const icons = { desktop: '🖥️', mobile: '📱', tablet: '📱' };
+
+            container.innerHTML = devices.map(device => {
+                const percentage = total > 0 ? ((device.count / total) * 100).toFixed(1) : 0;
+                return `
+                    <div class="flex items-center justify-between py-2">
+                        <div class="flex items-center gap-3 flex-1">
+                            <span class="text-xl">${icons[device.type] || '💻'}</span>
+                            <div class="w-20 text-sm font-medium text-gray-700 capitalize">${device.type}</div>
+                            <div class="flex-1 bg-gray-100 rounded-full h-2">
+                                <div class="bg-green-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-900 ml-4 w-16 text-right">${percentage}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderVisitorTypes(visitorTypes) {
+            const container = document.getElementById('visitor-type-chart');
+            if (!container) return;
+
+            const total = visitorTypes.new + visitorTypes.returning;
+            const newPercentage = total > 0 ? ((visitorTypes.new / total) * 100).toFixed(1) : 0;
+            const returningPercentage = total > 0 ? ((visitorTypes.returning / total) * 100).toFixed(1) : 0;
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 flex-1">
+                            <span class="text-xl">🆕</span>
+                            <div class="w-24 text-sm font-medium text-gray-700">New</div>
+                            <div class="flex-1 bg-gray-100 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${newPercentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-900 ml-4 w-20 text-right">${newPercentage}%</div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 flex-1">
+                            <span class="text-xl">🔄</span>
+                            <div class="w-24 text-sm font-medium text-gray-700">Returning</div>
+                            <div class="flex-1 bg-gray-100 rounded-full h-2">
+                                <div class="bg-green-600 h-2 rounded-full" style="width: ${returningPercentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-900 ml-4 w-20 text-right">${returningPercentage}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderConversionFunnel(funnel) {
+            const container = document.getElementById('conversion-funnel');
+            if (!container) return;
+
+            const steps = [
+                { name: 'Visits', count: funnel.visits || 0, icon: '👁️' },
+                { name: 'Product Views', count: funnel.productViews || 0, icon: '🍎' },
+                { name: 'Add to Cart', count: funnel.addToCart || 0, icon: '🛒' },
+                { name: 'Checkout', count: funnel.checkout || 0, icon: '💳' },
+                { name: 'Purchase', count: funnel.purchase || 0, icon: '✅' }
+            ];
+
+            const maxCount = steps[0].count || 1;
+
+            container.innerHTML = steps.map((step, index) => {
+                const percentage = maxCount > 0 ? ((step.count / maxCount) * 100).toFixed(1) : 0;
+                const dropoff = index > 0 ? steps[index - 1].count - step.count : 0;
+
+                return `
+                    <div class="mb-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center gap-2">
+                                <span>${step.icon}</span>
+                                <span class="text-sm font-medium text-gray-700">${step.name}</span>
+                            </div>
+                            <div class="text-sm font-semibold text-gray-900">${step.count.toLocaleString()} (${percentage}%)</div>
+                        </div>
+                        <div class="bg-gray-100 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-blue-600 to-green-600 h-3 rounded-full transition-all" style="width: ${percentage}%"></div>
+                        </div>
+                        ${dropoff > 0 ? `<div class="text-xs text-red-600 mt-1">↓ ${dropoff.toLocaleString()} dropped off</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Make globally available
+        window.loadAnalytics = loadAnalytics;
+    </script>
 
 </body>
 
