@@ -886,7 +886,6 @@
             </div>
 
 
-            <!-- SETTINGS/CONFIG VIEW (Redesigned) -->
             <!-- SETTINGS/CONFIG VIEW (Refactored with Tabs) -->
             <div id="view-settings" class="hidden pb-32 w-full max-w-7xl mx-auto">
 
@@ -966,7 +965,6 @@
 
                 <!-- Tab Content Container -->
                 <div id="config-tabs-container" class="space-y-6">
-
 
                     <!-- GENERAL TAB -->
                     <div id="config-content-general" class="space-y-6">
@@ -1291,7 +1289,7 @@
 
                 </div>
 
-                <!-- JSON Editor Modal (unchanged) -->
+                <!-- JSON Editor Modal -->
                 <div id="config-json-container"
                     class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
                     <div
@@ -1315,6 +1313,7 @@
 
             </div>
 
+
             <div
                 class="pt-6 pb-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
@@ -1330,8 +1329,7 @@
                         </div>
                         Site Configuration
                     </h2>
-                    <p class="text-gray-500 mt-2 ml-1">Manage global settings, content, and system behaviors.
-                    </p>
+                    <p class="text-gray-500 mt-2 ml-1">Manage global settings, content, and system behaviors.</p>
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto">
                     <button onclick="toggleAdvancedConfig()"
@@ -1409,8 +1407,7 @@
                                     <option value="heritage">Heritage (Intentional Imperfection)</option>
                                     <option value="community">CSA Connection (Communal)</option>
                                 </select>
-                                <p class="text-[10px] text-gray-400 mt-1">Changing this will reload the page.
-                                </p>
+                                <p class="text-[10px] text-gray-400 mt-1">Changing this will reload the page.</p>
                             </div>
                             <div>
                                 <label
@@ -1421,8 +1418,7 @@
                                     <option value="vertical">Vertical (2-Column)</option>
                                     <option value="horizontal">Horizontal (1-Column)</option>
                                 </select>
-                                <p class="text-[10px] text-gray-400 mt-1">Changes apply immediately to user
-                                    modals.
+                                <p class="text-[10px] text-gray-400 mt-1">Changes apply immediately to user modals.
                                 </p>
                             </div>
                             <div>
@@ -1517,8 +1513,7 @@
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div
                             class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-lg">🌟 Featured Products
-                            </h3>
+                            <h3 class="font-bold text-gray-900 dark:text-white text-lg">🌟 Featured Products</h3>
                         </div>
                         <div class="p-6">
                             <!-- Header & Toggle -->
@@ -1614,8 +1609,7 @@
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div
                             class="bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-lg">🔐 Authentication Pages
-                            </h3>
+                            <h3 class="font-bold text-gray-900 dark:text-white text-lg">🔐 Authentication Pages</h3>
                         </div>
                         <div class="p-0">
                             <div class="p-6 border-b border-gray-100 dark:border-gray-700">
@@ -1658,8 +1652,7 @@
                             <!-- HOW IT WORKS -->
                             <div class="p-6 border-b border-gray-100 dark:border-gray-700">
                                 <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-bold text-sm text-gray-800 dark:text-white">How It Works
-                                    </h4>
+                                    <h4 class="font-bold text-sm text-gray-800 dark:text-white">How It Works</h4>
                                 </div>
                                 <input type="text" id="cfg-how-title" placeholder="Section Title"
                                     class="w-full mb-3 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-sm dark:text-white">
@@ -1716,8 +1709,7 @@
                         <button onclick="toggleAdvancedConfig()"
                             class="mr-3 px-4 py-2 text-gray-500 hover:bg-gray-200 rounded">Cancel</button>
                         <button onclick="saveRawConfig()"
-                            class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save
-                            Raw
+                            class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save Raw
                             JSON</button>
                     </div>
                 </div>
@@ -1760,8 +1752,7 @@
             <!-- Instructions / Preview -->
             <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
                 <h3 class="font-bold text-gray-700">How it works</h3>
-                <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections
-                    on
+                <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections on
                     the home page.</p>
                 <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
                     <li><strong>Hero</strong>: The main welcome banner.</li>
