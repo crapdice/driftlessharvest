@@ -9,17 +9,27 @@ const stripe = process.env.STRIPE_SECRET_KEY ? require('stripe')(process.env.STR
 // POST /api/create-payment-intent
 router.post('/create-payment-intent', async (req, res) => {
     try {
+        console.log('[Payment Init] Starting payment intent creation...');
+
         if (!stripe) {
+            console.error('[Payment Init] Stripe not configured');
             return res.status(503).json({ error: 'Payment service unavailable (Configuration missing)' });
         }
 
         const { items, userEmail, shipping } = req.body;
+        console.log('[Payment Init] Request data:', {
+            itemCount: items?.length,
+            userEmail,
+            hasShipping: !!shipping
+        });
 
         if (!items || items.length === 0) {
+            console.error('[Payment Init] Empty cart');
             return res.status(400).json({ error: 'Cart is empty' });
         }
 
         // 1. Calculate Total & Validate Stock (Server-Side)
+        console.log('[Payment Init] Step 1: Validating stock...');
         const reserveTx = db.transaction(() => {
             const { failedItems, verifiedItems, total } = InventoryService.validateStock(items);
 
@@ -39,8 +49,12 @@ router.post('/create-payment-intent', async (req, res) => {
         let orderDetails;
         try {
             orderDetails = reserveTx();
+            console.log('[Payment Init] Stock validated and reserved:', {
+                total: orderDetails.total,
+                itemCount: orderDetails.verifiedItems.length
+            });
         } catch (e) {
-            console.error("Stock Reservation Failed:", e.message);
+            console.error("[Payment Init] Stock Reservation Failed:", e.message);
             if (e.failedItems) {
                 return res.status(409).json({ error: 'Some items are out of stock', failedItems: e.failedItems });
             }
@@ -51,19 +65,22 @@ router.post('/create-payment-intent', async (req, res) => {
         const shippingObj = shipping || {};
 
         // Lookup delivery_date from label
+        console.log('[Payment Init] Step 2: Looking up delivery date...');
         let deliveryDate = null;
         try {
             if (shippingObj.date) {
                 const win = db.prepare('SELECT date_value FROM delivery_windows WHERE date_label = ? OR date_value = ?').get(shippingObj.date, shippingObj.date);
                 if (win) {
                     deliveryDate = win.date_value;
+                    console.log('[Payment Init] Delivery date found:', deliveryDate);
                 }
             }
         } catch (e) {
-            console.warn("Delivery date lookup failed:", e);
+            console.warn("[Payment Init] Delivery date lookup failed:", e);
         }
 
         // 3. Create Draft Order (Pending Payment)
+        console.log('[Payment Init] Step 3: Creating draft order...');
         const stmt = db.prepare(`
             INSERT INTO orders (user_email, items, total, shipping_details, status, delivery_window, delivery_date)
             VALUES ($email, $items, $total, $shipping, $status, $window, $date)
@@ -94,8 +111,10 @@ router.post('/create-payment-intent', async (req, res) => {
 
         const result = stmt.run(insertObj);
         let orderId = result.lastInsertRowid;
+        console.log('[Payment Init] Draft order created:', orderId);
 
         // 3a. Insert Normalized Order Items
+        console.log('[Payment Init] Step 4: Inserting order items...');
         const insertItem = db.prepare(`
             INSERT INTO order_items (order_id, product_id, product_name, quantity, price_at_purchase, item_type)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -111,8 +130,10 @@ router.post('/create-payment-intent', async (req, res) => {
                 item.type || 'product'
             );
         }
+        console.log('[Payment Init] Order items inserted');
 
         // 3. Create Stripe PaymentIntent
+        console.log('[Payment Init] Step 5: Creating Stripe PaymentIntent...');
         const paymentIntent = await stripe.paymentIntents.create({
             amount: Math.round(orderDetails.total * 100), // Cents
             currency: 'usd',
@@ -124,14 +145,24 @@ router.post('/create-payment-intent', async (req, res) => {
             receipt_email: (userEmail && userEmail.includes('@')) ? userEmail : null
         });
 
+        console.log('[Payment Init] PaymentIntent created successfully:', paymentIntent.id);
+
         res.json({
             clientSecret: paymentIntent.client_secret,
             orderId: orderId
         });
 
     } catch (e) {
-        console.error("Payment Init Error:", e);
-        res.status(500).json({ error: 'Failed to initialize payment', details: e.message });
+        console.error("[Payment Init] ERROR:", {
+            message: e.message,
+            stack: e.stack,
+            name: e.name
+        });
+        res.status(500).json({
+            error: 'Failed to initialize payment',
+            details: e.message,
+            step: 'Payment initialization failed. Please check server logs for details.'
+        });
     }
 });
 

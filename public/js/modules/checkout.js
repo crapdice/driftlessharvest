@@ -11,11 +11,38 @@ let currentOrderId;
 export async function initCheckout() {
     // 1. Initialize Stripe
     if (!stripe) {
-        const key = window.CONFIG?.stripePublishableKey || 'pk_test_TYooMQauvdEDq54NiTphI7jx';
-        if (!window.Stripe) {
-            console.error("Stripe.js not loaded");
+        // CRITICAL: Do not use a hardcoded fallback key - it must match the backend secret key
+        const key = window.CONFIG?.stripePublishableKey;
+
+        if (!key) {
+            console.error('[Checkout] Stripe publishable key not found in CONFIG');
+            const el = document.getElementById("payment-element");
+            if (el) {
+                el.innerHTML = `
+                    <div class="p-4 text-red-600 bg-red-50 rounded border border-red-200">
+                        <div class="font-semibold mb-2">Configuration Error</div>
+                        <div class="text-sm">Payment system not configured. Please refresh the page.</div>
+                    </div>
+                `;
+            }
             return;
         }
+
+        if (!window.Stripe) {
+            console.error("[Checkout] Stripe.js not loaded");
+            const el = document.getElementById("payment-element");
+            if (el) {
+                el.innerHTML = `
+                    <div class="p-4 text-red-600 bg-red-50 rounded border border-red-200">
+                        <div class="font-semibold mb-2">Payment System Unavailable</div>
+                        <div class="text-sm">Unable to load payment processor. Please check your internet connection and refresh.</div>
+                    </div>
+                `;
+            }
+            return;
+        }
+
+        console.log('[Checkout] Initializing Stripe with key:', key.substring(0, 15) + '...');
         stripe = Stripe(key);
     }
 
@@ -41,6 +68,8 @@ export async function initCheckout() {
         }
 
     } catch (e) {
+        console.error('[Checkout] Payment initialization failed:', e);
+
         if (e.message.includes('stock')) {
             // Handle 409 from API if caught properly by api.js
             // But api.js throws Error(errorData.error).
@@ -52,7 +81,15 @@ export async function initCheckout() {
         }
 
         const el = document.getElementById("payment-element");
-        if (el) el.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded">${e.message}</div>`;
+        if (el) {
+            el.innerHTML = `
+                <div class="p-4 text-red-600 bg-red-50 rounded border border-red-200">
+                    <div class="font-semibold mb-2">Payment Initialization Failed</div>
+                    <div class="text-sm">${e.message}</div>
+                    <div class="text-xs mt-2 text-red-500">Please check your internet connection and try again. If the problem persists, contact support.</div>
+                </div>
+            `;
+        }
     }
 }
 
