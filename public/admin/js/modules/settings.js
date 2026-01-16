@@ -128,9 +128,18 @@ function populateForm(data) {
     // General
     setVal('cfg-bus-name', data.business?.name);
     setVal('cfg-bus-loc', data.business?.location);
+    setVal('cfg-bus-tagline', data.business?.tagline);
+    setVal('cfg-bus-email', data.business?.email);
+    setVal('cfg-bus-phone', data.business?.phone);
+    setVal('cfg-bus-hours', data.business?.hours);
     setVal('cfg-bus-voice', data.business?.farmerVoice);
     setVal('cfg-bus-trust', (data.business?.trustSignals || []).join('\n'));
     setVal('cfg-inv-alert', data.meta?.inventoryAlertLevel);
+
+    // Hero
+    setVal('cfg-hero-headline', data.pages?.home?.hero?.headline);
+    setVal('cfg-hero-subhead', data.pages?.home?.hero?.subheadline);
+    setVal('cfg-hero-image', data.pages?.home?.hero?.image);
 
 
     // Content: How It Works
@@ -292,8 +301,19 @@ export async function saveSettings() {
 
     currentConfig.business.name = document.getElementById('cfg-bus-name').value;
     currentConfig.business.location = document.getElementById('cfg-bus-loc').value;
+    currentConfig.business.tagline = document.getElementById('cfg-bus-tagline')?.value || '';
+    currentConfig.business.email = document.getElementById('cfg-bus-email')?.value || '';
+    currentConfig.business.phone = document.getElementById('cfg-bus-phone')?.value || '';
+    currentConfig.business.hours = document.getElementById('cfg-bus-hours')?.value || '';
     currentConfig.business.farmerVoice = document.getElementById('cfg-bus-voice').value;
     currentConfig.business.trustSignals = document.getElementById('cfg-bus-trust').value.split('\n');
+
+    // Hero
+    if (!currentConfig.pages.home) currentConfig.pages.home = {};
+    if (!currentConfig.pages.home.hero) currentConfig.pages.home.hero = {};
+    currentConfig.pages.home.hero.headline = document.getElementById('cfg-hero-headline')?.value || '';
+    currentConfig.pages.home.hero.subheadline = document.getElementById('cfg-hero-subhead')?.value || '';
+    currentConfig.pages.home.hero.image = document.getElementById('cfg-hero-image')?.value || '';
 
     // Featured Config
     if (!currentConfig.meta) currentConfig.meta = {};
@@ -408,3 +428,74 @@ async function loadFeaturedOptions() {
         showToast("Warning: Could not load product list for selector", "error");
     }
 }
+
+// Tab Switching Function
+window.setConfigTab = (tabName) => {
+    // Hide all tab content
+    document.querySelectorAll('[id^="config-content-"]').forEach(el => {
+        el.classList.add('hidden');
+    });
+
+    // Remove active state from all tabs
+    document.querySelectorAll('.config-tab').forEach(tab => {
+        tab.classList.remove('border-blue-600', 'text-blue-600');
+        tab.classList.add('border-transparent', 'text-gray-600');
+    });
+
+    // Show selected tab content
+    const content = document.getElementById(`config-content-${tabName}`);
+    if (content) content.classList.remove('hidden');
+
+    // Activate selected tab
+    const activeTab = document.getElementById(`config-tab-${tabName}`);
+    if (activeTab) {
+        activeTab.classList.add('border-blue-600', 'text-blue-600');
+        activeTab.classList.remove('border-transparent', 'text-gray-600');
+    }
+};
+
+// Search/Filter Function
+window.filterConfigSettings = (query) => {
+    const searchTerm = query.toLowerCase().trim();
+
+    if (!searchTerm) {
+        // Show all sections if search is empty
+        document.querySelectorAll('[id^="config-content-"] > div').forEach(section => {
+            section.style.display = '';
+        });
+        return;
+    }
+
+    // Search through all tab content
+    document.querySelectorAll('[id^="config-content-"]').forEach(tabContent => {
+        let hasMatch = false;
+
+        // Check each section within the tab
+        tabContent.querySelectorAll(':scope > div').forEach(section => {
+            const text = section.textContent.toLowerCase();
+            const labels = Array.from(section.querySelectorAll('label')).map(l => l.textContent.toLowerCase());
+            const hasTextMatch = text.includes(searchTerm);
+            const hasLabelMatch = labels.some(label => label.includes(searchTerm));
+
+            if (hasTextMatch || hasLabelMatch) {
+                section.style.display = '';
+                hasMatch = true;
+            } else {
+                section.style.display = 'none';
+            }
+        });
+
+        // If tab has matches, show it
+        if (hasMatch) {
+            tabContent.classList.remove('hidden');
+        }
+    });
+};
+
+// Initialize - set General tab as active on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Only run if we're on the settings view
+    if (document.getElementById('config-tab-general')) {
+        setConfigTab('general');
+    }
+});
