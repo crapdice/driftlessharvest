@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const db = require('../db');
+const { userRepository } = require('../repositories');
 const { checkRole } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createUserSchema, updateUserSchema, orderStatusSchema, deliveryWindowSchema } = require('../schemas');
@@ -18,10 +19,10 @@ router.get('/admin/stats', checkRole(['admin', 'super_admin']), (req, res) => {
 // GET /api/admin/users
 router.get('/admin/users', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
-        // Join with admin_types to get role name and count orders per user
+        // Get all users with role info
         const users = db.prepare(`
-            SELECT u.id, u.email, u.phone, u.created_at, u.is_admin, u.is_customer,
-                   t.name as role_name,
+            SELECT u.id, u.email, u.phone, u.created_at, u.admin_type_id,
+                   t.name as role_name, t.display_name as role_display_name,
                    u.first_name, u.last_name,
                    COUNT(DISTINCT o.id) as order_count
             FROM users u
@@ -31,12 +32,12 @@ router.get('/admin/users', checkRole(['admin', 'super_admin']), (req, res) => {
             ORDER BY u.created_at DESC
         `).all();
 
-        // Fetch addresses for each user
-        const addresses = db.prepare('SELECT user_email, street, city, state, zip FROM addresses').all();
+        // Fetch addresses by user_id
+        const addresses = db.prepare('SELECT user_id, street, city, state, zip FROM addresses').all();
         const addressMap = {};
         addresses.forEach(addr => {
-            if (!addressMap[addr.user_email]) {
-                addressMap[addr.user_email] = addr;
+            if (!addressMap[addr.user_id]) {
+                addressMap[addr.user_id] = addr;
             }
         });
 
@@ -44,11 +45,13 @@ router.get('/admin/users', checkRole(['admin', 'super_admin']), (req, res) => {
             id: u.id,
             email: u.email,
             phone: u.phone || '',
-            role: u.role_name || (u.is_admin ? 'admin' : 'user'),
+            role: u.role_name || 'customer',
+            role_display: u.role_display_name || 'Customer',
             created_at: u.created_at,
             order_count: u.order_count || 0,
-            address: addressMap[u.email] || {},
-            name: `${u.first_name || ''} ${u.last_name || ''}`.trim()
+            address: addressMap[u.id] || {},
+            name: `${u.first_name || ''} ${u.last_name || ''}`.trim(),
+            isAdmin: u.admin_type_id !== null
         }));
         res.json(safeUsers);
     } catch (e) {
@@ -58,102 +61,92 @@ router.get('/admin/users', checkRole(['admin', 'super_admin']), (req, res) => {
 });
 
 // POST /api/admin/users
-// POST /api/admin/users
 router.post('/admin/users', checkRole(['admin', 'super_admin']), validate(createUserSchema), async (req, res) => {
     try {
         const { email, password, role, city, state, zip, address, phone, firstName, lastName } = req.body;
 
-        const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
-        if (exists) return res.status(400).json({ error: 'User already exists' });
+        // Check if user exists via repository
+        if (userRepository.emailExists(email)) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const id = Date.now().toString(); // Or use string ID provided it doesn't conflict? 
-        // Wait, Migration 018 uses INTEGER for users.id?
-        // Let's check schema. User ID is NOT AutoIncrement in 018? 
-        // 018: id INTEGER PRIMARY KEY (no autoincrement specified)
-        // If we pass an int it works. If we pass string '17...' it works?
-
-        let typeId = null;
-        let isAdmin = 0;
-
-        // Resolve Role to Type ID
+        // Resolve role to admin_type_id
+        let adminTypeId = null;
         if (role && role !== 'user' && role !== 'customer') {
-            const type = db.prepare('SELECT id FROM admin_types WHERE name = ?').get(role);
-            if (type) {
-                typeId = type.id;
-                isAdmin = 1;
+            const adminType = userRepository.getAdminType(role);
+            if (adminType) {
+                adminTypeId = adminType.id;
             }
         }
 
-        // We'll skip address creation for now or create an address record?
-        // For simplicity, we just insert the user. Address logic needs to be fully updated to new table.
+        // Create user via repository
+        const user = userRepository.create({
+            email,
+            password,
+            firstName,
+            lastName,
+            phone: phone || '',
+            adminTypeId
+        });
 
-        db.prepare(`
-            INSERT INTO users (id, email, password, is_admin, admin_type_id, phone, first_name, last_name, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(id, email, hashedPassword, isAdmin, typeId, phone || '', firstName, lastName, new Date().toISOString());
+        // Create address if provided
+        if (address || city || state || zip) {
+            const fullName = `${firstName || ''} ${lastName || ''}`.trim() || 'User';
+            db.prepare(`
+                INSERT INTO addresses (user_id, name, street, city, state, zip, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+            `).run(user.id, fullName, address || '', city || '', state || '', zip || '');
+        }
 
-        res.json({ success: true, id });
+        res.json({ success: true, id: user.id });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to create user' });
+        console.error('POST /admin/users Error:', err);
+        res.status(500).json({ error: 'Failed to create user', details: err.message });
     }
 });
 
 // PUT /api/admin/users/:id
 router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(updateUserSchema), (req, res) => {
     try {
-        const { email, role, phone, address, city, state, zip } = req.body;
+        const { email, role, phone, address, city, state, zip, firstName, lastName } = req.body;
+        const userId = parseInt(req.params.id, 10);
 
-        let typeId = null;
-        let isAdmin = 0;
-
-        if (role && role !== 'user') {
-            const type = db.prepare('SELECT id FROM admin_types WHERE name = ?').get(role);
-            if (type) {
-                typeId = type.id;
-                isAdmin = 1;
+        // Resolve role to admin_type_id
+        let adminTypeId = null;
+        if (role && role !== 'user' && role !== 'customer') {
+            const adminType = userRepository.getAdminType(role);
+            if (adminType) {
+                adminTypeId = adminType.id;
             }
-        } else {
-            // Demote to user
-            isAdmin = 0;
-            typeId = null;
         }
 
-        // Update user record
-        db.prepare(`
-            UPDATE users 
-            SET email = @email, is_admin = @isAdmin, admin_type_id = @typeId, phone = @phone
-            WHERE id = @id
-        `).run({
-            id: req.params.id,
+        // Update user via repository
+        userRepository.update(userId, {
             email,
-            isAdmin,
-            typeId,
-            phone: phone || ''
+            firstName,
+            lastName,
+            phone: phone || '',
+            adminTypeId
         });
 
         // Handle address update/creation if address fields are provided
         if (address || city || state || zip) {
-            // Get user's name for address
-            const user = db.prepare('SELECT first_name, last_name FROM users WHERE id = ?').get(req.params.id);
+            const user = userRepository.findById(userId);
             const fullName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'User';
 
-            const existingAddress = db.prepare('SELECT id FROM addresses WHERE user_id = ?').get(req.params.id);
+            const existingAddress = db.prepare('SELECT id FROM addresses WHERE user_id = ?').get(userId);
 
             if (existingAddress) {
-                // Update existing address
                 db.prepare(`
                     UPDATE addresses 
                     SET name = ?, street = ?, city = ?, state = ?, zip = ?
                     WHERE user_id = ?
-                `).run(fullName, address || '', city || '', state || '', zip || '', req.params.id);
+                `).run(fullName, address || '', city || '', state || '', zip || '', userId);
             } else {
-                // Create new address
                 db.prepare(`
                     INSERT INTO addresses (user_id, name, street, city, state, zip, created_at)
                     VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-                `).run(req.params.id, fullName, address || '', city || '', state || '', zip || '');
+                `).run(userId, fullName, address || '', city || '', state || '', zip || '');
             }
         }
 
@@ -165,16 +158,28 @@ router.put('/admin/users/:id', checkRole(['admin', 'super_admin']), validate(upd
 });
 
 // DELETE /api/admin/users/:id
-// DELETE /api/admin/users/:id
 router.delete('/admin/users/:id', checkRole(['super_admin']), (req, res) => {
     try {
-        // Warning: This doesn't clean up addresses/orders
-        const target = db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id);
-        if (target && req.user.id == req.params.id) return res.status(400).json({ error: "Cannot delete yourself" });
+        const userId = parseInt(req.params.id, 10);
 
-        db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ error: 'Failed to delete user' }); }
+        // Can't delete yourself
+        if (req.user.id === userId) {
+            return res.status(400).json({ error: "Cannot delete yourself" });
+        }
+
+        // Check user exists
+        const user = userRepository.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Delete user and related data atomically
+        const result = userRepository.deleteWithRelated(userId);
+        res.json({ success: true, deleted: result.deleted });
+    } catch (err) {
+        console.error('DELETE /admin/users/:id Error:', err);
+        res.status(500).json({ error: 'Failed to delete user' });
+    }
 });
 
 

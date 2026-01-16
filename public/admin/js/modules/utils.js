@@ -57,4 +57,6 @@ export function handleAdminPhoneInput(inputElement) {
 
 // Make globally available
 window.handleAdminPhoneInput = handleAdminPhoneInput;
+window.showToast = showToast;
+window.formatCurrency = formatCurrency;
 

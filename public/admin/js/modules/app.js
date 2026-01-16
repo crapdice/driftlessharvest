@@ -1,7 +1,7 @@
 import { setLoginHandler } from './api.js';
 import { loadDashboard, stopPolling } from './dashboard.js';
 import { loadOrders } from './orders.js';
-import { loadProducts, loadInventory, loadCategories, loadArchivedProducts, addCategory, saveProduct, openProductModal, openTemplateModal, startProductPolling, stopProductPolling } from './products.js';
+import { loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal, startProductPolling, stopProductPolling } from './products.js';
 import { loadUsers, saveUser, openUserModal } from './users.js';
 import { loadDelivery, addDeliveryWindow } from './delivery.js';
 import { loadSettings, saveSettings, restoreDefaults } from './settings.js';
@@ -10,13 +10,14 @@ import {
     handleDragStart, handleDragOver, handleDrop,
     openComponentModal, closeComponentModal, setCompTab, saveComponentContent
 } from './layouts.js';
+import { initUtilities } from './utilities.js';
+import { initCategories } from './categories.js';
 
 // State
 let currentTab = 'dashboard';
 
 // Global Exports (Immediate Scope)
 window.setTab = setTab;
-window.addCategory = addCategory;
 window.saveProduct = saveProduct;
 window.openProductModal = openProductModal;
 window.editTemplate = window.editTemplate || function () { }; // Handled in products.js but ensuring stub
@@ -215,6 +216,9 @@ function setTab(tabName) {
     document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
     const view = document.getElementById(`view-${targetView}`);
     if (view) view.classList.remove('hidden');
+    if (document.getElementById('view-categories') && !document.getElementById('view-categories').classList.contains('hidden')) {
+        if (window.loadCategories) window.loadCategories(); // Refetch categories + recalc counts
+    }
 
     // Load Data
     switch (tabName) {
@@ -231,14 +235,16 @@ function setTab(tabName) {
         case 'users': loadUsers('admin'); break;
         case 'products': startProductPolling(); break;
         case 'archived': loadArchivedProducts(); break;
-        case 'categories': startProductPolling(); loadCategories(); break; // Categories uses product counts
+        case 'categories': initCategories(); break;
         case 'inventory':
             startProductPolling(); // Inventory uses products
             break;
         case 'delivery': loadDelivery(); break;
         case 'templates': startProductPolling(); break; // Templates uses products & templates
         case 'settings': loadSettings(); break;
-        case 'utilities': break; // No data loading needed
+        case 'utilities':
+            initUtilities();
+            break;
 
         case 'layouts': loadLayouts(); break;
     }

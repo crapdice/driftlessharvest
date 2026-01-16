@@ -2,6 +2,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 const MigrationRunner = require('./migrations');
+const { SqliteAdapter } = require('./adapters');
 
 // Use DATA_DIR if provided (Railway Volume), else default to local dir
 const DATA_DIR = process.env.DATA_DIR || __dirname;
@@ -152,34 +153,28 @@ try {
 
     let typeId = null;
     try {
-        // Ensure admin_types exist (created in migration 022)
-        const superAdminType = db.prepare("SELECT id FROM admin_types WHERE name = 'superadmin'").get();
+        // Look for super_admin type (created in migration 032)
+        const superAdminType = db.prepare("SELECT id FROM admin_types WHERE name = 'super_admin'").get();
         typeId = superAdminType ? superAdminType.id : null;
         console.log(`[Startup] Admin type ID: ${typeId}`);
     } catch (e) { console.log("[Startup] Warning: admin_types table missing during seed:", e.message); }
-
-    // Check user table columns
-    try {
-        const cols = db.prepare("PRAGMA table_info(users)").all();
-        console.log(`[Startup] Users table columns: ${cols.map(c => c.name).join(', ')}`);
-    } catch (e) { console.log('[Startup] Could not probe users table:', e.message); }
 
     const existingAdmin = db.prepare('SELECT id, email FROM users WHERE email = ?').get(adminEmail);
     console.log(`[Startup] Existing admin lookup: ${existingAdmin ? `Found ID ${existingAdmin.id}` : 'Not found'}`);
 
     if (existingAdmin) {
-        // Note: 'role' column may not exist in older schemas, only set is_admin and admin_type_id
+        // Update existing admin user
         const result = db.prepare(`
                 UPDATE users 
-                SET password = ?, is_admin = 1, admin_type_id = ? 
+                SET password = ?, admin_type_id = ?, updated_at = datetime('now')
                 WHERE id = ?
             `).run(hashedPassword, typeId, existingAdmin.id);
         console.log(`[Startup] Admin password updated. Changes: ${result.changes}`);
     } else {
-        // Note: 'role' column may not exist in older schemas
+        // Create new admin user
         const result = db.prepare(`
-                INSERT INTO users (email, password, first_name, last_name, is_admin, admin_type_id)
-                VALUES (?, ?, 'Admin', 'User', 1, ?)
+                INSERT INTO users (email, password, first_name, last_name, phone, admin_type_id, created_at, updated_at)
+                VALUES (?, ?, 'Admin', 'User', '', ?, datetime('now'), datetime('now'))
             `).run(adminEmail, hashedPassword, typeId);
         console.log(`[Startup] Admin user created. Row ID: ${result.lastInsertRowid}`);
     }
@@ -188,5 +183,12 @@ try {
     console.error('[Startup] Full error:', e);
 }
 
-module.exports = db;
+// Create adapter for new code
+const dbAdapter = new SqliteAdapter(db);
 
+// Export both for backward compatibility
+// New code should use: const { dbAdapter } = require('./db');
+// Legacy code can still use: const db = require('./db');
+module.exports = db;
+module.exports.db = db;
+module.exports.dbAdapter = dbAdapter;

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Harvest Admin V2</title>
+    <link rel="stylesheet" href="css/utilities.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -696,7 +697,9 @@
                         <div class="relative">
                             <span
                                 class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
-                            <input type="text" placeholder="Search users..." oninput="window.searchUsers(this.value)"
+                            <input type="text" placeholder="Search users..." id="search-users-input" autocomplete="nop"
+                                oninput="window.searchUsers(this.value)" readonly
+                                onfocus="this.removeAttribute('readonly');"
                                 class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                         </div>
                         <button onclick="openUserModal()" id="btn-add-user"
@@ -813,32 +816,10 @@
 
             <!-- CATEGORIES VIEW -->
             <div id="view-categories" class="hidden space-y-6">
-                <!-- Header & Actions -->
-                <div
-                    class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Product Categories</h2>
-                        <p class="text-sm text-gray-500">Organize your products into categories.</p>
-                    </div>
-
-                    <div class="flex w-full md:w-auto gap-3">
-                        <div class="relative flex-grow md:flex-grow-0">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span class="text-gray-400">🏷️</span>
-                            </div>
-                            <input type="text" id="new-cat-name" placeholder="New Category Name"
-                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
-                        </div>
-                        <button onclick="addCategory()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
-                            <span class="text-lg leading-none">+</span> Add Category
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Categories Grid -->
-                <div id="categories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Cards injected here -->
+                <!-- Content loaded dynamically from views/categories.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Categories & Tags...</span>
                 </div>
             </div>
 
@@ -1316,189 +1297,57 @@
 
             <!-- ADMIN UTILITIES VIEW -->
             <div id="view-utilities" class="hidden space-y-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Admin Utilities</h2>
-                    <p class="text-sm text-gray-500 mb-6">Database management and system maintenance tools</p>
+                <!-- Content loaded dynamically from views/utilities.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Initializing Master Terminals...</span>
+                </div>
+            </div>
+    </div>
+    </div>
 
-                    <!-- Database Cleanup Section -->
-                    <div class="space-y-4">
-                        <div class="border-b border-gray-200 pb-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Database Cleanup</h3>
+    <!-- LAYOUT EDITOR VIEW -->
+    <div id="view-layouts" class="hidden space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800">Page Layout Editor</h2>
+            <div class="text-sm text-gray-500">Drag to reorder home page sections</div>
+        </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <!-- Clean Orders -->
-                                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                                    <h4 class="font-semibold text-orange-800 mb-2 flex items-center gap-2">
-                                        <span>📦</span> Clean Orders
-                                    </h4>
-                                    <p class="text-sm text-orange-700 mb-3">Delete all orders, order items, carts, and
-                                        payment records</p>
-                                    <button onclick="cleanOrders()"
-                                        class="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                        Clean Orders
-                                    </button>
-                                </div>
-
-                                <!-- Clean Users -->
-                                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                                    <h4 class="font-semibold text-red-800 mb-2 flex items-center gap-2">
-                                        <span>👥</span> Clean Users
-                                    </h4>
-                                    <p class="text-sm text-red-700 mb-3">Delete all customer users and addresses
-                                        (preserves admins)</p>
-                                    <button onclick="cleanUsers()"
-                                        class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                        Clean Users
-                                    </button>
-                                </div>
-
-                                <!-- Verify Database -->
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <h4 class="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-                                        <span>✅</span> Verify Database
-                                    </h4>
-                                    <p class="text-sm text-blue-700 mb-3">Check database state and display counts</p>
-                                    <button onclick="verifyDatabase()"
-                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                        Verify Database
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Database Seeding Section -->
-                        <div class="border-b border-gray-200 pb-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Database Seeding</h3>
-
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <h4 class="font-semibold text-green-800 mb-2 flex items-center gap-2">
-                                    <span>🌱</span> Seed Test Data
-                                </h4>
-                                <p class="text-sm text-green-700 mb-3">Create 5 dummy customer users and 5 dummy orders
-                                    for testing</p>
-                                <button onclick="seedDatabase()"
-                                    class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                    Seed Database
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- File Cleanup Section -->
-                        <div class="border-b border-gray-200 pb-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">File Cleanup</h3>
-
-                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <h4 class="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                    <span>🧹</span> Clean Temporary Files
-                                </h4>
-                                <p class="text-sm text-gray-700 mb-3">Remove cleanup-db.js and cleanup-result.txt</p>
-                                <button onclick="cleanTempFiles()"
-                                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                    Clean Temp Files
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Database Queries Section -->
-                        <div class="border-b border-gray-200 pb-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Database Queries</h3>
-
-                            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
-                                <button onclick="viewAllUsers()"
-                                    class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded text-sm transition-colors">
-                                    👥 Users
-                                </button>
-                                <button onclick="viewAllOrders()"
-                                    class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded text-sm transition-colors">
-                                    📦 Orders
-                                </button>
-                                <button onclick="viewAllProducts()"
-                                    class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded text-sm transition-colors">
-                                    🍎 Products
-                                </button>
-                                <button onclick="viewDeliveryWindows()"
-                                    class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded text-sm transition-colors">
-                                    🚛 Delivery
-                                </button>
-                                <button onclick="viewAddresses()"
-                                    class="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded text-sm transition-colors">
-                                    📍 Addresses
-                                </button>
-                            </div>
-
-                            <div id="query-results"
-                                class="bg-white border border-gray-200 rounded-lg p-4 min-h-[200px]">
-                                <p class="text-sm text-gray-500">Click a button above to view database contents</p>
-                            </div>
-                        </div>
-
-                        <!-- Database Stats Display -->
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-700 mb-3">Database Status</h3>
-                            <div id="db-stats" class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <p class="text-sm text-gray-500">Click "Verify Database" to see current stats</p>
-                            </div>
-                        </div>
-
-                        <!-- Railway Instructions -->
-                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <h4 class="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
-                                <span>⚠️</span> Railway Database Cleanup
-                            </h4>
-                            <p class="text-sm text-yellow-700 mb-2">To clean the Railway database, use the Railway CLI:
-                            </p>
-                            <pre
-                                class="bg-yellow-100 p-3 rounded text-xs font-mono overflow-x-auto">railway run node cleanup-db.js</pre>
-                            <p class="text-xs text-yellow-600 mt-2">Note: This will delete all orders and customer users
-                                on Railway
-                            </p>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Canvas -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="font-bold text-gray-700 mb-4">Home Page Order</h3>
+                <ul id="layout-list" class="space-y-3">
+                    <!-- Draggable Items Injected Here -->
+                    <li class="text-gray-400 italic">Loading layout...</li>
+                </ul>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="saveLayout()"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
+                        <span>ðŸ’¾</span> Save Layout
+                    </button>
                 </div>
             </div>
 
-            <!-- LAYOUT EDITOR VIEW -->
-            <div id="view-layouts" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-gray-800">Page Layout Editor</h2>
-                    <div class="text-sm text-gray-500">Drag to reorder home page sections</div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Canvas -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 class="font-bold text-gray-700 mb-4">Home Page Order</h3>
-                        <ul id="layout-list" class="space-y-3">
-                            <!-- Draggable Items Injected Here -->
-                            <li class="text-gray-400 italic">Loading layout...</li>
-                        </ul>
-                        <div class="mt-6 flex justify-end">
-                            <button onclick="saveLayout()"
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
-                                <span>ðŸ’¾</span> Save Layout
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Instructions / Preview -->
-                    <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
-                        <h3 class="font-bold text-gray-700">How it works</h3>
-                        <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections on
-                            the home page.</p>
-                        <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
-                            <li><strong>Hero</strong>: The main welcome banner.</li>
-                            <li><strong>Featured Products</strong>: The row of 3 highlighted items.</li>
-                            <li><strong>Trust Signals</strong>: The 4-column selling points.</li>
-                            <li><strong>Narrative</strong>: The "Farmer Voice" quote section.</li>
-                        </ul>
-                        <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-100">
-                            <strong>Note:</strong> Changes apply immediately after saving.
-                        </div>
-                    </div>
+            <!-- Instructions / Preview -->
+            <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
+                <h3 class="font-bold text-gray-700">How it works</h3>
+                <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections on
+                    the home page.</p>
+                <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+                    <li><strong>Hero</strong>: The main welcome banner.</li>
+                    <li><strong>Featured Products</strong>: The row of 3 highlighted items.</li>
+                    <li><strong>Trust Signals</strong>: The 4-column selling points.</li>
+                    <li><strong>Narrative</strong>: The "Farmer Voice" quote section.</li>
+                </ul>
+                <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-100">
+                    <strong>Note:</strong> Changes apply immediately after saving.
                 </div>
             </div>
+        </div>
+    </div>
 
-        </main>
+    </main>
     </div>
 
     <!-- TEMPLATE MODAL -->
@@ -2659,7 +2508,8 @@
         // Make globally available
         window.saveModalOrientation = saveModalOrientation;
     </script>
-    <script src="/admin/js/utilities-functions.js"></script>
+    <script type="module" src="/admin/js/components/ChoiceModal.js"></script>
+
 
 </body>
 

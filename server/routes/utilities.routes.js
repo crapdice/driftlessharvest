@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const { userRepository } = require('../repositories');
 const fs = require('fs');
 const path = require('path');
 const { checkRole } = require('../middleware/auth');
@@ -10,25 +11,25 @@ router.post('/admin/utilities/clean-database', checkRole(['super_admin']), (req,
     try {
         console.log('[Utilities] Starting database cleanup...');
 
-        // Delete in correct order (foreign keys)
+        // Delete in correct order (respecting foreign keys)
+        const payments = db.prepare('DELETE FROM payments').run();
         const orderItems = db.prepare('DELETE FROM order_items').run();
         const orders = db.prepare('DELETE FROM orders').run();
-        const users = db.prepare(`DELETE FROM users WHERE email != 'admin@driftlessharvest.com'`).run();
-        const addresses = db.prepare('DELETE FROM addresses').run();
         const carts = db.prepare('DELETE FROM active_carts').run();
-        const payments = db.prepare('DELETE FROM payments').run();
+        const addresses = db.prepare('DELETE FROM addresses').run();
+        const users = userRepository.deleteAllExcept('admin@driftlessharvest.com');
 
         console.log('[Utilities] Database cleanup complete');
 
         res.json({
             success: true,
             deleted: {
+                payments: payments.changes,
                 orderItems: orderItems.changes,
                 orders: orders.changes,
-                users: users.changes,
-                addresses: addresses.changes,
                 carts: carts.changes,
-                payments: payments.changes
+                addresses: addresses.changes,
+                users
             }
         });
     } catch (error) {
@@ -43,8 +44,8 @@ router.post('/admin/utilities/clean-orders', checkRole(['super_admin']), (req, r
         console.log('[Utilities] Starting orders cleanup...');
 
         // Delete order-related data only
-        const orderItems = db.prepare('DELETE FROM order_items').run();
         const payments = db.prepare('DELETE FROM payments').run();
+        const orderItems = db.prepare('DELETE FROM order_items').run();
         const orders = db.prepare('DELETE FROM orders').run();
         const carts = db.prepare('DELETE FROM active_carts').run();
 
@@ -53,10 +54,10 @@ router.post('/admin/utilities/clean-orders', checkRole(['super_admin']), (req, r
         res.json({
             success: true,
             deleted: {
-                orders: orders.changes,
+                payments: payments.changes,
                 orderItems: orderItems.changes,
-                carts: carts.changes,
-                payments: payments.changes
+                orders: orders.changes,
+                carts: carts.changes
             }
         });
     } catch (error) {
@@ -70,18 +71,14 @@ router.post('/admin/utilities/clean-users', checkRole(['super_admin']), (req, re
     try {
         console.log('[Utilities] Starting users cleanup...');
 
-        // Delete customer users and addresses (preserve admins)
-        const users = db.prepare(`DELETE FROM users WHERE role = 'user'`).run();
-        const addresses = db.prepare('DELETE FROM addresses WHERE user_id NOT IN (SELECT id FROM users)').run();
+        // Delete customer users and all their related data atomically
+        const result = userRepository.deleteAllCustomersWithRelated();
 
         console.log('[Utilities] Users cleanup complete');
 
         res.json({
             success: true,
-            deleted: {
-                users: users.changes,
-                addresses: addresses.changes
-            }
+            deleted: result
         });
     } catch (error) {
         console.error('[Utilities] Clean users error:', error);
@@ -89,118 +86,147 @@ router.post('/admin/utilities/clean-users', checkRole(['super_admin']), (req, re
     }
 });
 
-// POST /api/admin/utilities/seed-database
-router.post('/admin/utilities/seed-database', checkRole(['super_admin']), (req, res) => {
+// POST /api/admin/utilities/seed-users
+router.post('/admin/utilities/seed-users', checkRole(['super_admin']), (req, res) => {
     try {
-        console.log('[Utilities] Starting database seeding...');
+        console.log('[Utilities] Starting user seeding...');
 
-        const bcrypt = require('bcryptjs');
-        let usersCreated = 0;
-        let addressesCreated = 0;
-        let ordersCreated = 0;
-        let orderItemsCreated = 0;
-
-        // Create 5 dummy users
-        const dummyUsers = [
-            { email: 'customer1@test.com', first_name: 'John', last_name: 'Doe', phone: '(555) 123-4567' },
-            { email: 'customer2@test.com', first_name: 'Jane', last_name: 'Smith', phone: '(555) 234-5678' },
-            { email: 'customer3@test.com', first_name: 'Bob', last_name: 'Johnson', phone: '(555) 345-6789' },
-            { email: 'customer4@test.com', first_name: 'Alice', last_name: 'Williams', phone: '(555) 456-7890' },
-            { email: 'customer5@test.com', first_name: 'Charlie', last_name: 'Brown', phone: '(555) 567-8901' }
+        // Define test users
+        const testUsers = [
+            { email: 'customer1@test.com', password: 'password123', firstName: 'John', lastName: 'Doe', phone: '5551234567' },
+            { email: 'customer2@test.com', password: 'password123', firstName: 'Jane', lastName: 'Smith', phone: '5552345678' },
+            { email: 'customer3@test.com', password: 'password123', firstName: 'Bob', lastName: 'Johnson', phone: '5553456789' },
+            { email: 'customer4@test.com', password: 'password123', firstName: 'Alice', lastName: 'Williams', phone: '5554567890' },
+            { email: 'customer5@test.com', password: 'password123', firstName: 'Charlie', lastName: 'Brown', phone: '5555678901' }
         ];
 
-        const hashedPassword = bcrypt.hashSync('password123', 10);
+        // Seed users using repository
+        const userResult = userRepository.seedUsers(testUsers);
 
-        dummyUsers.forEach((user, index) => {
-            // Create user
-            const userResult = db.prepare(`
-                INSERT INTO users (email, password, first_name, last_name, phone, role, created_at)
-                VALUES (?, ?, ?, ?, ?, 'user', datetime('now'))
-            `).run(user.email, hashedPassword, user.first_name, user.last_name, user.phone);
-
-            usersCreated++;
-            const userId = userResult.lastInsertRowid;
-
-            // Create address for user
-            db.prepare(`
-                INSERT INTO addresses (user_id, street, city, state, zip, created_at)
-                VALUES (?, ?, ?, ?, ?, datetime('now'))
-            `).run(userId, `${100 + index} Main St`, 'Madison', 'WI', `5370${index}`);
-
-            addressesCreated++;
+        // Create addresses for users who don't have one
+        let addressesCreated = 0;
+        const customers = userRepository.listCustomers();
+        customers.forEach((user, index) => {
+            const existingAddr = db.prepare('SELECT id FROM addresses WHERE user_id = ?').get(user.id);
+            if (!existingAddr) {
+                db.prepare(`
+                    INSERT INTO addresses (user_id, name, street, city, state, zip, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+                `).run(
+                    user.id,
+                    `${user.first_name || 'Test'} ${user.last_name || 'User'}`,
+                    `${100 + index} Main St`,
+                    'Madison',
+                    'WI',
+                    `5370${index}`
+                );
+                addressesCreated++;
+            }
         });
 
-        // Get some products for orders
-        const products = db.prepare('SELECT id, name, price FROM products WHERE is_active = 1 LIMIT 10').all();
-
-        if (products.length > 0) {
-            // Create 5 dummy orders
-            const userIds = db.prepare('SELECT id FROM users WHERE role = "user" ORDER BY id DESC LIMIT 5').all();
-
-            userIds.forEach((user, index) => {
-                const orderResult = db.prepare(`
-                    INSERT INTO orders (user_id, status, total, delivery_date, created_at)
-                    VALUES (?, ?, ?, date('now', '+${index + 1} days'), datetime('now'))
-                `).run(user.id, 'Pending', 0);
-
-                ordersCreated++;
-                const orderId = orderResult.lastInsertRowid;
-
-                // Add 2-3 random products to each order
-                const numItems = 2 + Math.floor(Math.random() * 2);
-                let orderTotal = 0;
-
-                for (let i = 0; i < numItems; i++) {
-                    const product = products[Math.floor(Math.random() * products.length)];
-                    const quantity = 1 + Math.floor(Math.random() * 3);
-                    const subtotal = product.price * quantity;
-                    orderTotal += subtotal;
-
-                    db.prepare(`
-                        INSERT INTO order_items (order_id, product_id, product_name, quantity, price, subtotal)
-                        VALUES (?, ?, ?, ?, ?, ?)
-                    `).run(orderId, product.id, product.name, quantity, product.price, subtotal);
-
-                    orderItemsCreated++;
-                }
-
-                // Update order total
-                db.prepare('UPDATE orders SET total = ? WHERE id = ?').run(orderTotal, orderId);
-            });
-        }
-
-        console.log('[Utilities] Database seeding complete');
+        console.log('[Utilities] User seeding complete');
 
         res.json({
             success: true,
             created: {
-                users: usersCreated,
-                addresses: addressesCreated,
-                orders: ordersCreated,
-                orderItems: orderItemsCreated
-            }
+                users: userResult.created,
+                usersSkipped: userResult.skipped,
+                addresses: addressesCreated
+            },
+            totalCustomers: userRepository.countCustomers()
         });
     } catch (error) {
-        console.error('[Utilities] Seed database error:', error);
-        res.status(500).json({ error: 'Failed to seed database', details: error.message });
+        console.error('[Utilities] Seed users error:', error);
+        res.status(500).json({ error: 'Failed to seed users', details: error.message });
+    }
+});
+
+// POST /api/admin/utilities/seed-orders
+router.post('/admin/utilities/seed-orders', checkRole(['super_admin']), (req, res) => {
+    try {
+        console.log('[Utilities] Starting order seeding...');
+
+        const customers = userRepository.listCustomers();
+        if (customers.length === 0) {
+            return res.status(400).json({ error: 'No customers found. Please seed users first.' });
+        }
+
+        const products = db.prepare('SELECT id, name, price FROM products WHERE is_active = 1 LIMIT 10').all();
+        if (products.length === 0) {
+            return res.status(400).json({ error: 'No active products found. Please add products first.' });
+        }
+
+        let ordersCreated = 0;
+        let orderItemsCreated = 0;
+
+        // Create orders for up to 5 customers
+        customers.slice(0, 5).forEach((user, index) => {
+            const orderResult = db.prepare(`
+                INSERT INTO orders (user_id, user_email, status, total, items, delivery_date, created_at)
+                VALUES (?, ?, ?, ?, ?, date('now', '+${index + 1} days'), datetime('now'))
+            `).run(user.id, user.email, 'Pending', 0, '[]');
+
+            ordersCreated++;
+            const orderId = orderResult.lastInsertRowid;
+
+            // Add 2-3 random products
+            const numItems = 2 + Math.floor(Math.random() * 2);
+            let orderTotal = 0;
+            const orderItemsList = [];
+
+            for (let i = 0; i < numItems; i++) {
+                const product = products[Math.floor(Math.random() * products.length)];
+                const quantity = 1 + Math.floor(Math.random() * 3);
+                const subtotal = product.price * quantity;
+                orderTotal += subtotal;
+
+                db.prepare(`
+                    INSERT INTO order_items (order_id, product_id, product_name, quantity, price_at_purchase, item_type)
+                    VALUES (?, ?, ?, ?, ?, 'product')
+                `).run(orderId, product.id, product.name, quantity, product.price);
+
+                orderItemsList.push({
+                    product_id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: quantity,
+                    total: subtotal
+                });
+
+                orderItemsCreated++;
+            }
+
+            db.prepare('UPDATE orders SET total = ?, items = ? WHERE id = ?')
+                .run(orderTotal, JSON.stringify(orderItemsList), orderId);
+        });
+
+        console.log('[Utilities] Order seeding complete');
+
+        res.json({
+            success: true,
+            created: {
+                orders: ordersCreated,
+                orderItems: orderItemsCreated
+            },
+            totalOrders: db.prepare('SELECT COUNT(*) as count FROM orders').get().count
+        });
+    } catch (error) {
+        console.error('[Utilities] Seed orders error:', error);
+        res.status(500).json({ error: 'Failed to seed orders', details: error.message });
     }
 });
 
 // GET /api/admin/utilities/verify-database
 router.get('/admin/utilities/verify-database', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
-        const users = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
-        const admins = db.prepare('SELECT COUNT(*) as count FROM users WHERE is_admin = 1').get().count;
-        const orders = db.prepare('SELECT COUNT(*) as count FROM orders').get().count;
-        const products = db.prepare('SELECT COUNT(*) as count FROM products').get().count;
-
         res.json({
             success: true,
             counts: {
-                users,
-                admins,
-                orders,
-                products
+                users: userRepository.count(),
+                admins: userRepository.countAdmins(),
+                customers: userRepository.countCustomers(),
+                orders: db.prepare('SELECT COUNT(*) as count FROM orders').get().count,
+                products: db.prepare('SELECT COUNT(*) as count FROM products').get().count
             }
         });
     } catch (error) {
@@ -214,7 +240,9 @@ router.post('/admin/utilities/clean-temp-files', checkRole(['super_admin']), (re
     try {
         const filesToDelete = [
             path.join(__dirname, '../../cleanup-db.js'),
-            path.join(__dirname, '../../cleanup-result.txt')
+            path.join(__dirname, '../../cleanup-result.txt'),
+            path.join(__dirname, '../../check-schema.js'),
+            path.join(__dirname, '../../test-utilities.js')
         ];
 
         let deleted = 0;
@@ -240,7 +268,7 @@ router.post('/admin/utilities/clean-temp-files', checkRole(['super_admin']), (re
 // GET /api/admin/utilities/query/:table
 router.get('/admin/utilities/query/:table', checkRole(['admin', 'super_admin']), (req, res) => {
     const { table } = req.params;
-    const allowedTables = ['users', 'orders', 'products', 'delivery_windows', 'addresses', 'categories', 'box_templates'];
+    const allowedTables = ['users', 'orders', 'products', 'delivery_windows', 'addresses', 'categories', 'box_templates', 'admin_types'];
 
     if (!allowedTables.includes(table)) {
         return res.status(400).json({ error: 'Invalid table' });

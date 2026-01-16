@@ -87,7 +87,7 @@ export async function loadProducts() {
             renderInventory(products);
         }
         if (document.getElementById('view-categories') && !document.getElementById('view-categories').classList.contains('hidden')) {
-            loadCategories(); // Refetch categories + recalc counts
+            if (window.loadCategories) window.loadCategories(); // Refetch categories + recalc counts
         }
     } catch (e) {
         showToast("Failed to load products/templates", "error");
@@ -282,10 +282,19 @@ window.searchProducts = (query) => {
         renderData(productsCache, templatesCache);
         return;
     }
-    const filtered = productsCache.filter(p =>
-        p.name.toLowerCase().includes(term) ||
-        String(p.category).toLowerCase().includes(term)
-    );
+    const filtered = productsCache.filter(p => {
+        const nameMatch = p.name.toLowerCase().includes(term);
+        const catMatch = String(p.category || '').toLowerCase().includes(term);
+
+        // Support tags search (handles array or string formats)
+        let tagMatch = false;
+        if (p.tags) {
+            const tagStr = Array.isArray(p.tags) ? p.tags.join(' ') : String(p.tags);
+            tagMatch = tagStr.toLowerCase().includes(term);
+        }
+
+        return nameMatch || catMatch || tagMatch;
+    });
     renderData(filtered, templatesCache);
 };
 
@@ -722,100 +731,7 @@ function renderInventory(products) {
     }).join('');
 }
 
-export async function loadCategories() {
-    try {
-        // Ensure we have products for counts
-        if (productsCache.length === 0) {
-            try { productsCache = await api.getProducts(); } catch (e) { }
-        }
 
-        // Count products per category
-        const counts = {};
-        productsCache.forEach(p => {
-            const key = String(p.category).trim(); // Normalize
-            counts[key] = (counts[key] || 0) + 1;
-        });
-
-        const res = await fetch('/api/categories');
-        const cats = await res.json();
-
-        const grid = document.getElementById('categories-grid');
-        if (!grid) return;
-
-        if (cats.length === 0) {
-            grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400 italic">No categories found. Create one above!</div>`;
-            return;
-        }
-
-        const colors = [
-            'bg-rose-50 text-rose-600 border-rose-100',
-            'bg-orange-50 text-orange-600 border-orange-100',
-            'bg-amber-50 text-amber-600 border-amber-100',
-            'bg-emerald-50 text-emerald-600 border-emerald-100',
-            'bg-cyan-50 text-cyan-600 border-cyan-100',
-            'bg-indigo-50 text-indigo-600 border-indigo-100',
-            'bg-violet-50 text-violet-600 border-violet-100',
-            'bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100'
-        ];
-
-        grid.innerHTML = cats.map(c => {
-            // Deterministic color based on name
-            const charCode = (c.name || '?').charCodeAt(0);
-            const colorClass = colors[charCode % colors.length];
-            const productCount = counts[c.name] || 0;
-
-            return `
-            <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-lg hover:-translate-y-1 transition-all group duration-300">
-                <div class="flex items-center gap-4">
-                     <div class="w-14 h-14 rounded-xl ${colorClass} border flex items-center justify-center text-2xl font-black shadow-inner">
-                         ${(c.name[0] || '?').toUpperCase()}
-                     </div>
-                     <div>
-                         <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">${c.name}</h3>
-                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-500">
-                            ${productCount} Product${productCount !== 1 ? 's' : ''}
-                         </span>
-                     </div>
-                </div>
-                
-                <button onclick="window.deleteCategory('${c.id}')" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
-                    title="Delete Category">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-            </div>
-        `}).join('');
-    } catch (e) {
-        console.error(e);
-        showToast("Failed to load categories", "error");
-    }
-}
-
-export async function addCategory() {
-    const name = document.getElementById('new-cat-name').value.trim();
-    if (!name) return;
-    try {
-        await fetch('/api/categories', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` },
-            body: JSON.stringify({ name })
-        });
-        document.getElementById('new-cat-name').value = '';
-        loadCategories();
-        showToast("Category added");
-    } catch (e) { showToast("Error", "error"); }
-}
-
-window.deleteCategory = async (id) => {
-    if (!confirm("Delete category?")) return;
-    try {
-        await fetch(`/api/categories/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-        });
-        loadCategories();
-    } catch (e) { showToast("Error", "error"); }
-};
 
 window.updateStock = async (id, delta) => {
     const p = productsCache.find(x => String(x.id) === String(id));

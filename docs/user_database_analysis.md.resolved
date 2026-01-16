@@ -1,0 +1,352 @@
+# User Database Code Analysis
+
+## Files That Update Users Table
+
+### Active Route Files (4)
+
+| File | INSERT | UPDATE | DELETE |
+|------|--------|--------|--------|
+| [auth.routes.js](file:///c:/Users/zackf/Documents/OpenAI/harvest-app/server/routes/auth.routes.js) | Line 22 | Lines 204, 207 | - |
+| [admin.routes.js](file:///c:/Users/zackf/Documents/OpenAI/harvest-app/server/routes/admin.routes.js) | Line 92 | Line 125 | Line 175 |
+| [utilities.routes.js](file:///c:/Users/zackf/Documents/OpenAI/harvest-app/server/routes/utilities.routes.js) | Line 125 | - | Lines 16, 74 |
+| [db/index.js](file:///c:/Users/zackf/Documents/OpenAI/harvest-app/server/db/index.js) | Line 181 | Line 173 | - |
+
+### Summary
+
+**4 files** directly modify the users table with **raw SQL statements**.
+
+**Key Issues:**
+- No centralized data access layer
+- SQL scattered across route handlers
+- Inconsistent column usage between files
+- No parameterized query builder
+
+---
+
+## 10 Improvement Suggestions
+
+### 1. **Create UserRepository Class**
+
+**Problem:** SQL scattered across 4+ files
+**Solution:** Centralize all user operations in one place
+
+```javascript
+// server/repositories/UserRepository.js
+class UserRepository {
+    constructor(db) {
+        this.db = db;
+    }
+    
+    create(userData) { }
+    update(id, userData) { }
+    delete(id) { }
+    findById(id) { }
+    findByEmail(email) { }
+    list(filters) { }
+}
+```
+
+**Benefits:**
+- Single source of truth for user queries
+- Easier to maintain and test
+- PostgreSQL migration: change one file
+
+---
+
+### 2. **Use Prepared Statement Caching**
+
+**Problem:** Each query creates a new prepared statement
+**Solution:** Cache frequently-used statements
+
+```javascript
+// Current (inefficient)
+db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+
+// Better (cached)
+class UserRepository {
+    constructor(db) {
+        this.stmts = {
+            findByEmail: db.prepare('SELECT * FROM users WHERE email = ?'),
+            findById: db.prepare('SELECT * FROM users WHERE id = ?'),
+        };
+    }
+    
+    findByEmail(email) {
+        return this.stmts.findByEmail.get(email);
+    }
+}
+```
+
+**Benefits:**
+- 2-5x faster for repeated queries
+- Reduced memory allocation
+- PostgreSQL: prepared statements work the same
+
+---
+
+### 3. **Abstract Database Driver**
+
+**Problem:** Code tightly coupled to better-sqlite3
+**Solution:** Create database abstraction layer
+
+```javascript
+// server/db/DatabaseAdapter.js
+class DatabaseAdapter {
+    prepare(sql) { }
+    run(sql, params) { }
+    get(sql, params) { }
+    all(sql, params) { }
+    transaction(fn) { }
+}
+
+class SqliteAdapter extends DatabaseAdapter { }
+class PostgresAdapter extends DatabaseAdapter { }
+```
+
+**Benefits:**
+- Swap SQLite for PostgreSQL with minimal code changes
+- Test with in-memory SQLite, deploy with PostgreSQL
+- Clear interface contract
+
+---
+
+### 4. **Use Query Builder for Dynamic Queries**
+
+**Problem:** String concatenation for dynamic SQL
+**Solution:** Use query builder pattern
+
+```javascript
+// Current (fragile)
+let sql = 'SELECT * FROM users WHERE 1=1';
+if (isAdmin !== undefined) sql += ` AND is_admin = ${isAdmin}`;
+
+// Better (safe)
+class QueryBuilder {
+    select(table, columns = ['*']) { }
+    where(column, op, value) { }
+    limit(n) { }
+    build() { } // Returns { sql, params }
+}
+```
+
+**Benefits:**
+- SQL injection prevention
+- Cleaner code
+- PostgreSQL: query syntax mostly compatible
+
+---
+
+### 5. **Add Row Versioning for Optimistic Locking**
+
+**Problem:** No concurrency control
+**Solution:** Add version column for optimistic locking
+
+```sql
+ALTER TABLE users ADD COLUMN version INTEGER DEFAULT 1;
+
+-- Update only if version matches
+UPDATE users SET ..., version = version + 1 
+WHERE id = ? AND version = ?
+```
+
+**Benefits:**
+- Prevent lost updates in concurrent scenarios
+- No database-level locking needed
+- PostgreSQL: same pattern works
+
+---
+
+### 6. **Implement Soft Delete**
+
+**Problem:** Hard deletes lose data
+**Solution:** Add deleted_at column
+
+```sql
+ALTER TABLE users ADD COLUMN deleted_at DATETIME;
+
+-- Instead of DELETE
+UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?;
+
+-- All queries filter deleted
+SELECT * FROM users WHERE deleted_at IS NULL;
+```
+
+**Benefits:**
+- Audit trail
+- Easy restore
+- GDPR: can purge after retention period
+- PostgreSQL: same pattern
+
+---
+
+### 7. **Add Database Indexes for Common Queries**
+
+**Problem:** Missing indexes on frequently queried columns
+**Solution:** Add indexes
+
+```sql
+CREATE INDEX idx_users_email ON users(email);           -- Already UNIQUE
+CREATE INDEX idx_users_admin_type ON users(admin_type_id);
+CREATE INDEX idx_users_created_at ON users(created_at);
+CREATE INDEX idx_users_deleted_at ON users(deleted_at); -- If soft delete
+```
+
+**Benefits:**
+- 10-100x faster queries on large tables
+- PostgreSQL: same syntax
+
+---
+
+### 8. **Standardize Column Usage Across Files**
+
+**Problem:** Different files use different columns
+
+```javascript
+// auth.routes.js
+INSERT INTO users (email, password, first_name, last_name, phone)
+
+// admin.routes.js
+INSERT INTO users (id, email, password, is_admin, admin_type_id, phone, first_name, last_name, created_at)
+
+// utilities.routes.js
+INSERT INTO users (email, password, first_name, last_name, phone, is_admin, created_at)
+```
+
+**Solution:** Define canonical column list in repository
+
+```javascript
+const USER_COLUMNS = {
+    required: ['email', 'password'],
+    optional: ['first_name', 'last_name', 'phone', 'admin_type_id'],
+    system: ['id', 'created_at', 'updated_at']
+};
+```
+
+**Benefits:**
+- Consistency
+- Single place to update schema changes
+- PostgreSQL migration: one place to adjust
+
+---
+
+### 9. **Use Transactions for Multi-Table Operations**
+
+**Problem:** Some operations span multiple tables without transactions
+**Solution:** Wrap related operations in transactions
+
+```javascript
+// Current (risky)
+db.prepare('DELETE FROM addresses WHERE user_id = ?').run(userId);
+db.prepare('DELETE FROM orders WHERE user_id = ?').run(userId);
+db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+
+// Better (atomic)
+db.transaction(() => {
+    db.prepare('DELETE FROM addresses WHERE user_id = ?').run(userId);
+    db.prepare('DELETE FROM orders WHERE user_id = ?').run(userId);
+    db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+})();
+```
+
+**Benefits:**
+- Data integrity
+- Consistent state on failure
+- PostgreSQL: transactions work the same
+
+---
+
+### 10. **Add SQL Logging and Query Timing**
+
+**Problem:** No visibility into query performance
+**Solution:** Add logging wrapper
+
+```javascript
+class LoggingDb {
+    constructor(db, logger) {
+        this.db = db;
+        this.logger = logger;
+    }
+    
+    prepare(sql) {
+        const stmt = this.db.prepare(sql);
+        const self = this;
+        return {
+            run(...params) {
+                const start = Date.now();
+                const result = stmt.run(...params);
+                self.logger.log(`[${Date.now() - start}ms] ${sql}`);
+                return result;
+            },
+            // ... other methods
+        };
+    }
+}
+```
+
+**Benefits:**
+- Identify slow queries
+- Debug production issues
+- PostgreSQL: can use same pattern or pg-monitor
+
+---
+
+## PostgreSQL Migration Checklist
+
+When ready to migrate, these changes will ease the transition:
+
+| SQLite | PostgreSQL |
+|--------|------------|
+| `INTEGER PRIMARY KEY AUTOINCREMENT` | `SERIAL PRIMARY KEY` |
+| `datetime('now')` | `NOW()` |
+| `DATETIME` | `TIMESTAMP` |
+| `TEXT` | `VARCHAR(n)` or `TEXT` |
+| `db.prepare().run()` | `pool.query()` |
+| `db.transaction(() => {})()` | `await pool.query('BEGIN'); ... COMMIT` |
+| In-process SQLite | Connection pool |
+
+**Priority Order:**
+1. Implement UserRepository (suggestion #1)
+2. Abstract database driver (suggestion #3)
+3. Standardize column usage (suggestion #8)
+4. Add transactions (suggestion #9)
+
+These 4 changes will make PostgreSQL migration straightforward.
+
+---
+
+## Current Architecture (Before)
+
+```
+auth.routes.js ──┐
+admin.routes.js ─┼──> Raw SQL ──> better-sqlite3
+utilities.routes.js ──┘
+db/index.js ─────┘
+```
+
+## Target Architecture (After)
+
+```
+auth.routes.js ──┐
+admin.routes.js ─┼──> UserRepository ──> DatabaseAdapter ──┬──> SQLite
+utilities.routes.js ──┘                                      └──> PostgreSQL
+```
+
+---
+
+## Quick Wins (Do First)
+
+1. ✅ Create `UserRepository.js` with all user operations
+2. ✅ Add prepared statement caching
+3. ✅ Wrap multi-table operations in transactions
+
+## Medium Term
+
+4. Add `DatabaseAdapter` abstraction
+5. Implement soft delete
+6. Add query logging
+
+## Long Term
+
+7. Add row versioning
+8. Query builder for complex queries
+9. PostgreSQL migration

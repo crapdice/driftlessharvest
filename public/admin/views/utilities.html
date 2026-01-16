@@ -1,0 +1,316 @@
+<!-- System Utilities Header & Main Operations -->
+<div
+    class="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4 mb-2">
+    <div>
+        <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">System Utilities</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Database maintenance, seeding, and diagnostic tools.</p>
+    </div>
+    <button onclick="refreshQuickStats()"
+        class="w-full md:w-auto text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-bold px-5 py-2.5 border border-blue-100 dark:border-blue-900/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2">
+        <span>🔄</span> Refresh Stats
+    </button>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Maintenance Operations -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/30">
+            <h3 class="font-black text-gray-800 dark:text-gray-200 text-sm uppercase tracking-wider">Data Lifecycle</h3>
+        </div>
+        <div class="p-6 space-y-4">
+            <div
+                class="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <p class="font-bold text-gray-900 dark:text-white">Seeding Engine</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Populate database with sample data sets.
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="seedUsers()"
+                        class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-[11px] font-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">USERS</button>
+                    <button onclick="seedOrders()"
+                        class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-[11px] font-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">ORDERS</button>
+                </div>
+            </div>
+            <div
+                class="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100/50 dark:border-blue-900/30 flex items-center justify-between">
+                <div>
+                    <p class="font-bold text-blue-900 dark:text-blue-300">Integrity Check</p>
+                    <p class="text-xs text-blue-600/70 dark:text-blue-400/60 mt-0.5">Scan database for orphans and
+                        structural errors.</p>
+                </div>
+                <button onclick="verifyDatabase()"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95">RUN
+                    DIAGNOSTIC</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cleanup Operations -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-50 dark:border-gray-700 bg-red-50/30 dark:bg-red-900/10">
+            <h3 class="font-black text-red-800 dark:text-red-400 text-sm uppercase tracking-wider">Destructive Actions
+            </h3>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="flex items-center justify-between p-1">
+                <div>
+                    <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Orders</p>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Delete all transaction records.</p>
+                </div>
+                <button onclick="cleanOrders()"
+                    class="px-4 py-2 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
+            </div>
+            <div class="flex items-center justify-between p-1">
+                <div>
+                    <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Customers</p>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Clear all non-admin user data.</p>
+                </div>
+                <button onclick="cleanUsers()"
+                    class="px-4 py-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
+            </div>
+            <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <p class="font-bold text-red-700 dark:text-red-400 text-sm">Factory Reset</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 italic mt-0.5">Wipe database but keep
+                        structure.</p>
+                </div>
+                <button onclick="cleanDatabase()"
+                    class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-black shadow-lg shadow-red-500/30 transition-all active:scale-95 leading-none">TOTAL
+                    NUKE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- STANDARD VIEW (Default) -->
+<div id="utilities-standard" class="space-y-6 mt-6">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between group hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total
+                    Users</p>
+                <h3 class="text-3xl font-black text-gray-900 dark:text-white stat-count-users">--</h3>
+            </div>
+            <div
+                class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl text-2xl group-hover:scale-110 transition-transform">
+                👤</div>
+        </div>
+        <div
+            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between group hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total
+                    Orders</p>
+                <h3 class="text-3xl font-black text-gray-900 dark:text-white stat-count-orders">--</h3>
+            </div>
+            <div
+                class="p-4 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl text-2xl group-hover:scale-110 transition-transform">
+                🛒</div>
+        </div>
+        <div
+            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between group hover:shadow-md transition-shadow">
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total
+                    Products</p>
+                <h3 class="text-3xl font-black text-gray-900 dark:text-white stat-count-products">--</h3>
+            </div>
+            <div
+                class="p-4 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl text-2xl group-hover:scale-110 transition-transform">
+                🍎</div>
+        </div>
+    </div>
+
+    <!-- Shared Console -->
+    <div class="bg-gray-900 rounded-2xl p-6 border border-gray-800 shadow-2xl relative overflow-hidden group">
+        <div class="flex items-center gap-2 mb-4">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <span class="ml-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">Maintenance Console</span>
+        </div>
+        <div id="std-db-output"
+            class="font-mono text-[12px] text-gray-400 min-h-[120px] max-h-[300px] overflow-y-auto custom-scrollbar">
+            <span class="text-gray-600 animate-pulse">_ System Ready. Standing by for instructions...</span>
+        </div>
+    </div>
+</div>
+
+<!-- HI-FI MASTER VIEW (John Deere Theme) -->
+<div id="utilities-hifi">
+    <div class="hifi-panel p-8">
+        <div class="flex justify-between items-start mb-12">
+            <div>
+                <h2 class="text-3xl font-black text-gray-700 italic tracking-tighter"
+                    style="font-family: 'Inter', sans-serif;">
+                    HARVEST <span class="text-gray-500 font-light">MASTER SERIES</span>
+                </h2>
+                <p class="text-[10px] font-bold text-gray-500 tracking-[0.3em] uppercase mt-1">
+                    Professional Database Management System • Model v2.0
+                </p>
+            </div>
+            <div class="flex gap-4 items-center">
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-gray-600 uppercase">Signal Stability</p>
+                    <div class="vu-meter w-24 mt-1">
+                        <div class="vu-needle" style="transform: rotate(15deg);"></div>
+                        <div
+                            class="absolute inset-x-0 bottom-0 flex justify-between px-1 text-[8px] text-gray-500 font-mono">
+                            <span>-20</span><span>0</span><span>+3</span>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] border border-orange-300">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Left Channel: System Operations -->
+            <div class="space-y-10">
+                <div>
+                    <span class="hifi-section-label">Channel A: Data Seeding</span>
+                    <div class="flex gap-12 mt-6">
+                        <div class="hifi-knob-container">
+                            <button onclick="seedUsers()" class="hifi-knob">👤</button>
+                            <span class="label-tag">Seed Users</span>
+                        </div>
+                        <div class="hifi-knob-container">
+                            <button onclick="seedOrders()" class="hifi-knob">🛒</button>
+                            <span class="label-tag">Seed Orders</span>
+                        </div>
+                        <div class="hifi-knob-container">
+                            <button onclick="verifyDatabase()" class="hifi-knob">🔍</button>
+                            <span class="label-tag">Scan DB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="hifi-section-label">System Monitoring</span>
+                    <div
+                        class="flex justify-between gap-6 py-4 px-6 bg-black/5 rounded border border-gray-400 font-mono text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500">USR:</span>
+                            <span class="backlit-orange text-lg font-bold stat-count-users">--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500">ORD:</span>
+                            <span class="backlit-orange text-lg font-bold stat-count-orders">--</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-500">PRD:</span>
+                            <span class="backlit-orange text-lg font-bold stat-count-products">--</span>
+                        </div>
+                        <button onclick="refreshQuickStats()"
+                            class="ml-4 hover:translate-y-[-1px] active:translate-y-[1px] transition-transform">🔄</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Channel: Danger Zone -->
+            <div class="space-y-10">
+                <div>
+                    <span class="hifi-section-label">Channel B: Cleanup Core</span>
+                    <div class="flex gap-12 mt-6">
+                        <div class="hifi-toggle-container">
+                            <div onclick="cleanOrders(event)" class="hifi-toggle"></div>
+                            <span class="label-tag bg-orange-700">Purge Orders</span>
+                        </div>
+                        <div class="hifi-toggle-container">
+                            <div onclick="cleanUsers(event)" class="hifi-toggle"></div>
+                            <span class="label-tag bg-red-700">Purge Users</span>
+                        </div>
+                        <div class="hifi-toggle-container">
+                            <div onclick="cleanDatabase(event)" class="hifi-toggle"></div>
+                            <span class="label-tag bg-red-900 shadow-[0_0_10px_rgba(153,27,27,0.4)]">Total Nuke</span>
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mt-6 italic">* Use master bypass for all destructive operations.
+                        Irreversible signal loss may occur.</p>
+                </div>
+
+                <div>
+                    <span class="hifi-section-label">Maintenance Output</span>
+                    <div
+                        class="bg-gray-800 text-gray-300 p-4 rounded font-mono text-[11px] min-h-[100px] border-l-4 border-orange-500 shadow-inner hifi-db-output">
+                        <span class="text-gray-500">&gt; Standing by...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 flex justify-end">
+            <div class="hifi-knob-container">
+                <button onclick="cleanTempFiles()"
+                    class="w-10 h-10 rounded-full bg-gray-400 border-2 border-gray-500 shadow-sm hover:bg-gray-300 transition-colors">🧹</button>
+                <span class="text-[8px] font-bold text-gray-500 uppercase">Clear Temp</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Database Queries Section -->
+<div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-12 pb-4">
+    <h3 class="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <span class="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg">📊</span>
+        Table Inspection
+    </h3>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <button onclick="viewAllUsers()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">👥</span> Users
+        </button>
+        <button onclick="viewAllOrders()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📦</span> Orders
+        </button>
+        <button onclick="viewAllProducts()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🍎</span> Products
+        </button>
+        <button onclick="viewDeliveryWindows()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🚛</span> Delivery
+        </button>
+        <button onclick="viewAddresses()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📍</span> Addresses
+        </button>
+    </div>
+
+    <div id="query-results"
+        class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 min-h-[200px] shadow-inner">
+        <div class="flex flex-col items-center justify-center py-12 text-gray-400 italic">
+            <span class="text-4xl mb-4">🔍</span>
+            <p class="text-xs font-medium uppercase tracking-widest">Select a channel above to inspect raw data</p>
+        </div>
+    </div>
+</div>
+
+<!-- Database Stats Display -->
+<div class="mt-6">
+    <h3 class="text-lg font-black text-gray-900 dark:text-white mb-4">System Diagnostic Report</h3>
+    <div id="db-diagnostic-stats"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
+        <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+            Run "Verify Database" to generate a detailed report.
+        </p>
+    </div>
+</div>
+
+<!-- Railway Instructions -->
+<div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+    <h4 class="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+        <span>⚠️</span> Railway Database Cleanup
+    </h4>
+    <p class="text-sm text-yellow-700 mb-2">To clean the Railway database, use the Railway CLI:</p>
+    <pre class="bg-yellow-100 p-3 rounded text-xs font-mono overflow-x-auto">railway run node cleanup-db.js</pre>
+    <p class="text-xs text-yellow-600 mt-2">Note: This will delete all orders and customer users on Railway</p>
+</div>

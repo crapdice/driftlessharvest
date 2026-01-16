@@ -6,6 +6,12 @@ let currentMode = 'customer'; // 'customer' or 'admin'
 
 export async function loadUsers(mode = 'customer') {
     currentMode = mode;
+
+    // Reset search state and clear input
+    activeUserSearch = '';
+    const searchInput = document.getElementById('search-users-input');
+    if (searchInput) searchInput.value = '';
+
     const titleEl = document.getElementById('customers-view-title');
     if (titleEl) titleEl.innerText = (mode === 'admin') ? 'User Management' : 'Customers';
 

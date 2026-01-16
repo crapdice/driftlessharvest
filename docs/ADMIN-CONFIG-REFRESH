@@ -1,0 +1,17 @@
+ve performed a deep dive into your current Admin Configuration layout and identified 5 key areas where we can transform it from a disorganized list into a premium, workflow-oriented dashboard.
+
+1. Vertical Category Navigation (The "Command Center" Sidebar)
+Improvement: Move away from the two-column "grid of cards" and implement a left-hand navigation menu for settings categories (e.g., Branding, Storefront UX, Marketing, System).
+Why: Current layout forces the eye to jump across unrelated cards. Tabbing content allows the user to focus on one logical group at a time (e.g., "I'm doing Marketing updates now").
+2. Context-Aware Visual Previews
+Improvement: Instead of just a dropdown for Frontend Theme or Hero Image, display a small "Live Preview" thumbnail next to the selector.
+Why: Currently, you have to save and refresh the storefront to see the impact of a theme change. A mini-preview makes the configuration feel like a professional design tool.
+3. Progressive Disclosure for Technical Settings
+Improvement: Use collapsible "Advanced" sections for technical values like Inventory Threshold or AB Testing.
+Why: Branding (Business Name, Quote) and technical configurations (JSON Editor) have different "mental models." Tucking the technical stuff behind a "System Settings" toggle keeps the page clean for everyday branding updates.
+4. Floating Global Action Bar
+Improvement: Replace the top-mounted buttons with a sticky bar at the bottom of the screen that only appears (or highlights) when changes are detected.
+Why: After scrolling through several sections of settings, having to scroll all the way back to the top to "Save" breaks the flow. A sticky footer ensures the "Confirm" action is always reachable.
+5. Rich Input Feedback & Tooltips
+Improvement: Replace the small gray subtext under fields with interactive "Info" icons that show rich tooltips. Add "Success" indicators (tiny grüen checks) next to fields that were recently saved.
+Why: It cleans up the vertical space and provides a premium "instrument panel" feel consistent with your Hi-Fi Master aesthetic in the Utilities tab.
