@@ -104,7 +104,7 @@ export function BentoGrid(items, config = {}) {
                                 <p class="text-white/80 text-sm mb-6 line-clamp-2 max-w-lg font-light leading-relaxed">${item.description || 'Fresh from the farm.'}</p>
                                 <div class="flex items-center justify-between">
                                     <span class="font-sans font-medium text-2xl tracking-tight">$${price}</span>
-                                    <button onclick="addToCart('${item.id}', '${item.type || 'product'}')" class="bg-white text-kale px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-kale hover:text-white transition-colors shadow-lg">
+                                    <button onclick="addToCart('${item.id}', '${item.type || 'product'}')" class="bg-white text-yellow-300 px-8 py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-kale hover:text-white transition-colors shadow-lg">
                                         Add to Cart
                                     </button>
                                 </div>
