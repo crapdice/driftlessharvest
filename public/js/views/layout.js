@@ -3,6 +3,11 @@ import { setView } from '../modules/router.js';
 
 export function renderHeader() {
   const CONFIG = window.CONFIG || { business: {}, navigation: [] };
+
+  // Hide header on Auth pages for distraction-free conversion
+  const path = window.location.pathname;
+  if (path === '/login' || path === '/signup') return '';
+
   // Safety check if CONFIG is not loaded yet
 
   const user = store.getUser();
