@@ -54,6 +54,7 @@ app.use('/api', configRoutes);
 app.use('/api', generalRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api', require('./routes/utilities.routes'));
+app.use('/api', require('./routes/analytics.routes'));
 
 
 // Global Error Handler
