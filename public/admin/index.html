@@ -2645,6 +2645,11 @@
                 document.getElementById('stat-conversion-rate').textContent = `${data.overview?.conversionRate || 0}%`;
                 document.getElementById('stat-mobile-percentage').textContent = `${data.overview?.mobilePercentage || 0}%`;
 
+                // Update change indicators (currently no historical data tracked)
+                document.getElementById('stat-visits-change').textContent = 'No historical data';
+                document.getElementById('stat-unique-change').textContent = 'No historical data';
+                document.getElementById('stat-conversion-change').textContent = 'No historical data';
+
                 // Render charts
                 renderTrafficSources(data.trafficSources || []);
                 renderDeviceBreakdown(data.devices || []);
