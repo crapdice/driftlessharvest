@@ -140,6 +140,30 @@ router.get('/admin/analytics/overview', authenticateToken, checkRole(['admin', '
     }
 });
 
+// GET /api/admin/analytics/recent-visitors - Get last 10 visitors
+router.get('/admin/analytics/recent-visitors', authenticateToken, checkRole(['admin', 'super_admin']), (req, res) => {
+    try {
+        const recentVisitors = db.prepare(`
+            SELECT 
+                ip_address,
+                user_agent,
+                page_url,
+                created_at,
+                session_id
+            FROM analytics_events
+            WHERE event_type = 'pageview'
+            ORDER BY created_at DESC
+            LIMIT 10
+        `).all();
+
+        res.json({ visitors: recentVisitors });
+
+    } catch (error) {
+        console.error('[Analytics] Error fetching recent visitors:', error);
+        res.status(500).json({ error: 'Failed to fetch recent visitors' });
+    }
+});
+
 // POST /api/analytics/track - Track analytics event (public endpoint)
 router.post('/analytics/track', (req, res) => {
     try {
@@ -152,10 +176,16 @@ router.post('/analytics/track', (req, res) => {
         // Get user_id from token if authenticated
         const user_id = req.user?.id || null;
 
+        // Get IP address from request
+        const ip_address = req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            null;
+
         db.prepare(`
-            INSERT INTO analytics_events (session_id, user_id, event_type, page_url, referrer, device_type, user_agent)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(session_id, user_id, event_type, page_url, referrer, device_type, user_agent);
+            INSERT INTO analytics_events (session_id, user_id, event_type, page_url, referrer, device_type, user_agent, ip_address)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(session_id, user_id, event_type, page_url, referrer, device_type, user_agent, ip_address);
 
         res.json({ success: true });
 

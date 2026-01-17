@@ -1459,6 +1459,36 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Recent Visitors -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Visitors</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        IP Address</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        User Agent</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Page</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-visitors-table" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-gray-400">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
         </main>
@@ -2656,6 +2686,9 @@
                 renderVisitorTypes(data.visitorTypes || { new: 0, returning: 0 });
                 renderConversionFunnel(data.conversionFunnel || {});
 
+                // Load recent visitors
+                loadRecentVisitors();
+
             } catch (error) {
                 console.error('[Analytics] Error loading data:', error);
                 // Show placeholder message
@@ -2794,6 +2827,62 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        async function loadRecentVisitors() {
+            const token = localStorage.getItem('harvest_token');
+            const tbody = document.getElementById('recent-visitors-table');
+
+            try {
+                const response = await fetch('/api/admin/analytics/recent-visitors', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch recent visitors');
+                }
+
+                const data = await response.json();
+                const visitors = data.visitors || [];
+
+                if (visitors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">No visitors yet</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = visitors.map(visitor => {
+                    const date = new Date(visitor.created_at);
+                    const timeAgo = getTimeAgo(date);
+                    const userAgent = visitor.user_agent || 'Unknown';
+                    const shortUA = userAgent.length > 60 ? userAgent.substring(0, 60) + '...' : userAgent;
+                    const page = visitor.page_url || '/';
+                    const ip = visitor.ip_address || 'Unknown';
+
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-gray-700 font-mono text-xs">${ip}</td>
+                            <td class="px-4 py-3 text-gray-600 text-xs" title="${userAgent}">${shortUA}</td>
+                            <td class="px-4 py-3 text-gray-700 text-xs">${page}</td>
+                            <td class="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">${timeAgo}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('[Analytics] Error loading recent visitors:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Failed to load visitors</td></tr>';
+            }
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+
+            return date.toLocaleDateString();
         }
 
         // Make globally available
