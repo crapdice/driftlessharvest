@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5 Professional Enhancements - Driftless Harvest TODO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d4a22;
+            border-bottom: 3px solid #2d4a22;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: #3e3e35;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-left: 5px solid #2d4a22;
+            border-radius: 5px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2d4a22;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .context-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .enhancement-card {
+            background: #fafafa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+        }
+
+        .enhancement-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #2d4a22;
+        }
+
+        .enhancement-number {
+            display: inline-block;
+            background: #2d4a22;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .gap-section {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .gap-section h3 {
+            margin-top: 0;
+            color: #e65100;
+        }
+
+        .enhancement-section {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .enhancement-section h3 {
+            margin-top: 0;
+            color: #0d47a1;
+        }
+
+        .impact-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .priority-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .priority-table th,
+        .priority-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .priority-table th {
+            background: #2d4a22;
+            color: white;
+            font-weight: 600;
+        }
+
+        .priority-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .phase-1 {
+            background: #f44336;
+            color: white;
+        }
+
+        .phase-2 {
+            background: #ff9800;
+            color: white;
+        }
+
+        .phase-3 {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .phase-4 {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .phase-5 {
+            background: #2196F3;
+            color: white;
+        }
+
+        .tech-considerations {
+            background: #f5f5f5;
+            border: 2px dashed #999;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 12px;
+            border-left: 3px solid #2d4a22;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to TODO Index</a>
+
+        <h1>🌾 5 Professional Enhancements for Driftless Harvest</h1>
+
+        <div class="context-box">
+            <strong>Context:</strong> Local food operation in Viroqua, Wisconsin with curated box subscriptions,
+            delivery windows, and farm-to-table operations. These enhancements are designed to push the application into
+            professional territory while staying true to the farm's operational needs.
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid #ddd;">
+
+        <!-- Enhancement 1 -->
+        <div class="enhancement-card">
+            <h2><span class="enhancement-number">1</span> 📦 Harvest Planning & Packing Workflow Manager</h2>
+
+            <div class="gap-section">
+                <h3>The Gap</h3>
+                <p>Currently, admins see orders but lack tools to translate orders into actionable harvest and packing
+                    plans. Farm operations require knowing <em>what to pick</em> and <em>when to pack</em> based on
+                    delivery schedules.</p>
+            </div>
+
+            <div class="enhancement-section">
+                <h3>The Enhancement</h3>
+                <p><strong>Harvest-to-Pack Dashboard</strong> with three integrated views:</p>
+            </div>
+
+            <h4>A. Weekly Harvest Forecast</h4>
+            <ul>
+                <li>Aggregates all pending orders by delivery window</li>
+                <li>Shows total quantities needed per product across all orders</li>
+                <li>Displays "Pick by" dates (2-3 days before delivery)</li>
+                <li>Color-coded urgency indicators (pick today, pick tomorrow, upcoming)</li>
+                <li>Printable harvest checklist grouped by farm/field location</li>
+            </ul>
+
+            <h4>B. Packing Queue</h4>
+            <ul>
+                <li>Orders grouped by delivery date with visual packing status</li>
+                <li>Drag-and-drop interface to move orders through stages:
+                    <ul>
+                        <li>📋 Ready to Pack → 📦 Packing → ✅ Packed → 🚚 Ready for Delivery</li>
+                    </ul>
+                </li>
+                <li>Shows the consolidated pick list for each delivery window</li>
+                <li>Batch actions: "Mark all as packed" for a delivery window</li>
+                <li>Mobile-optimized for use in the packing area</li>
+            </ul>
+
+            <h4>C. Inventory Depletion Alerts</h4>
+            <ul>
+                <li>Real-time stock tracking as orders are marked "Packed"</li>
+                <li>Automatic alerts when inventory drops below threshold</li>
+                <li>Suggested harvest quantities based on upcoming orders</li>
+                <li>Integration with the existing inventory management</li>
+            </ul>
+
+            <div class="impact-box">
+                <strong>Business Impact:</strong> Reduces harvest waste, improves packing efficiency, prevents
+                stockouts, and creates a clear workflow from field to customer.
+            </div>
+        </div>
+
+        <!-- Enhancement 2 -->
+        <div class="enhancement-card">
+            <h2><span class="enhancement-number">2</span> 📧 Automated Customer Communication Hub</h2>
+
+            <div class="gap-section">
+                <h3>The Gap</h3>
+                <p>Customer communication is manual and reactive. No automated updates for order status, delivery
+                    reminders, or seasonal announcements.</p>
+            </div>
+
+            <div class="enhancement-section">
+                <h3>The Enhancement</h3>
+                <p><strong>Communication Center</strong> with template-based automation:</p>
+            </div>
+
+            <h4>A. Email Templates & Triggers</h4>
+            <div class="feature-list">
+                <div class="feature-item">Order confirmation with delivery window details</div>
+                <div class="feature-item">"Your box is packed!" notification (24hrs before delivery)</div>
+                <div class="feature-item">Delivery day reminder with what's in their box</div>
+                <div class="feature-item">Seasonal product availability announcements</div>
+                <div class="feature-item">Weather delay notifications</div>
+                <div class="feature-item">Visual template editor with merge fields</div>
+            </div>
+
+            <h4>B. Automated Workflows</h4>
+            <ul>
+                <li>Trigger emails based on order status changes:
+                    <ul>
+                        <li>Paid → Send confirmation</li>
+                        <li>Packed → Send "ready for delivery" notice</li>
+                        <li>Delivered → Send thank you + feedback request</li>
+                    </ul>
+                </li>
+                <li>Scheduled broadcasts (e.g., "This week's harvest" every Monday)</li>
+                <li>Delivery window reminders sent automatically</li>
+            </ul>
+
+            <h4>C. SMS Integration (Optional)</h4>
+            <ul>
+                <li>Quick delivery updates via text</li>
+                <li>"Your delivery arrives in 2 hours" notifications</li>
+                <li>Integration with existing phone numbers in customer records</li>
+            </ul>
+
+            <h4>D. Communication Log</h4>
+            <ul>
+                <li>Track all sent emails/SMS per customer</li>
+                <li>View delivery rates and open rates</li>
+                <li>Resend capability for failed deliveries</li>
+            </ul>
+
+            <div class="impact-box">
+                <strong>Business Impact:</strong> Builds customer trust, reduces "where's my order?" inquiries,
+                increases repeat purchases, and creates a professional customer experience.
+            </div>
+        </div>
+
+        <!-- Enhancement 3 -->
+        <div class="enhancement-card">
+            <h2><span class="enhancement-number">3</span> 🌾 Seasonal Product Lifecycle Manager</h2>
+
+            <div class="gap-section">
+                <h3>The Gap</h3>
+                <p>Farm products are inherently seasonal, but the current system treats all products as perpetually
+                    available. No tools for managing crop seasons, succession planting, or seasonal availability.</p>
+            </div>
+
+            <div class="enhancement-section">
+                <h3>The Enhancement</h3>
+                <p><strong>Seasonal Intelligence System:</strong></p>
+            </div>
+
+            <h4>A. Growing Season Calendar</h4>
+            <ul>
+                <li>Visual timeline showing when each product is:
+                    <ul>
+                        <li>🌱 Planting → 🌿 Growing → 🍅 Harvest → ❄️ Off-Season</li>
+                    </ul>
+                </li>
+                <li>Set availability windows per product (e.g., "Tomatoes: June 15 - Sept 30")</li>
+                <li>Automatic product hiding/showing based on season</li>
+                <li>Succession planting tracker for continuous harvest items</li>
+            </ul>
+
+            <h4>B. Pre-Season Planning</h4>
+            <ul>
+                <li>"Coming Soon" product status with customer waitlist</li>
+                <li>Email notifications when seasonal favorites return</li>
+                <li>Historical data: "Last year, strawberries sold out in 3 weeks"</li>
+                <li>Suggested pricing based on previous seasons</li>
+            </ul>
+
+            <h4>C. End-of-Season Management</h4>
+            <ul>
+                <li>Automatic inventory countdown for limited harvest items</li>
+                <li>"Last chance" badges for products going out of season</li>
+                <li>Graceful product archiving with customer notifications</li>
+                <li>Preserve historical data for next year's planning</li>
+            </ul>
+
+            <h4>D. Crop Rotation Insights</h4>
+            <ul>
+                <li>Track which products were offered in which seasons</li>
+                <li>Compare year-over-year performance</li>
+                <li>Notes field for "what worked" and "what didn't"</li>
+            </ul>
+
+            <div class="impact-box">
+                <strong>Business Impact:</strong> Aligns digital presence with farm reality, manages customer
+                expectations, reduces manual product updates, and provides data for better crop planning.
+            </div>
+        </div>
+
+        <!-- Enhancement 4 -->
+        <div class="enhancement-card">
+            <h2><span class="enhancement-number">4</span> 📊 Farm Business Intelligence Dashboard</h2>
+
+            <div class="gap-section">
+                <h3>The Gap</h3>
+                <p>Current analytics show basic web metrics but lack farm-specific business insights needed for
+                    operational and financial decisions.</p>
+            </div>
+
+            <div class="enhancement-section">
+                <h3>The Enhancement</h3>
+                <p><strong>Farm Operations Analytics</strong> with actionable metrics:</p>
+            </div>
+
+            <h4>A. Revenue & Profitability</h4>
+            <ul>
+                <li>Weekly/monthly revenue trends with year-over-year comparison</li>
+                <li>Revenue by product category (vegetables, fruits, boxes, etc.)</li>
+                <li>Average order value and customer lifetime value</li>
+                <li>Top-selling products by revenue and quantity</li>
+                <li>Seasonal revenue patterns visualization</li>
+            </ul>
+
+            <h4>B. Customer Insights</h4>
+            <ul>
+                <li>Customer retention rate and churn analysis</li>
+                <li>New vs. returning customer ratio</li>
+                <li>Delivery window popularity (helps with capacity planning)</li>
+                <li>Geographic distribution of customers (delivery route optimization)</li>
+                <li>Customer preferences: most common box configurations</li>
+            </ul>
+
+            <h4>C. Operational Efficiency</h4>
+            <ul>
+                <li>Order fulfillment time tracking (order → packed → delivered)</li>
+                <li>Delivery window utilization (capacity vs. actual orders)</li>
+                <li>Inventory turnover rate per product</li>
+                <li>Waste tracking: products that expired before selling</li>
+                <li>Peak order times for staffing decisions</li>
+            </ul>
+
+            <h4>D. Forecasting Tools</h4>
+            <ul>
+                <li>Predicted demand for next week based on historical patterns</li>
+                <li>Seasonal trend predictions</li>
+                <li>"If current trends continue" projections</li>
+                <li>Suggested harvest quantities based on order velocity</li>
+            </ul>
+
+            <h4>E. Exportable Reports</h4>
+            <ul>
+                <li>CSV/PDF export for accounting software</li>
+                <li>Tax-ready sales reports</li>
+                <li>Printable weekly summaries for farm meetings</li>
+            </ul>
+
+            <div class="impact-box">
+                <strong>Business Impact:</strong> Data-driven decision making, better financial planning, optimized
+                harvest quantities, improved customer retention, and professional reporting for stakeholders.
+            </div>
+        </div>
+
+        <!-- Enhancement 5 -->
+        <div class="enhancement-card">
+            <h2><span class="enhancement-number">5</span> 🚚 Smart Delivery Route Optimizer</h2>
+
+            <div class="gap-section">
+                <h3>The Gap</h3>
+                <p>Delivery logistics are manual. No tools for route planning, driver coordination, or delivery
+                    efficiency optimization.</p>
+            </div>
+
+            <div class="enhancement-section">
+                <h3>The Enhancement</h3>
+                <p><strong>Delivery Management System:</strong></p>
+            </div>
+
+            <h4>A. Route Planning</h4>
+            <ul>
+                <li>Visual map of all deliveries for a given window</li>
+                <li>Automatic route optimization based on addresses</li>
+                <li>Estimated delivery times per stop</li>
+                <li>Printable driver manifest with:
+                    <ul>
+                        <li>Customer names, addresses, phone numbers</li>
+                        <li>Order contents and special instructions</li>
+                        <li>Optimized stop sequence</li>
+                        <li>Total route distance and estimated time</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>B. Driver Interface</h4>
+            <ul>
+                <li>Mobile-friendly delivery view for drivers</li>
+                <li>Check off deliveries as completed</li>
+                <li>One-tap "mark as delivered" with timestamp</li>
+                <li>Photo upload for proof of delivery</li>
+                <li>Customer signature capture (optional)</li>
+                <li>Notes field for delivery issues</li>
+            </ul>
+
+            <h4>C. Delivery Window Management</h4>
+            <ul>
+                <li>Visual capacity planning: see how many orders per window</li>
+                <li>Suggested delivery windows based on address clusters</li>
+                <li>Automatic alerts when a window is near capacity</li>
+                <li>Ability to split large windows into multiple routes</li>
+            </ul>
+
+            <h4>D. Customer Delivery Preferences</h4>
+            <ul>
+                <li>Save delivery instructions per customer ("Leave on porch", "Ring doorbell", etc.)</li>
+                <li>Preferred delivery time within window</li>
+                <li>Access codes for gated communities</li>
+                <li>Special handling notes</li>
+            </ul>
+
+            <h4>E. Performance Tracking</h4>
+            <ul>
+                <li>On-time delivery rate</li>
+                <li>Average deliveries per hour</li>
+                <li>Driver efficiency metrics</li>
+                <li>Customer feedback per delivery</li>
+                <li>Failed delivery tracking and retry scheduling</li>
+            </ul>
+
+            <div class="impact-box">
+                <strong>Business Impact:</strong> Reduces delivery time and fuel costs, improves on-time performance,
+                enhances customer satisfaction, scales delivery operations, and provides professional driver
+                coordination.
+            </div>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #ddd;">
+
+        <h2>📋 Implementation Priority Recommendation</h2>
+
+        <p>Based on immediate operational impact and technical complexity:</p>
+
+        <table class="priority-table">
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>Enhancement</th>
+                    <th>Rationale</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="phase-badge phase-1">Phase 1</span></td>
+                    <td><strong>#2 Customer Communication Hub</strong></td>
+                    <td>Highest ROI - Immediate customer satisfaction improvement with moderate technical lift</td>
+                </tr>
+                <tr>
+                    <td><span class="phase-badge phase-2">Phase 2</span></td>
+                    <td><strong>#1 Harvest Planning & Packing Workflow</strong></td>
+                    <td>Core Operations - Directly improves daily farm operations</td>
+                </tr>
+                <tr>
+                    <td><span class="phase-badge phase-3">Phase 3</span></td>
+                    <td><strong>#3 Seasonal Product Lifecycle</strong></td>
+                    <td>Strategic - Aligns system with farm reality</td>
+                </tr>
+                <tr>
+                    <td><span class="phase-badge phase-4">Phase 4</span></td>
+                    <td><strong>#5 Delivery Route Optimizer</strong></td>
+                    <td>Scaling - Critical as delivery volume grows</td>
+                </tr>
+                <tr>
+                    <td><span class="phase-badge phase-5">Phase 5</span></td>
+                    <td><strong>#4 Business Intelligence Dashboard</strong></td>
+                    <td>Intelligence - Builds on data from other systems</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #ddd;">
+
+        <div class="tech-considerations">
+            <h2 style="margin-top: 0;">🛠️ Technical Considerations</h2>
+            <ul>
+                <li>All enhancements integrate with existing SQLite database</li>
+                <li>Mobile-responsive design for field/packing area use</li>
+                <li>Printable views for offline workflows</li>
+                <li>Minimal external dependencies (stay true to "simple, maintainable" philosophy)</li>
+                <li>Progressive enhancement: features work without JavaScript where possible</li>
+                <li>Export capabilities for integration with accounting/farm management software</li>
+            </ul>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #ddd;">
+
+        <p style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 0.9em;">
+            <strong>Created:</strong> January 16, 2026<br>
+            <strong>Status:</strong> Strategic Planning Document<br>
+            <strong>Priority:</strong> Long-term Roadmap<br>
+            <strong>Note:</strong> These are comprehensive enhancements that would transform the application into a
+            professional farm management platform. Implementation should be phased based on business priorities and
+            resource availability.
+        </p>
+    </div>
+</body>
+
+</html>
