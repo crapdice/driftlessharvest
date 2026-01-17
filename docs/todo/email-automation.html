@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Automation System - Driftless Harvest TODO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d4a22;
+            border-bottom: 3px solid #2d4a22;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #3e3e35;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #2d4a22;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul,
+        ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .flow-diagram {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .flow-number {
+            background: #2d4a22;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #2d4a22;
+            font-size: 1.5em;
+            margin: 5px 0;
+        }
+
+        .email-template {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .email-header {
+            background: #2d4a22;
+            color: white;
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .email-subject {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .email-from {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .email-body {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-ready {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .badge-build {
+            background: #FF9800;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2d4a22;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .benefit-card {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .benefit-card h4 {
+            margin-top: 0;
+            color: #2d4a22;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #2d4a22;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to TODO Index</a>
+
+        <h1>📧 Email Automation System</h1>
+
+        <p><strong>Current State:</strong> No automated email notifications. All customer communication is manual.</p>
+
+        <p><strong>Goal:</strong> Implement automated email system using Resend API for order confirmations, delivery
+            reminders, and status updates.</p>
+
+        <p><span class="badge badge-ready">✅ API Key Ready</span> Resend API key is already configured in the system.
+        </p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>📬 How Order Confirmation Emails Would Work</h2>
+
+        <div class="flow-diagram">
+            <div class="flow-step">
+                <div class="flow-number">1</div>
+                <div>
+                    <strong>Customer places order</strong><br>
+                    <span style="color: #666;">Stripe payment succeeds</span>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+                <div class="flow-number">2</div>
+                <div>
+                    <strong>Backend creates order</strong><br>
+                    <span style="color: #666;">Order saved to database</span>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+                <div class="flow-number">3</div>
+                <div>
+                    <strong>Backend sends email</strong><br>
+                    <span style="color: #666;">Via Resend API</span>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+                <div class="flow-number">4</div>
+                <div>
+                    <strong>Customer receives confirmation</strong><br>
+                    <span style="color: #666;">Professional branded email</span>
+                </div>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>🏗️ What Needs to Be Built</h2>
+
+        <h3>1. Email Service Module</h3>
+        <p><strong>File:</strong> <code>server/services/email.js</code></p>
+
+        <pre><code>const { Resend } = require('resend');
+const fs = require('fs').promises;
+const path = require('path');
+
+class EmailService {
+  constructor() {
+    // Load API key from config
+    const config = require('../data/config.json');
+    this.resend = new Resend(config.apiKeys.resend);
+    this.from = 'Driftless Harvest <orders@driftlessharvest.com>';
+  }
+
+  async sendOrderConfirmation(order, customer) {
+    const html = await this.buildOrderConfirmationEmail(order);
+    
+    await this.resend.emails.send({
+      from: this.from,
+      to: customer.email,
+      subject: `Order Confirmed - Delivery ${order.deliveryWindow}`,
+      html: html
+    });
+  }
+
+  async sendDeliveryReminder(order, customer) {
+    const html = await this.buildDeliveryReminderEmail(order);
+    
+    await this.resend.emails.send({
+      from: this.from,
+      to: customer.email,
+      subject: `Your delivery arrives tomorrow!`,
+      html: html
+    });
+  }
+
+  async sendPackedNotification(order, customer) {
+    const html = await this.buildPackedNotificationEmail(order);
+    
+    await this.resend.emails.send({
+      from: this.from,
+      to: customer.email,
+      subject: `Your box is packed and ready!`,
+      html: html
+    });
+  }
+
+  buildOrderConfirmationEmail(order) {
+    // Build HTML email template
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; }
+          .container { max-width: 600px; margin: 0 auto; }
+          .header { background: #2d4a22; color: white; padding: 20px; }
+          .content { padding: 20px; }
+          .order-items { background: #f9f9f9; padding: 15px; }
+          .footer { text-align: center; color: #666; padding: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Thanks for your order!</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${order.customerName},</p>
+            <p>We've received your order and will have it ready for delivery.</p>
+            
+            <h3>Order Summary</h3>
+            <div class="order-items">
+              ${order.items.map(item => \`
+                <div>\${item.name} x \${item.qty} - $\${item.price}</div>
+              \`).join('')}
+              <hr>
+              <strong>Total: $${order.total}</strong>
+            </div>
+            
+            <h3>Delivery Details</h3>
+            <p><strong>When:</strong> ${order.deliveryWindow}</p>
+            <p><strong>Where:</strong> ${order.address}</p>
+            
+            <h3>What's Next?</h3>
+            <ol>
+              <li>We'll harvest your items fresh this week</li>
+              <li>Your box will be packed the day before delivery</li>
+              <li>You'll receive a reminder 24 hours before delivery</li>
+            </ol>
+          </div>
+          <div class="footer">
+            <p>Questions? Reply to this email or call us.</p>
+            <p>Driftless Harvest - Viroqua, Wisconsin</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    \`;
+  }
+}
+
+module.exports = new EmailService();
+</code></pre>
+
+        <h3>2. Integration Points (Trigger Locations)</h3>
+
+        <h4>A. Order Placed (Stripe Webhook or Order Creation)</h4>
+        <p><strong>File:</strong> <code>server/routes/checkout.routes.js</code> or
+            <code>server/routes/orders.routes.js</code></p>
+        <pre><code>const emailService = require('../services/email');
+
+// After order is created in database
+router.post('/checkout', async (req, res) => {
+  // ... existing order creation logic ...
+  
+  const order = await createOrder(orderData);
+  
+  // Send confirmation email
+  try {
+    await emailService.sendOrderConfirmation(order, customer);
+    console.log('[Email] Order confirmation sent to', customer.email);
+  } catch (error) {
+    console.error('[Email] Failed to send confirmation:', error);
+    // Don't fail the order if email fails
+  }
+  
+  res.json({ success: true, orderId: order.id });
+});
+</code></pre>
+
+        <h4>B. Order Status Changes (Admin Panel)</h4>
+        <p><strong>File:</strong> <code>server/routes/admin.routes.js</code></p>
+        <pre><code>const emailService = require('../services/email');
+
+router.put('/admin/orders/:id/status', async (req, res) => {
+  const { status } = req.body;
+  
+  // Update order status in database
+  await updateOrderStatus(req.params.id, status);
+  
+  // Send email based on status change
+  if (status === 'Packed') {
+    const order = await getOrder(req.params.id);
+    const customer = await getCustomer(order.user_email);
+    
+    try {
+      await emailService.sendPackedNotification(order, customer);
+      console.log('[Email] Packed notification sent');
+    } catch (error) {
+      console.error('[Email] Failed to send notification:', error);
+    }
+  }
+  
+  res.json({ success: true });
+});
+</code></pre>
+
+        <h4>C. Scheduled Delivery Reminders (Cron Job)</h4>
+        <p><strong>File:</strong> <code>server/jobs/delivery-reminders.js</code> <span class="badge badge-build">To
+                Build</span></p>
+        <pre><code>const cron = require('node-cron');
+const emailService = require('../services/email');
+
+// Run daily at 9 AM
+cron.schedule('0 9 * * *', async () => {
+  console.log('[Cron] Running delivery reminder job');
+  
+  // Get orders for tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const orders = await getOrdersForDate(tomorrow);
+  
+  for (const order of orders) {
+    const customer = await getCustomer(order.user_email);
+    
+    try {
+      await emailService.sendDeliveryReminder(order, customer);
+      console.log('[Email] Reminder sent to', customer.email);
+    } catch (error) {
+      console.error('[Email] Failed to send reminder:', error);
+    }
+  }
+});
+
+module.exports = { start: () => console.log('[Cron] Delivery reminders scheduled') };
+</code></pre>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>📝 Email Templates to Create</h2>
+
+        <h3>1. Order Confirmation</h3>
+        <div class="email-template">
+            <div class="email-header">
+                <div class="email-subject">Order Confirmed - Delivery Tuesday, Jan 21</div>
+                <div class="email-from">From: Driftless Harvest &lt;orders@driftlessharvest.com&gt;</div>
+            </div>
+            <div class="email-body">
+                <h3>Thanks for your order, Sarah!</h3>
+                <p>We've received your order and will have it ready for delivery.</p>
+
+                <h4>Order Summary</h4>
+                <ul>
+                    <li>Family Harvest Box x 1 - $38.00</li>
+                    <li>Heirloom Tomatoes (1 lb) x 2 - $8.00</li>
+                </ul>
+                <p><strong>Total: $46.00</strong></p>
+
+                <h4>Delivery Details</h4>
+                <p><strong>When:</strong> Tuesday, Jan 21 (2-6 PM)</p>
+                <p><strong>Where:</strong> 123 Main St, Viroqua, WI</p>
+
+                <h4>What's Next?</h4>
+                <ol>
+                    <li>We'll harvest your items fresh this week</li>
+                    <li>Your box will be packed Monday evening</li>
+                    <li>You'll receive a reminder 24 hours before delivery</li>
+                </ol>
+            </div>
+        </div>
+
+        <h3>2. Packed & Ready Notification</h3>
+        <div class="email-template">
+            <div class="email-header">
+                <div class="email-subject">Your box is packed and ready!</div>
+                <div class="email-from">From: Driftless Harvest &lt;orders@driftlessharvest.com&gt;</div>
+            </div>
+            <div class="email-body">
+                <h3>Your box is ready, Sarah!</h3>
+                <p>We've just finished packing your order and it's ready for delivery tomorrow.</p>
+
+                <h4>What's in your box this week:</h4>
+                <ul>
+                    <li>Mixed greens (lettuce, kale, chard)</li>
+                    <li>Heirloom tomatoes</li>
+                    <li>Fresh carrots</li>
+                    <li>Sweet peppers</li>
+                    <li>And more seasonal surprises!</li>
+                </ul>
+
+                <p><strong>Delivery:</strong> Tomorrow (Tuesday) between 2-6 PM</p>
+                <p>We'll leave it on your porch if you're not home.</p>
+            </div>
+        </div>
+
+        <h3>3. Delivery Day Reminder</h3>
+        <div class="email-template">
+            <div class="email-header">
+                <div class="email-subject">Your delivery arrives today!</div>
+                <div class="email-from">From: Driftless Harvest &lt;orders@driftlessharvest.com&gt;</div>
+            </div>
+            <div class="email-body">
+                <h3>Your delivery is coming today!</h3>
+                <p>Just a friendly reminder that your Driftless Harvest box will be delivered today between 2-6 PM.</p>
+
+                <p><strong>Delivery Instructions:</strong> Leave on front porch</p>
+
+                <p>We hope you enjoy this week's harvest!</p>
+
+                <p><em>Questions? Just reply to this email.</em></p>
+            </div>
+        </div>
+
+        <h3>4. Delivery Confirmation (Optional)</h3>
+        <div class="email-template">
+            <div class="email-header">
+                <div class="email-subject">Your order was delivered</div>
+                <div class="email-from">From: Driftless Harvest &lt;orders@driftlessharvest.com&gt;</div>
+            </div>
+            <div class="email-body">
+                <h3>Delivered!</h3>
+                <p>Your Driftless Harvest box was delivered today at 3:45 PM.</p>
+
+                <p>We hope you enjoy this week's harvest! Let us know how everything tastes.</p>
+
+                <p><strong>Ready for next week?</strong><br>
+                    <a href="https://driftlessharvest.com/boxes">Order your next box →</a>
+                </p>
+
+                <p><em>How was your experience? We'd love to hear from you.</em></p>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>✨ Benefits</h2>
+
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <h4>Reduces Support Burden</h4>
+                <p>Fewer "where's my order?" questions</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Professional Experience</h4>
+                <p>Customers feel informed and valued</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Builds Trust</h4>
+                <p>Proactive communication increases confidence</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Fully Automated</h4>
+                <p>No manual work required</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Branded Emails</h4>
+                <p>From your own domain</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Drives Repeat Orders</h4>
+                <p>Delivery confirmations include re-order CTAs</p>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>📦 What's Already Set Up</h2>
+
+        <table>
+            <tr>
+                <td>✅ Resend API key configured</td>
+                <td>Ready in <code>config.json</code></td>
+            </tr>
+            <tr>
+                <td>✅ Order creation flow exists</td>
+                <td>Stripe checkout → database</td>
+            </tr>
+            <tr>
+                <td>✅ Order status tracking exists</td>
+                <td>Admin can mark as Packed, Shipped, etc.</td>
+            </tr>
+            <tr>
+                <td>✅ Customer email addresses stored</td>
+                <td>In orders and users tables</td>
+            </tr>
+        </table>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>🛠️ Implementation Checklist</h2>
+
+        <h3>Phase 1: Core Email Service (1-2 hours)</h3>
+        <ol>
+            <li>Install <code>resend</code> npm package</li>
+            <li>Create <code>server/services/email.js</code></li>
+            <li>Build order confirmation email template</li>
+            <li>Add trigger to order creation endpoint</li>
+            <li>Test with real order</li>
+        </ol>
+
+        <h3>Phase 2: Status Update Emails (1 hour)</h3>
+        <ol>
+            <li>Build "Packed" notification template</li>
+            <li>Add trigger to status update endpoint</li>
+            <li>Test from admin panel</li>
+        </ol>
+
+        <h3>Phase 3: Delivery Reminders (1-2 hours)</h3>
+        <ol>
+            <li>Install <code>node-cron</code> package</li>
+            <li>Create <code>server/jobs/delivery-reminders.js</code></li>
+            <li>Build reminder email template</li>
+            <li>Set up daily cron job</li>
+            <li>Test with tomorrow's orders</li>
+        </ol>
+
+        <h3>Phase 4: Polish & Optimization (Optional)</h3>
+        <ol>
+            <li>Add email logging to database</li>
+            <li>Create admin view for sent emails</li>
+            <li>Add email preferences for customers</li>
+            <li>Implement delivery confirmation emails</li>
+        </ol>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>💰 Cost Analysis</h2>
+
+        <p><strong>Resend Free Tier:</strong> 3,000 emails/month, 100 emails/day</p>
+
+        <h3>Estimated Email Volume</h3>
+        <table>
+            <tr>
+                <th>Email Type</th>
+                <th>Per Order</th>
+                <th>50 Orders/Month</th>
+            </tr>
+            <tr>
+                <td>Order Confirmation</td>
+                <td>1</td>
+                <td>50</td>
+            </tr>
+            <tr>
+                <td>Packed Notification</td>
+                <td>1</td>
+                <td>50</td>
+            </tr>
+            <tr>
+                <td>Delivery Reminder</td>
+                <td>1</td>
+                <td>50</td>
+            </tr>
+            <tr>
+                <td>Delivery Confirmation</td>
+                <td>1</td>
+                <td>50</td>
+            </tr>
+            <tr>
+                <th colspan="2">Total per Month</th>
+                <th>200 emails</th>
+            </tr>
+        </table>
+
+        <p><strong>Conclusion:</strong> Completely free for your current volume (200 emails << 3,000 limit)</p>
+
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+                <h2>🚀 Ready to Implement?</h2>
+
+                <p>All the pieces are in place:</p>
+                <ul>
+                    <li>✅ API key configured</li>
+                    <li>✅ Order flow exists</li>
+                    <li>✅ Customer emails stored</li>
+                    <li>✅ Status tracking works</li>
+                </ul>
+
+                <p><strong>Total Implementation Time:</strong> 3-5 hours for full system</p>
+                <p><strong>Quick Win:</strong> Order confirmations only = 1-2 hours</p>
+
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+                <p
+                    style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 0.9em;">
+                    <strong>Created:</strong> January 16, 2026<br>
+                    <strong>Status:</strong> Pending Implementation<br>
+                    <strong>Priority:</strong> High<br>
+                    <strong>Dependencies:</strong> Resend API key (✅ Complete)
+                </p>
+    </div>
+</body>
+
+</html>
