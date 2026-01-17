@@ -329,31 +329,64 @@ router.put('/admin/orders/:id/status', checkRole(['admin', 'super_admin']), vali
 router.put('/admin/orders/:id/delivery', checkRole(['admin', 'super_admin']), (req, res) => {
     try {
         const { delivery_window } = req.body;
+
+        // Check which columns exist in orders table
+        const cols = db.prepare("PRAGMA table_info(orders)").all().map(c => c.name);
+        const hasDeliveryWindow = cols.includes('delivery_window');
+        const hasDeliveryDate = cols.includes('delivery_date');
+
+        if (!hasDeliveryWindow && !hasDeliveryDate) {
+            console.error('[Delivery Reschedule] Neither delivery_window nor delivery_date columns exist');
+            return res.status(500).json({
+                error: 'Database schema missing delivery columns. Please run migrations.'
+            });
+        }
+
         const order = db.prepare('SELECT shipping_details FROM orders WHERE id = ?').get(req.params.id);
         if (!order) return res.status(404).json({ error: 'Order not found' });
 
         let details = {};
-        try { details = JSON.parse(order.shipping_details); } catch (e) { }
+        try { details = JSON.parse(order.shipping_details || '{}'); } catch (e) {
+            console.warn('[Delivery Reschedule] Failed to parse shipping_details:', e);
+        }
 
         details.delivery_window = delivery_window;
 
-        // Lookup DATE value
+        // Lookup DATE value if we have delivery_date column
         let deliveryDate = null;
-        try {
-            const win = db.prepare('SELECT date_value FROM delivery_windows WHERE date_label = ?').get(delivery_window);
-            if (win) deliveryDate = win.date_value;
-        } catch (e) { }
+        if (hasDeliveryDate) {
+            try {
+                const win = db.prepare('SELECT date_value FROM delivery_windows WHERE date_label = ?').get(delivery_window);
+                if (win) deliveryDate = win.date_value;
+            } catch (e) {
+                console.error('[Delivery Reschedule] Error looking up delivery window:', e);
+            }
+        }
 
-        db.prepare('UPDATE orders SET shipping_details = ?, delivery_window = ?, delivery_date = ? WHERE id = ?')
-            .run(
-                JSON.stringify(details),
-                delivery_window,
-                deliveryDate,
-                req.params.id
-            );
+        // Build UPDATE query based on available columns
+        let updateQuery = 'UPDATE orders SET shipping_details = ?';
+        const params = [JSON.stringify(details)];
+
+        if (hasDeliveryWindow) {
+            updateQuery += ', delivery_window = ?';
+            params.push(delivery_window);
+        }
+
+        if (hasDeliveryDate) {
+            updateQuery += ', delivery_date = ?';
+            params.push(deliveryDate);
+        }
+
+        updateQuery += ' WHERE id = ?';
+        params.push(req.params.id);
+
+        db.prepare(updateQuery).run(...params);
 
         res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+    } catch (e) {
+        console.error('[Delivery Reschedule] Error:', e);
+        res.status(500).json({ error: 'Failed to reschedule delivery', details: e.message });
+    }
 });
 
 // PUT /api/admin/orders/:id - Update Entire Order
