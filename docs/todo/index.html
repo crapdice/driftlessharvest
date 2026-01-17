@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO Index - Driftless Harvest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2d4a22;
+        }
+
+        h1 {
+            color: #2d4a22;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card.pending {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card.in-progress {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-card.completed {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            background: #f9f9f9;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-item.pending {
+            border-left-color: #f5576c;
+        }
+
+        .todo-item.in-progress {
+            border-left-color: #4facfe;
+        }
+
+        .todo-item.completed {
+            border-left-color: #43e97b;
+            opacity: 0.7;
+        }
+
+        .todo-link {
+            display: block;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .todo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .todo-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2d4a22;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .todo-icon {
+            font-size: 1.5em;
+        }
+
+        .todo-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff5f5;
+            color: #f5576c;
+        }
+
+        .status-in-progress {
+            background: #f0f9ff;
+            color: #4facfe;
+        }
+
+        .status-completed {
+            background: #f0fdf4;
+            color: #43e97b;
+        }
+
+        .todo-description {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+
+        .todo-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .priority {
+            font-weight: 600;
+        }
+
+        .priority-high {
+            color: #f5576c;
+        }
+
+        .priority-medium {
+            color: #ff9800;
+        }
+
+        .priority-low {
+            color: #4facfe;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🌾 Driftless Harvest TODO</h1>
+            <p class="subtitle">Feature Requests & Enhancement Ideas</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card pending">
+                <span class="stat-number">1</span>
+                <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-card in-progress">
+                <span class="stat-number">0</span>
+                <span class="stat-label">In Progress</span>
+            </div>
+            <div class="stat-card completed">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Completed</span>
+            </div>
+        </div>
+
+        <ul class="todo-list">
+            <li class="todo-item pending">
+                <a href="image-handling.html" class="todo-link">
+                    <div class="todo-header">
+                        <div class="todo-title">
+                            <span class="todo-icon">📸</span>
+                            Professional Image Handling for Products & Boxes
+                        </div>
+                        <span class="todo-status status-pending">Pending</span>
+                    </div>
+                    <div class="todo-description">
+                        Replace manual URL pasting with professional image upload/management system. Includes 5
+                        different approaches: Direct Upload, Cloudinary, Image Library, Unsplash, and Hybrid.
+                    </div>
+                    <div class="todo-meta">
+                        <span class="priority priority-medium">Priority: Medium</span>
+                        <span>Created: Jan 16, 2026</span>
+                        <span>Est. Time: 30min - 2hrs</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Future TODO items will be added here -->
+            <!-- Example template:
+            <li class="todo-item pending">
+                <a href="email-automation.html" class="todo-link">
+                    <div class="todo-header">
+                        <div class="todo-title">
+                            <span class="todo-icon">📧</span>
+                            Email Automation System
+                        </div>
+                        <span class="todo-status status-pending">Pending</span>
+                    </div>
+                    <div class="todo-description">
+                        Implement automated email notifications for order confirmations, delivery reminders, and status updates using Resend API.
+                    </div>
+                    <div class="todo-meta">
+                        <span class="priority priority-high">Priority: High</span>
+                        <span>Created: Jan 16, 2026</span>
+                        <span>Est. Time: 2-3hrs</span>
+                    </div>
+                </a>
+            </li>
+            -->
+        </ul>
+
+        <footer>
+            <p>Last updated: January 16, 2026</p>
+            <p>Driftless Harvest - Local Food Operation Management System</p>
+        </footer>
+    </div>
+</body>
+
+</html>

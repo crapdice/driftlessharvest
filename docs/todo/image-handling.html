@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Handling - Driftless Harvest TODO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d4a22;
+            border-bottom: 3px solid #2d4a22;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #3e3e35;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #2d4a22;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul,
+        ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #2d4a22;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-recommended {
+            background: #2d4a22;
+            color: white;
+        }
+
+        .badge-simple {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .badge-complex {
+            background: #FF9800;
+            color: white;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pros,
+        .cons {
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .pros {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .cons {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .pros h4,
+        .cons h4 {
+            margin-top: 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2d4a22;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .ui-mockup {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to TODO Index</a>
+
+        <h1>📸 Professional Image Handling for Products & Boxes</h1>
+
+        <p><strong>Current State:</strong> Admins manually paste image URLs into a text field when adding/editing
+            products or boxes.</p>
+
+        <p><strong>Goal:</strong> Implement a more professional image management system that's easier to use and
+            maintains better organization.</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>Option 1: Direct File Upload <span class="badge badge-recommended">RECOMMENDED</span></h2>
+
+        <p><strong>Best for:</strong> Simple, self-hosted, no external dependencies</p>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li>Admin clicks "Upload Image" button</li>
+            <li>File is uploaded to your server</li>
+            <li>Stored in <code>/public/images/products/</code></li>
+            <li>Automatically generates the URL</li>
+        </ol>
+
+        <h3>Implementation Details</h3>
+
+        <h4>Frontend (File Picker with Preview)</h4>
+        <pre><code>&lt;input type="file" accept="image/*" onchange="uploadProductImage(this)"&gt;
+&lt;img id="image-preview" class="hidden"&gt;
+
+async function uploadProductImage(input) {
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  const response = await fetch('/api/admin/upload/product-image', {
+    method: 'POST',
+    body: formData
+  });
+  
+  const { url } = await response.json();
+  document.getElementById('product-image-url').value = url;
+  document.getElementById('image-preview').src = url;
+}</code></pre>
+
+        <h4>Backend (Save to Disk)</h4>
+        <pre><code>const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: './public/images/products/',
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ storage });
+
+router.post('/upload/product-image', upload.single('image'), (req, res) => {
+  res.json({ url: `/images/products/${req.file.filename}` });
+});</code></pre>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>✅ Pros</h4>
+                <ul>
+                    <li>No external services needed</li>
+                    <li>Full control over files</li>
+                    <li>Free (just disk space)</li>
+                    <li>Works offline</li>
+                    <li>Simple to implement</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>❌ Cons</h4>
+                <ul>
+                    <li>Files stored on your server (uses disk space)</li>
+                    <li>No automatic image optimization</li>
+                    <li>Need to manage backups</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>Option 2: Cloudinary Integration</h2>
+
+        <p><strong>Best for:</strong> Automatic optimization, transformations, CDN delivery</p>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li>Admin uploads image</li>
+            <li>Sent to Cloudinary</li>
+            <li>Automatically optimized and resized</li>
+            <li>Returns CDN URL</li>
+        </ol>
+
+        <h3>Implementation</h3>
+        <pre><code>// Install: npm install cloudinary
+
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+router.post('/upload/product-image', upload.single('image'), async (req, res) => {
+  const result = await cloudinary.uploader.upload(req.file.path, {
+    folder: 'driftless-harvest/products',
+    transformation: [
+      { width: 800, height: 800, crop: 'limit' },
+      { quality: 'auto' },
+      { fetch_format: 'auto' }
+    ]
+  });
+  
+  res.json({ url: result.secure_url });
+});</code></pre>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>✅ Pros</h4>
+                <ul>
+                    <li>Automatic image optimization</li>
+                    <li>CDN delivery (fast worldwide)</li>
+                    <li>On-the-fly transformations</li>
+                    <li>Free tier: 25GB storage, 25GB bandwidth</li>
+                    <li>Automatic format conversion (WebP, AVIF)</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>❌ Cons</h4>
+                <ul>
+                    <li>External dependency</li>
+                    <li>Costs money after free tier</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>Option 3: Image Library with Drag & Drop</h2>
+
+        <p><strong>Best for:</strong> Reusing images across products, better UX</p>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li>Upload images to a central library</li>
+            <li>When adding product, browse library</li>
+            <li>Click to select existing image</li>
+            <li>Or upload new one</li>
+        </ol>
+
+        <h3>UI Mockup</h3>
+        <div class="ui-mockup">┌─────────────────────────────────────┐
+            │ Product Image │
+            │ ┌───────────────────────────────┐ │
+            │ │ [Current Image Preview] │ │
+            │ │ │ │
+            │ └───────────────────────────────┘ │
+            │ │
+            │ [📁 Choose from Library] │
+            │ [⬆️ Upload New Image] │
+            └─────────────────────────────────────┘
+
+            When clicking "Choose from Library":
+            ┌─────────────────────────────────────┐
+            │ Image Library │
+            │ ┌────┐ ┌────┐ ┌────┐ ┌────┐ │
+            │ │ 🍎 │ │ 🥕 │ │ 🥬 │ │ 📦 │ │
+            │ └────┘ └────┘ └────┘ └────┘ │
+            │ ┌────┐ ┌────┐ ┌────┐ │
+            │ │ 🍅 │ │ 🥔 │ │ 🌽 │ │
+            │ └────┘ └────┘ └────┘ │
+            │ │
+            │ [⬆️ Upload New to Library] │
+            └─────────────────────────────────────┘</div>
+
+        <h3>Database Schema</h3>
+        <pre><code>CREATE TABLE image_library (
+  id INTEGER PRIMARY KEY,
+  filename TEXT,
+  url TEXT,
+  alt_text TEXT,
+  uploaded_at DATETIME,
+  used_count INTEGER DEFAULT 0
+);</code></pre>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>✅ Pros</h4>
+                <ul>
+                    <li>Reuse images across products</li>
+                    <li>Better organization</li>
+                    <li>See all images at once</li>
+                    <li>Track which images are used</li>
+                    <li>Easier to maintain consistency</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>❌ Cons</h4>
+                <ul>
+                    <li>More complex to build</li>
+                    <li>Requires database changes</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>Option 4: Unsplash Integration</h2>
+
+        <p><strong>Best for:</strong> Quick professional photos without photography</p>
+
+        <h3>How It Works</h3>
+        <ol>
+            <li>Admin searches Unsplash</li>
+            <li>Clicks image to select</li>
+            <li>URL automatically populated</li>
+        </ol>
+
+        <h3>Implementation</h3>
+        <pre><code>// Unsplash API (Free: 50 requests/hour)
+async function searchUnsplash(query) {
+  const response = await fetch(
+    `https://api.unsplash.com/search/photos?query=${query}&per_page=12`,
+    { headers: { 'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}` }}
+  );
+  return await response.json();
+}</code></pre>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>✅ Pros</h4>
+                <ul>
+                    <li>Free professional photos</li>
+                    <li>No photography needed</li>
+                    <li>Huge library</li>
+                    <li>Legally safe (Unsplash license)</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>❌ Cons</h4>
+                <ul>
+                    <li>Generic stock photos (not your actual products)</li>
+                    <li>API rate limits</li>
+                    <li>Requires internet</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>Option 5: Hybrid Approach</h2>
+
+        <p><strong>Best for:</strong> Maximum flexibility</p>
+
+        <h3>Features</h3>
+        <ol>
+            <li><strong>Upload your own</strong> (for actual product photos)</li>
+            <li><strong>Choose from library</strong> (reuse existing images)</li>
+            <li><strong>Search Unsplash</strong> (for placeholder/inspiration)</li>
+            <li><strong>Paste URL</strong> (for external images)</li>
+        </ol>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>📊 Comparison Table</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Direct Upload</th>
+                    <th>Cloudinary</th>
+                    <th>Image Library</th>
+                    <th>Unsplash</th>
+                    <th>Hybrid</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Cost</strong></td>
+                    <td>Free</td>
+                    <td>Free tier</td>
+                    <td>Free</td>
+                    <td>Free</td>
+                    <td>Free</td>
+                </tr>
+                <tr>
+                    <td><strong>Complexity</strong></td>
+                    <td>Low</td>
+                    <td>Medium</td>
+                    <td>High</td>
+                    <td>Low</td>
+                    <td>High</td>
+                </tr>
+                <tr>
+                    <td><strong>Auto-optimize</strong></td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>Partial</td>
+                </tr>
+                <tr>
+                    <td><strong>Reuse images</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td><strong>Your photos</strong></td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td><strong>Stock photos</strong></td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>✅</td>
+                </tr>
+                <tr>
+                    <td><strong>CDN delivery</strong></td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>❌</td>
+                    <td>✅</td>
+                    <td>Partial</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>🎯 Recommendation for Driftless Harvest</h2>
+
+        <h3>Start with: Option 1 (Direct Upload) + Option 4 (Unsplash)</h3>
+
+        <h4>Why:</h4>
+        <ol>
+            <li><strong>Direct Upload</strong> for your actual product photos (tomatoes, boxes, etc.)</li>
+            <li><strong>Unsplash</strong> for quick placeholders or hero images</li>
+            <li>Simple to implement</li>
+            <li>No ongoing costs</li>
+            <li>Professional UX</li>
+        </ol>
+
+        <h3>Future Enhancement</h3>
+        <p>Add <strong>Option 3 (Image Library)</strong> later when you have lots of products and want to reuse images.
+        </p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>🚀 Implementation Estimate</h2>
+
+        <h3>Option 1 (Direct Upload) - Quick Win</h3>
+        <ul>
+            <li><strong>Time:</strong> ~30 minutes</li>
+            <li><strong>Dependencies:</strong> <code>multer</code> npm package</li>
+            <li><strong>Changes needed:</strong>
+                <ul>
+                    <li>Add file upload button to product/box forms</li>
+                    <li>Show image preview before saving</li>
+                    <li>Create upload endpoint</li>
+                    <li>Store images in <code>/public/images/products/</code></li>
+                    <li>Auto-populate the URL field</li>
+                </ul>
+            </li>
+        </ul>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <p style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 0.9em;">
+            <strong>Created:</strong> January 16, 2026<br>
+            <strong>Status:</strong> Pending Implementation<br>
+            <strong>Priority:</strong> Medium
+        </p>
+    </div>
+</body>
+
+</html>
