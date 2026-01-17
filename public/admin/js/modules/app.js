@@ -253,6 +253,9 @@ function setTab(tabName) {
         case 'analytics':
             if (typeof loadAnalytics === 'function') loadAnalytics();
             break;
+        case 'api-keys':
+            if (typeof loadApiKeys === 'function') loadApiKeys();
+            break;
     }
 }
 

@@ -554,6 +554,10 @@
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                         <span>📊</span> <span class="font-medium">Analytics</span>
                     </button>
+                    <button onclick="setTab('api-keys')" id="nav-api-keys"
+                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <span>🔑</span> <span class="font-medium">API Keys</span>
+                    </button>
                     <button onclick="setTab('utilities')" id="nav-utilities"
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-transparent cursor-not-allowed transition-colors"
                         disabled title="Requires Super Admin">
@@ -1488,6 +1492,106 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- API KEYS VIEW -->
+            <div id="view-api-keys" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">API Keys Management</h2>
+                        <p class="text-sm text-gray-500 mt-1">Manage third-party service API keys</p>
+                    </div>
+                </div>
+
+                <!-- Warning Banner -->
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        <div>
+                            <h3 class="text-sm font-semibold text-amber-800">Security Notice</h3>
+                            <p class="text-sm text-amber-700 mt-1">API keys are stored in the configuration file. In
+                                future versions, these will be moved to environment variables for enhanced security.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resend API Key -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                📧 Resend API Key
+                            </h3>
+                            <p class="text-sm text-gray-500 mt-1">Used for sending transactional emails (order
+                                confirmations, delivery notifications)</p>
+                        </div>
+                        <a href="https://resend.com/api-keys" target="_blank"
+                            class="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                            Get API Key
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                            <div class="relative">
+                                <input type="password" id="resend-api-key"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                                    placeholder="re_xxxxxxxxxxxxxxxxxxxx">
+                                <button type="button" onclick="toggleApiKeyVisibility('resend-api-key')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Starts with "re_" • Keep this secret</p>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="saveApiKeys()"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                Save API Key
+                            </button>
+                            <button onclick="testResendConnection()"
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
+                                Test Connection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Future API Keys (Placeholder) -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 border-dashed">
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">Future Integrations</h3>
+                    <p class="text-sm text-gray-500 mb-4">Additional API keys will be added here as new services are
+                        integrated:</p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li class="flex items-center gap-2">
+                            <span class="text-gray-400">○</span> SMS Provider (Twilio, etc.)
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-gray-400">○</span> Payment Gateway (Stripe - already configured)
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-gray-400">○</span> Shipping/Logistics APIs
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -2887,6 +2991,111 @@
 
         // Make globally available
         window.loadAnalytics = loadAnalytics;
+    </script>
+
+    <!-- API Keys Management Functions -->
+    <script>
+        async function loadApiKeys() {
+            try {
+                const response = await fetch('/api/admin/config', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load config');
+
+                const config = await response.json();
+
+                // Load Resend API key if it exists
+                if (config.apiKeys?.resend) {
+                    document.getElementById('resend-api-key').value = config.apiKeys.resend;
+                }
+            } catch (error) {
+                console.error('[API Keys] Error loading:', error);
+            }
+        }
+
+        async function saveApiKeys() {
+            const resendKey = document.getElementById('resend-api-key').value.trim();
+
+            if (!resendKey) {
+                showToast('Please enter a Resend API key', 'error');
+                return;
+            }
+
+            if (!resendKey.startsWith('re_')) {
+                showToast('Invalid Resend API key format (should start with "re_")', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/config', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load config');
+
+                const config = await response.json();
+
+                // Add or update apiKeys section
+                if (!config.apiKeys) {
+                    config.apiKeys = {};
+                }
+                config.apiKeys.resend = resendKey;
+
+                // Save updated config
+                const saveResponse = await fetch('/api/admin/config', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                if (!saveResponse.ok) throw new Error('Failed to save config');
+
+                showToast('API key saved successfully!', 'success');
+            } catch (error) {
+                console.error('[API Keys] Error saving:', error);
+                showToast('Failed to save API key', 'error');
+            }
+        }
+
+        function toggleApiKeyVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+
+        async function testResendConnection() {
+            const resendKey = document.getElementById('resend-api-key').value.trim();
+
+            if (!resendKey) {
+                showToast('Please enter a Resend API key first', 'error');
+                return;
+            }
+
+            showToast('Testing connection...', 'info');
+
+            // TODO: Implement actual test endpoint on backend
+            // For now, just validate the format
+            if (resendKey.startsWith('re_') && resendKey.length > 20) {
+                setTimeout(() => {
+                    showToast('API key format is valid! (Full test coming soon)', 'success');
+                }, 1000);
+            } else {
+                showToast('Invalid API key format', 'error');
+            }
+        }
+
+        // Make globally available
+        window.loadApiKeys = loadApiKeys;
+        window.saveApiKeys = saveApiKeys;
+        window.toggleApiKeyVisibility = toggleApiKeyVisibility;
+        window.testResendConnection = testResendConnection;
     </script>
 
 </body>
