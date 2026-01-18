@@ -12,8 +12,7 @@ import { QuantityControl } from '../components/QuantityControl.js';
 
 // Sync to server on change
 store.subscribe('cartUpdated', async (cart) => {
-    // 1. Sync to Server
-    const token = localStorage.getItem('harvest_token');
+    // 1. Sync to Server (token now in HttpOnly cookie via api.js credentials:'include')
     let guestId = localStorage.getItem('harvest_guest_id');
     if (!guestId) {
         guestId = Math.random().toString(36).substring(2, 15);

@@ -29,11 +29,18 @@ router.post('/auth/signup', validate(signupSchema), async (req, res) => {
         const token = jwt.sign(
             { id: user.id, email: user.email, role: 'customer' },
             JWT_SECRET,
-            { expiresIn: '24h' }
+            { expiresIn: '7d' }
         );
 
-        res.json({
-            token,
+        // Set HttpOnly cookie
+        res.cookie('harvest_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        res.status(201).json({
             user: {
                 id: user.id,
                 email: user.email,
@@ -66,11 +73,18 @@ router.post('/auth/login', validate(loginSchema), async (req, res) => {
         const token = jwt.sign(
             { id: user.id, email: user.email, role },
             JWT_SECRET,
-            { expiresIn: '24h' }
+            { expiresIn: '7d' }
         );
 
+        // Set HttpOnly cookie
+        res.cookie('harvest_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.json({
-            token,
             user: {
                 id: user.id,
                 email: user.email,
@@ -101,11 +115,18 @@ router.post('/login', validate(loginSchema), async (req, res) => {
         const token = jwt.sign(
             { id: user.id, email: user.email, role },
             JWT_SECRET,
-            { expiresIn: '24h' }
+            { expiresIn: '7d' }
         );
 
+        // Set HttpOnly cookie (legacy /api/login path)
+        res.cookie('harvest_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
         res.json({
-            token,
             user: {
                 id: user.id,
                 email: user.email,
@@ -235,6 +256,12 @@ router.put('/user/profile', authenticateToken, validate(updateProfileSchema), (r
             details: process.env.NODE_ENV === 'development' ? e.message : undefined
         });
     }
+});
+
+// POST /api/auth/logout
+router.post('/auth/logout', (req, res) => {
+    res.clearCookie('harvest_token');
+    res.json({ success: true });
 });
 
 module.exports = router;

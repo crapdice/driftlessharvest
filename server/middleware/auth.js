@@ -4,10 +4,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'harvest-secret-key-change-in-prod'
 
 const checkRole = (roles) => (req, res, next) => {
     let token;
-    const authHeader = req.headers.authorization;
 
-    if (authHeader) {
-        token = authHeader.split(' ')[1];
+    // Priority: cookie > header > query (backwards compat)
+    if (req.cookies && req.cookies.harvest_token) {
+        token = req.cookies.harvest_token;
+    } else if (req.headers.authorization) {
+        token = req.headers.authorization.split(' ')[1];
     } else if (req.query.token) {
         token = req.query.token;
     }
@@ -47,8 +49,15 @@ const requireAdmin = (req, res, next) => {
 };
 
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    let token;
+
+    // Priority: cookie > header (matches checkRole pattern for HttpOnly cookie auth)
+    if (req.cookies && req.cookies.harvest_token) {
+        token = req.cookies.harvest_token;
+    } else {
+        const authHeader = req.headers['authorization'];
+        token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    }
 
     if (token == null) return res.status(401).json({ error: 'Token required' });
 

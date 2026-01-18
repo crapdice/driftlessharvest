@@ -1,10 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 
 const authRoutes = require('./routes/auth.routes');
-const adminRoutes = require('./routes/admin.routes');
 const productRoutes = require('./routes/product.routes');
 const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
@@ -14,7 +14,9 @@ const paymentRoutes = require('./routes/payment.routes');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: true })); // Enable credentials for cookies
+app.use(cookieParser());
+
 
 // Configure Body Parser to preserve raw body for Stripe Webhooks
 app.use(bodyParser.json({
@@ -35,12 +37,37 @@ app.use((req, res, next) => {
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
 app.use('/marketing', express.static(path.join(__dirname, '../public/marketing')));
 
-// A/B Test Routing for Homepage
-app.get('/', (req, res, next) => {
-    const fs = require('fs');
-    const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
-    const configPath = path.join(DATA_DIR, 'config.json');
+// Launch Mode Middleware - blocks ALL frontend routes when enabled
+// Must run BEFORE static file serving
+const fs = require('fs');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 
+app.use((req, res, next) => {
+    // Whitelist: paths that should NEVER be blocked by launch mode
+    const whitelist = [
+        '/admin',      // Admin panel
+        '/marketing',  // Marketing portal
+        '/api/',       // All API endpoints
+        '/assets/',    // Static assets (CSS, images for launch page)
+        '/images/',    // Image assets
+        '/css/',       // CSS files
+        '/js/',        // JS files (but not /js route)
+        '/previews/',  // Preview files including launch pages
+        '/favicon',    // Favicon
+    ];
+
+    // Skip whitelisted paths
+    if (whitelist.some(prefix => req.path.startsWith(prefix))) {
+        return next();
+    }
+
+    // Skip static file extensions (let express.static handle them)
+    if (/\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot|webp|mp4|webm|json|map)$/i.test(req.path)) {
+        return next();
+    }
+
+    // Check launch mode config
+    const configPath = path.join(DATA_DIR, 'config.json');
     if (fs.existsSync(configPath)) {
         try {
             const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -48,7 +75,7 @@ app.get('/', (req, res, next) => {
             const activeVariant = config.meta?.activeLaunchVariant;
 
             if (launchModeEnabled && activeVariant) {
-                console.log(`[A/B Router] Serving Launch Variant: ${activeVariant}`);
+                console.log(`[Launch Mode] Blocking ${req.path} → Serving Launch Variant: ${activeVariant}`);
                 // Map variant name to filename: "Artisan Sketch (Design 3)" -> "design_3.html"
                 const match = activeVariant.match(/Design (\d)/);
                 if (match) {
@@ -60,11 +87,12 @@ app.get('/', (req, res, next) => {
                 }
             }
         } catch (e) {
-            console.error('[A/B Router Error]', e);
+            console.error('[Launch Mode Error]', e);
         }
     }
-    next(); // Fallback to normal static serving
+    next(); // Fallback to normal routing when launch mode is off
 });
+
 
 // Serve static files from public/ (Customer App)
 app.use(express.static(path.join(__dirname, '../public')));
@@ -78,9 +106,8 @@ app.get('/api/admin/test', (req, res) => res.json({ status: 'ok', msg: 'Admin pa
 
 // Mount Routes
 app.use('/api', authRoutes);
-app.use('/api', require('./routes/admin')); // New modular admin routes (extracted)
-app.use('/api', adminRoutes); // Legacy admin routes (being phased out)
-app.use('/api/admin/marketing', require('./routes/admin-marketing.routes'));
+app.use('/api', require('./routes/admin')); // Admin routes (modular aggregator)
+// Marketing routes included in admin aggregator: ./routes/admin/marketing.routes.js
 app.use('/api', productRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', orderRoutes);

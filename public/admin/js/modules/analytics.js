@@ -25,7 +25,6 @@ export async function initAnalytics() {
 
 export async function loadAnalytics() {
     const dateRange = document.getElementById('analytics-date-range')?.value || 30;
-    const token = localStorage.getItem('harvest_token');
 
     try {
         const data = await api.getAnalyticsOverview(dateRange);
@@ -197,7 +196,6 @@ function renderConversionFunnel(funnel) {
 }
 
 async function loadRecentVisitors() {
-    const token = localStorage.getItem('harvest_token');
     const tbody = document.getElementById('recent-visitors-table');
     if (!tbody) return;
 

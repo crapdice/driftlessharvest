@@ -39,6 +39,9 @@ export async function initUtilities() {
         }
     }
 
+    // Ensure bindings are present even if content was cached/pre-loaded
+    bindGlobalActions();
+
     // Always refresh stats when entering
     refreshQuickStats();
 }
@@ -63,6 +66,15 @@ function bindGlobalActions() {
     window.viewAllProducts = () => queryTable('products');
     window.viewDeliveryWindows = () => queryTable('delivery_windows');
     window.viewAddresses = () => queryTable('addresses');
+    window.viewCategories = () => queryTable('categories');
+    window.viewFarms = () => queryTable('farms');
+    window.viewPayments = () => queryTable('payments');
+    window.viewOrderItems = () => queryTable('order_items');
+    window.viewActiveCarts = () => queryTable('active_carts');
+    window.viewAnalyticsEvents = () => queryTable('analytics_events');
+    window.viewBoxTemplates = () => queryTable('box_templates');
+    window.viewBoxItems = () => queryTable('box_items');
+    window.viewLaunchSignups = () => queryTable('launch_signups');
 }
 
 // --- Maintenance Operations ---

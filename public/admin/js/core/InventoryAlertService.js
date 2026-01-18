@@ -49,9 +49,8 @@ class InventoryAlertService {
      */
     async check() {
         try {
-            const token = localStorage.getItem('harvest_token');
             const res = await fetch(`/api/admin/inventory-status?threshold=${this.#threshold}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
 
             if (!res.ok) {

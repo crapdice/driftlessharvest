@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Fidelity Marketing Analytics - Driftless Harvest</title>
+    <style>
+        :root {
+            --brand-green: #2d4a22;
+            --brand-light: #e8f5e9;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --bg-canvas: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: var(--brand-green);
+            border-bottom: 4px solid var(--brand-green);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid var(--brand-green);
+            background: linear-gradient(90deg, #f8f9fa 0%, white 100%);
+            padding: 10px 15px;
+            font-size: 1.5em;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3::before {
+            content: '⚙️';
+            font-size: 0.8em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        ul,
+        ol {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Technical Elements */
+        code {
+            background: #f1f3f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85em;
+            color: #d63384;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            font-size: 0.9em;
+        }
+
+        /* Comment Styling in SQL */
+        .sql-comment {
+            color: #6a9955;
+        }
+
+        .sql-keyword {
+            color: #569cd6;
+            font-weight: bold;
+        }
+
+        .sql-func {
+            color: #dcdcaa;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.95em;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: var(--brand-green);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #f1f3f5;
+        }
+
+        /* Utility Components */
+        .alert-box {
+            padding: 20px;
+            background: #fff8e1;
+            border-left: 5px solid #ffc107;
+            margin: 25px 0;
+            border-radius: 4px;
+            color: #856404;
+        }
+
+        .metric-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--brand-green);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9em;
+            padding: 8px 12px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            transition: bg 0.2s;
+        }
+
+        .back-link:hover {
+            background: #c8e6c9;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Return to Roadmap</a>
+
+        <h1>📊 High-Fidelity Marketing Analytics Framework</h1>
+
+        <div class="alert-box">
+            <strong>EXECUTIVE SUMMARY:</strong> This document serves as the technical blueprint for the "Series-A Phase"
+            analytics engine. It moves beyond vanity metrics to implement "Source-of-Truth" financial, retention, and
+            custom domain-specific logic.
+        </div>
+
+        <!-- SECTION I -->
+        <h2>I. Core Financial Metrics (The "North Star")</h2>
+        <p>Direct mapping to P&L health. These metrics answer: "Are we growing efficiently?"</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Definition</th>
+                    <th>Technical Logic</th>
+                    <th>Target</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>CAC Payback</strong></td>
+                    <td>Months to break even on acquisition cost.</td>
+                    <td><code>CAC / (ARPU * Gross_Margin_%)</code></td>
+                    <td>
+                        < 12 Months</td>
+                </tr>
+                <tr>
+                    <td><strong>LTV:CAC</strong></td>
+                    <td>Lifetime efficiency.</td>
+                    <td><code>(Avg_Lifespan * ARPU) / CAC</code></td>
+                    <td>> 3:1</td>
+                </tr>
+                <tr>
+                    <td><strong>Net Churn</strong></td>
+                    <td>Revenue lost minus expansion revenue.</td>
+                    <td><code>(Churned_MRR - Expansion_MRR) / Start_MRR</code></td>
+                    <td>
+                        < 0% (Negative Churn)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Implementation: CAC Payback Analysis</h3>
+        <p>This query calculates the rolling 3-month payback period, dynamically adjusting for seasonal margin
+            fluctuations.</p>
+        <pre><code><span class="sql-keyword">WITH</span> margin_data <span class="sql-keyword">AS</span> (
+    <span class="sql-comment">-- Calculate actual gross margin per customer (Revenue - COGS)</span>
+    <span class="sql-keyword">SELECT</span> 
+        customer_id,
+        <span class="sql-func">AVG</span>(total_amount - cost_of_goods) <span class="sql-keyword">as</span> monthly_gross_margin
+    <span class="sql-keyword">FROM</span> orders 
+    <span class="sql-keyword">WHERE</span> status = 'completed' <span class="sql-keyword">AND</span> created_at >= <span class="sql-func">DATE</span>('now', '-90 days')
+    <span class="sql-keyword">GROUP BY</span> customer_id
+),
+acquisition_spend <span class="sql-keyword">AS</span> (
+    <span class="sql-comment">-- Blended CAC (Ad Spend + Marketing Salaries + Tools)</span>
+    <span class="sql-keyword">SELECT</span> 
+        <span class="sql-func">SUM</span>(amount) / (<span class="sql-keyword">SELECT</span> <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">FROM</span> customers <span class="sql-keyword">WHERE</span> created_at >= <span class="sql-func">DATE</span>('now', '-90 days')) <span class="sql-keyword">as</span> blended_cac
+    <span class="sql-keyword">FROM</span> expenses 
+    <span class="sql-keyword">WHERE</span> category = 'marketing' <span class="sql-keyword">AND</span> incurred_at >= <span class="sql-func">DATE</span>('now', '-90 days')
+)
+<span class="sql-keyword">SELECT</span> 
+    <span class="sql-func">ROUND</span>(ac.blended_cac / md.monthly_gross_margin, 1) <span class="sql-keyword">as</span> payback_months,
+    ac.blended_cac,
+    md.monthly_gross_margin
+<span class="sql-keyword">FROM</span> margin_data md, acquisition_spend ac
+<span class="sql-keyword">LIMIT</span> 1;</code></pre>
+
+        <!-- SECTION II -->
+        <h2>II. Acquisition & Attribution (The "Engine")</h2>
+        <p>Moving beyond "Last Click" to understand the full journey.</p>
+
+        <div class="metric-card">
+            <h4>Attribution Models</h4>
+            <ul>
+                <li><strong>Linear:</strong> Equal credit to all touchpoints.</li>
+                <li><strong>Time Decay:</strong> Actions closer to conversion get more credit.</li>
+                <li><strong>U-Shaped (Recommended):</strong> 40% First Touch, 40% Lead Creation, 20% Middle.</li>
+            </ul>
+        </div>
+
+        <h3>Implementation: U-Shaped Multi-Touch SQL</h3>
+        <pre><code><span class="sql-keyword">WITH</span> journey <span class="sql-keyword">AS</span> (
+    <span class="sql-keyword">SELECT</span> 
+        user_id,
+        source,
+        timestamp,
+        <span class="sql-func">ROW_NUMBER</span>() <span class="sql-keyword">OVER</span>(<span class="sql-keyword">PARTITION BY</span> user_id <span class="sql-keyword">ORDER BY</span> timestamp <span class="sql-keyword">ASC</span>) <span class="sql-keyword">as</span> touch_rank,
+        <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">OVER</span>(<span class="sql-keyword">PARTITION BY</span> user_id) <span class="sql-keyword">as</span> total_touches
+    <span class="sql-keyword">FROM</span> marketing_touches
+)
+<span class="sql-keyword">SELECT</span> 
+    source,
+    <span class="sql-func">SUM</span>(
+        <span class="sql-keyword">CASE</span> 
+            <span class="sql-keyword">WHEN</span> touch_rank = 1 <span class="sql-keyword">THEN</span> 0.4 <span class="sql-comment">-- First Touch</span>
+            <span class="sql-keyword">WHEN</span> touch_rank = total_touches <span class="sql-keyword">THEN</span> 0.4 <span class="sql-comment">-- Lead Creation/Conversion</span>
+            <span class="sql-keyword">ELSE</span> 0.2 / <span class="sql-func">NULLIF</span>(total_touches - 2, 0) <span class="sql-comment">-- Middle Touches</span>
+        <span class="sql-keyword">END</span> * 100 <span class="sql-comment">-- Assuming $100 value per conversion</span>
+    ) <span class="sql-keyword">as</span> attributed_revenue
+<span class="sql-keyword">FROM</span> journey
+<span class="sql-keyword">GROUP BY</span> source
+<span class="sql-keyword">ORDER BY</span> attributed_revenue <span class="sql-keyword">DESC</span>;</code></pre>
+
+        <!-- SECTION III -->
+        <h2>III. Retention & Cohorts (The "Leaky Bucket")</h2>
+        <p>Visualize user lifespan effectiveness.</p>
+
+        <h3>Implementation: Logarithmic Cohort Matrix</h3>
+        <p>Tracks retention % at Month 1, 3, 6, and 12.</p>
+        <pre><code><span class="sql-keyword">SELECT</span> 
+    <span class="sql-func">strftime</span>('%Y-%m', created_at) <span class="sql-keyword">as</span> cohort_month,
+    <span class="sql-func">COUNT</span>(<span class="sql-keyword">DISTINCT</span> user_id) <span class="sql-keyword">as</span> total_users,
+    <span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span> lifespan_months >= 1 <span class="sql-keyword">THEN</span> 1 <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) * 100.0 / <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> month_1_retention,
+    <span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span> lifespan_months >= 3 <span class="sql-keyword">THEN</span> 1 <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) * 100.0 / <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> month_3_retention,
+    <span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span> lifespan_months >= 12 <span class="sql-keyword">THEN</span> 1 <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) * 100.0 / <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> month_12_retention
+<span class="sql-keyword">FROM</span> user_stats
+<span class="sql-keyword">GROUP BY</span> 1
+<span class="sql-keyword">ORDER BY</span> 1 <span class="sql-keyword">DESC</span>;</code></pre>
+
+        <!-- SECTION IV -->
+        <h2>IV. Organic Growth & Virality (The "Flywheel")</h2>
+        <p>Measuring the self-perpetuating engine of the business.</p>
+
+        <h3>1. K-Factor (Viral Coefficient)</h3>
+        <p>Formula: <code>Invites per User (i) * Conversion Rate of Invites (c)</code>. If K > 1, growth is exponential.
+        </p>
+        <pre><code><span class="sql-keyword">WITH</span> invites <span class="sql-keyword">AS</span> (
+    <span class="sql-keyword">SELECT</span> 
+        referrer_id, 
+        <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> invites_sent,
+        <span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span> status = 'accepted' <span class="sql-keyword">THEN</span> 1 <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) <span class="sql-keyword">as</span> invites_accepted
+    <span class="sql-keyword">FROM</span> referrals
+    <span class="sql-keyword">WHERE</span> created_at >= <span class="sql-func">DATE</span>('now', '-30 days')
+    <span class="sql-keyword">GROUP BY</span> referrer_id
+)
+<span class="sql-keyword">SELECT</span> 
+    <span class="sql-func">AVG</span>(invites_sent) <span class="sql-keyword">as</span> i_value,
+    <span class="sql-func">SUM</span>(invites_accepted) * 1.0 / <span class="sql-func">SUM</span>(invites_sent) <span class="sql-keyword">as</span> c_value,
+    (<span class="sql-func">AVG</span>(invites_sent) * (<span class="sql-func">SUM</span>(invites_accepted) * 1.0 / <span class="sql-func">SUM</span>(invites_sent))) <span class="sql-keyword">as</span> k_factor
+<span class="sql-keyword">FROM</span> invites;</code></pre>
+
+        <h3>2. Content Performance Matrix</h3>
+        <p>Identify "High Traffic / Low Conversion" pages (Optimization Opportunities) vs "High Conversion / Low
+            Traffic" (Promotion Opportunities).</p>
+        <pre><code><span class="sql-keyword">SELECT</span> 
+    page_path,
+    <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> page_views,
+    <span class="sql-func">SUM</span>(is_conversion) * 100.0 / <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> conversion_rate,
+    <span class="sql-keyword">CASE</span> 
+        <span class="sql-keyword">WHEN</span> <span class="sql-func">COUNT</span>(*) > 1000 <span class="sql-keyword">AND</span> (<span class="sql-func">SUM</span>(is_conversion) / <span class="sql-func">COUNT</span>(*)) < 0.01 <span class="sql-keyword">THEN</span> 'Fix Leak'
+        <span class="sql-keyword">WHEN</span> <span class="sql-func">COUNT</span>(*) < 500 <span class="sql-keyword">AND</span> (<span class="sql-func">SUM</span>(is_conversion) / <span class="sql-func">COUNT</span>(*)) > 0.05 <span class="sql-keyword">THEN</span> 'Promote Hard'
+        <span class="sql-keyword">ELSE</span> 'Maintain'
+    <span class="sql-keyword">END</span> <span class="sql-keyword">as</span> strategy_action
+<span class="sql-keyword">FROM</span> page_analytics
+<span class="sql-keyword">GROUP BY</span> page_path
+<span class="sql-keyword">ORDER BY</span> page_views <span class="sql-keyword">DESC</span>;</code></pre>
+
+
+        <!-- SECTION V -->
+        <h2>V. Driftless Harvest Specifics (The "Yield")</h2>
+        <p>Custom domain logic for local food subscription dynamics.</p>
+
+        <h3>1. "Box Ecology" (Swap Intelligence)</h3>
+        <p>Understanding product demand via Market Basket Analysis on swaps.</p>
+        <pre><code><span class="sql-keyword">SELECT</span> 
+    original_item_id,
+    swapped_for_item_id,
+    <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">as</span> swap_frequency,
+    <span class="sql-comment">-- Calculate "Discontent Score" (Likelihood to be removed)</span>
+    (<span class="sql-func">COUNT</span>(*) * 100.0 / (<span class="sql-keyword">SELECT</span> <span class="sql-func">COUNT</span>(*) <span class="sql-keyword">FROM</span> box_items <span class="sql-keyword">WHERE</span> item_id = original_item_id)) <span class="sql-keyword">as</span> rejection_rate
+<span class="sql-keyword">FROM</span> subscription_swaps
+<span class="sql-keyword">GROUP BY</span> original_item_id, swapped_for_item_id
+<span class="sql-keyword">ORDER BY</span> swap_frequency <span class="sql-keyword">DESC</span>
+<span class="sql-keyword">LIMIT</span> 10;</code></pre>
+
+        <h3>2. Sustainability Index (Food Miles)</h3>
+        <p>Marketing metric: "Miles Saved vs Conventional Supply Chain". Assumes conventional average distance is 1500
+            miles.</p>
+        <pre><code><span class="sql-keyword">WITH</span> delivery_audit <span class="sql-keyword">AS</span> (
+    <span class="sql-keyword">SELECT</span> 
+        d.id,
+        d.weight_lbs,
+        <span class="sql-comment">-- Calculate distance from Farm (origin) to Hub (destination)</span>
+        <span class="sql-comment">-- Using Haversine formula logic or pre-calculated fields</span>
+        (farm.distance_to_hub_miles) <span class="sql-keyword">as</span> actual_miles,
+        1500 <span class="sql-keyword">as</span> conventional_benchmark_miles
+    <span class="sql-keyword">FROM</span> deliveries d
+    <span class="sql-keyword">JOIN</span> farms farm <span class="sql-keyword">ON</span> d.farm_id = farm.id
+)
+<span class="sql-keyword">SELECT</span> 
+    <span class="sql-func">SUM</span>(weight_lbs) <span class="sql-keyword">as</span> total_lbs_moved,
+    <span class="sql-func">SUM</span>(weight_lbs * (conventional_benchmark_miles - actual_miles)) <span class="sql-keyword">as</span> carbon_miles_saved
+<span class="sql-keyword">FROM</span> delivery_audit;</code></pre>
+
+        <hr style="margin: 40px 0; border: none; border-top: 1px solid #ddd;">
+
+        <p style="margin-top: 50px; color: #777; font-size: 0.9em; text-align: center;">
+            <strong>Generated by:</strong> Antigravity Agentic Brain v2<br>
+            <strong>Status:</strong> Blueprint Complete<br>
+            <strong>Version:</strong> 2.0 (Enhanced with SQL Logic)
+        </p>
+    </div>
+</body>
+
+</html>

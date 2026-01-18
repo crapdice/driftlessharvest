@@ -6,10 +6,13 @@ const API_BASE = '/api';
  */
 async function sendRequest(endpoint, method = 'GET', body = null) {
     const headers = { 'Content-Type': 'application/json' };
-    const token = localStorage.getItem('harvest_token');
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    // Cookies sent automatically - no need to read from localStorage
 
-    const options = { method, headers };
+    const options = {
+        method,
+        headers,
+        credentials: 'include' // CRITICAL: sends HttpOnly cookies
+    };
     if (body) options.body = JSON.stringify(body);
 
     const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;

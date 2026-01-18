@@ -57,21 +57,21 @@ class Store {
             localStorage.setItem('harvest_user', JSON.stringify(user));
         } else {
             localStorage.removeItem('harvest_user');
-            localStorage.removeItem('harvest_token');
+            // Token cleared via API logout - not stored in localStorage anymore
         }
         this.publish('userChanged', user);
     }
 
     loadSession() {
         try {
-            const token = localStorage.getItem('harvest_token');
+            // Token validation happens server-side via cookie
+            // Only restore user object for UI state
             const savedUser = localStorage.getItem('harvest_user');
-            if (token && savedUser) {
+            if (savedUser) {
                 this.state.user = JSON.parse(savedUser);
             }
         } catch (e) {
             console.warn("Failed to restore session", e);
-            localStorage.removeItem('harvest_token');
             localStorage.removeItem('harvest_user');
             this.state.user = null;
         }

@@ -53,8 +53,18 @@ export function renderDashboard() {
 
   // Load data immediately
   setTimeout(() => {
-    if (dashboardTab === 'orders' && typeof window.loadUserOrders === 'function') window.loadUserOrders();
-    if (dashboardTab === 'profile' && typeof window.loadUserProfile === 'function') window.loadUserProfile();
+    console.log('[Dashboard] Tab:', dashboardTab);
+    console.log('[Dashboard] loadUserOrders exists:', typeof window.loadUserOrders);
+    console.log('[Dashboard] loadUserProfile exists:', typeof window.loadUserProfile);
+
+    if (dashboardTab === 'orders' && typeof window.loadUserOrders === 'function') {
+      console.log('[Dashboard] Calling loadUserOrders...');
+      window.loadUserOrders();
+    }
+    if (dashboardTab === 'profile' && typeof window.loadUserProfile === 'function') {
+      console.log('[Dashboard] Calling loadUserProfile...');
+      window.loadUserProfile();
+    }
   }, 0);
 
   return `

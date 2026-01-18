@@ -404,7 +404,7 @@ window.restoreProduct = async (id) => {
     try {
         await fetch(`/api/admin/products/${id}/restore`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
+            credentials: 'include'
         });
         showToast("Product Restored");
         loadArchivedProducts();
@@ -416,7 +416,7 @@ window.permanentDeleteProduct = async (id) => {
     try {
         await fetch(`/api/admin/products/${id}/permanent`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
+            credentials: 'include'
         });
         showToast("Permanently Deleted");
         loadArchivedProducts();

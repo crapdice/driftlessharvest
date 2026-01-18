@@ -206,10 +206,6 @@
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
                         <span>📊</span> <span class="font-medium">Analytics</span>
                     </button>
-                    <button onclick="setTab('api-keys')" id="nav-api-keys"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🔑</span> <span class="font-medium">API Keys</span>
-                    </button>
                     <button onclick="setTab('utilities')" id="nav-utilities"
                         class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-transparent cursor-not-allowed transition-colors"
                         disabled title="Requires Super Admin">
@@ -415,15 +411,6 @@
                 <div class="flex items-center justify-center p-12 text-gray-400">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
                     <span>Initializing Analytics Dashboard...</span>
-                </div>
-            </div>
-
-            <!-- API KEYS VIEW -->
-            <div id="view-api-keys" class="hidden space-y-6">
-                <!-- API Keys content loaded dynamically from views/api-keys.html -->
-                <div class="flex items-center justify-center p-12 text-gray-400">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
-                    <span>Initializing API Management...</span>
                 </div>
             </div>
 
@@ -749,7 +736,7 @@
                     <!-- RIGHT COLUMN: Details -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        Main Info -->
+                        <!-- Main Info -->
                         <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
                             <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
                             </h4>
@@ -1429,9 +1416,9 @@
                 const response = await fetch('/api/gemini/generate', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
+                        'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         prompt,
                         context: `${context}. Current Input/Keywords: "${originalValue}"`

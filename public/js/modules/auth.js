@@ -8,11 +8,7 @@ export async function login(email, password) {
         const data = await api.loginUser(email, password);
 
         store.setUser(data.user);
-
-        // Store saves token? No, store saves cart/config.
-        // Token management usually stays in Auth module or API layer.
-        // API layer reads it from localStorage.
-        localStorage.setItem('harvest_token', data.token);
+        // Token now in HttpOnly cookie - localStorage only stores user object for UI
         localStorage.setItem('harvest_user', JSON.stringify(data.user));
 
         setView('home');
@@ -27,10 +23,8 @@ export async function signup(email, password) {
         const data = await api.signupUser(email, password);
 
         store.setUser(data.user);
-        localStorage.setItem('harvest_token', data.token);
-        localStorage.setItem('harvest_user', JSON.stringify(data.user)); // Redundant if store handles it? 
-        // Store doesn't persist User to localstorage automatically yet, only Cart. 
-        // So keeping this is fine for now/init.
+        // Token now in HttpOnly cookie
+        localStorage.setItem('harvest_user', JSON.stringify(data.user));
 
         setView('home');
         showToast('Account created successfully!');
@@ -39,10 +33,18 @@ export async function signup(email, password) {
     }
 }
 
-export function logout() {
+export async function logout() {
+    try {
+        // Clear cookie server-side
+        await api.sendRequest('/auth/logout', 'POST');
+    } catch (e) {
+        console.error('Logout API failed:', e);
+        // Continue with local cleanup even if API fails
+    }
+
     store.setUser(null);
-    localStorage.removeItem('harvest_token');
     localStorage.removeItem('harvest_user');
+    // No need to remove harvest_token - it never existed in localStorage
     setView('home');
     showToast('Logged out successfully.');
 }

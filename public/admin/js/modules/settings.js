@@ -1,6 +1,7 @@
 import { api } from './api.js';
 import { showToast } from './utils.js';
 import { inventoryAlertService } from '../core/InventoryAlertService.js';
+import { loadApiKeys, saveApiKey, toggleApiKeyVisibility, testResendConnection, testGeminiConnection } from './api-keys.js';
 
 let currentConfig = {};
 
@@ -116,6 +117,9 @@ export async function loadSettings() {
         currentConfig = await res.json();
 
         populateForm(currentConfig);
+
+        // Also load API keys (now part of settings tab)
+        await loadApiKeys();
     } catch (e) {
         showToast("Failed to load settings", "error");
     }
@@ -397,10 +401,10 @@ export async function saveSettings() {
     if (heroImg && heroImg.value) currentConfig.pages.home.hero.image = heroImg.value;
 
     try {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/config', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(currentConfig)
         });
 
@@ -428,8 +432,7 @@ export async function saveSettings() {
 export async function restoreDefaults() {
     if (!confirm("Restore defaults?")) return;
     try {
-        const token = localStorage.getItem('harvest_token');
-        await fetch('/api/config/restore', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        await fetch('/api/config/restore', { method: 'POST', credentials: 'include' });
         showToast("Restored");
         setTimeout(() => window.location.reload(), 1000);
     } catch (e) { showToast("Error", "error"); }
@@ -497,6 +500,11 @@ window.setConfigTab = (tabName) => {
     if (activeTab) {
         activeTab.classList.add('border-blue-600', 'text-blue-600');
         activeTab.classList.remove('border-transparent', 'text-gray-600');
+    }
+
+    // Load API keys when switching to that tab
+    if (tabName === 'api-keys') {
+        loadApiKeys();
     }
 };
 
@@ -568,13 +576,10 @@ export async function saveRawConfig() {
 
     try {
         const data = JSON.parse(editor.value);
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/config', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(data)
         });
 

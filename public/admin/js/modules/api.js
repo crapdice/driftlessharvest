@@ -12,16 +12,20 @@ export function setLoginHandler(handler) {
 }
 
 function getHeaders() {
-    const token = localStorage.getItem('harvest_token');
+    // Token now in HttpOnly cookie - just send Content-Type
     return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
     };
 }
 
 export async function request(endpoint, method = 'GET', body = null) {
     try {
-        const options = { method, headers: getHeaders(), cache: 'no-store' };
+        const options = {
+            method,
+            headers: getHeaders(),
+            credentials: 'include', // CRITICAL: sends HttpOnly cookie
+            cache: 'no-store'
+        };
         if (body) options.body = JSON.stringify(body);
 
         const res = await fetch(`/api/admin${endpoint}`, options);
@@ -38,7 +42,7 @@ export async function request(endpoint, method = 'GET', body = null) {
         if (res.status === 403) {
             // Force re-login on permission denied to allow switching accounts
             console.warn('403 Forbidden - Insufficient Permissions. Forcing re-login.');
-            localStorage.removeItem('harvest_token'); // Ensure token is gone
+            // Cookie cleared via API logout, no localStorage to remove
             loginHandler(); // Trigger reload/login flow
             throw new Error('Permission denied');
         }
@@ -102,21 +106,17 @@ export const api = {
 
     // Config (note: uses /api/config not /api/admin/config)
     getConfig: async () => {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/config', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         if (!res.ok) throw new Error('Failed to load config');
         return res.json();
     },
     updateConfig: async (data) => {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/config', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error('Failed to save config');
@@ -125,10 +125,9 @@ export const api = {
 
     // Gemini
     testGemini: async () => {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/gemini/test', {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         return res.json();
     },
@@ -139,28 +138,26 @@ export const api = {
 
     // Categories (uses /api/categories not /api/admin/categories)
     getCategories: async () => {
-        const res = await fetch('/api/categories');
+        const res = await fetch('/api/categories', {
+            credentials: 'include'
+        });
         if (!res.ok) throw new Error('Failed to load categories');
         return res.json();
     },
     createCategory: async (name) => {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/categories', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ name })
         });
         if (!res.ok) throw new Error('Failed to create category');
         return res.json();
     },
     deleteCategory: async (id) => {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch(`/api/categories/${id}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         if (!res.ok) throw new Error('Failed to delete category');
         return res.json();
@@ -172,10 +169,9 @@ export const api = {
 
     // Config Restore
     restoreConfig: async () => {
-        const token = localStorage.getItem('harvest_token');
         const res = await fetch('/api/config/restore', {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         if (!res.ok) throw new Error('Failed to restore config');
         return res.json();

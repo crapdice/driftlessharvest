@@ -14,7 +14,6 @@ import {
 } from './layouts.js';
 import { initUtilities } from './utilities.js';
 import { initCategories } from './categories.js';
-import { initApiKeys } from './api-keys.js';
 import { initAnalytics } from './analytics.js';
 
 // State
@@ -74,8 +73,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function initAuth() {
     setLoginHandler(showLoginModal);
-    const token = localStorage.getItem('harvest_token');
-    if (!token) {
+    // Token is in HttpOnly cookie - check for user object to know if session exists
+    const userStr = localStorage.getItem('harvest_user');
+    if (!userStr) {
         window.location.href = '/login.html';
     } else {
         renderHeaderUser();
@@ -168,13 +168,14 @@ async function handleLogin(e) {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // Receive and store HttpOnly cookie
             body: JSON.stringify({ email, password: pwd })
         });
         const data = await res.json();
 
         if (res.ok) {
-            localStorage.setItem('harvest_token', data.token);
-            localStorage.setItem('harvest_user', JSON.stringify(data.user)); // Store User Info
+            // Token now in cookie - only store user info for UI
+            localStorage.setItem('harvest_user', JSON.stringify(data.user));
             document.getElementById('login-modal').style.display = 'none';
             renderHeaderUser(); // Update UI
             setTab(currentTab);
@@ -187,8 +188,13 @@ async function handleLogin(e) {
     }
 }
 
-window.logout = () => {
-    localStorage.removeItem('harvest_token');
+window.logout = async () => {
+    // Clear cookie server-side
+    try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch (e) {
+        console.error('Logout API failed:', e);
+    }
     localStorage.removeItem('harvest_user');
     window.location.reload();
 };
@@ -265,9 +271,6 @@ function setTab(tabName) {
         case 'layouts': initLayouts(); break;
         case 'analytics':
             initAnalytics();
-            break;
-        case 'api-keys':
-            initApiKeys();
             break;
     }
 }

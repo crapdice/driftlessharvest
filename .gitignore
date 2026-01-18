@@ -11,4 +11,6 @@ node_modules/
 
 server/data/config.json
 server/db/harvest.db
+server/data/*.db
+*.db
 

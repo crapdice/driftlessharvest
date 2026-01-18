@@ -11,6 +11,8 @@ A maintainable web application for a local food operation in Viroqua, Wisconsin.
 
 👉 **[View Full Feature Manifest](./_FEATURES.md)**
 
+👉 **[Project Structure Guide](./STRUCTURE.md)** - Read before adding files
+
 ## Deployment (Railway)
 
 We use **Railway** to host this application because it supports our backend database and API.

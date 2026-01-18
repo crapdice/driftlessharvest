@@ -412,11 +412,11 @@ export async function saveComponentContent() {
         // Also update local state
         currentLayout[editingCompIndex].styles = styleObj;
 
-        // 4. Save to Server
-        const token = localStorage.getItem('harvest_token');
+        // 4. Save to Server (cookie-based auth)
         await fetch('/api/config', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(fullConfig)
         });
         showToast('Component updated!');
@@ -482,10 +482,10 @@ export async function saveLayout() {
         fullConfig.meta.layouts = fullConfig.meta.layouts || {};
         fullConfig.meta.layouts.home = currentLayout;
 
-        const token = localStorage.getItem('harvest_token');
         await fetch('/api/config', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(fullConfig)
         });
         showToast("Layout saved! Check the Home page.");

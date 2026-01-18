@@ -304,6 +304,44 @@
         </button>
     </div>
 
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <button onclick="viewCategories()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🏷️</span> Categories
+        </button>
+        <button onclick="viewFarms()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-green-500 hover:text-green-600 dark:hover:text-green-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🚜</span> Farms
+        </button>
+        <button onclick="viewPayments()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">💳</span> Payments
+        </button>
+        <button onclick="viewOrderItems()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📜</span> Items
+        </button>
+        <button onclick="viewAnalyticsEvents()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📈</span> Analytics
+        </button>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <button onclick="viewBoxTemplates()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-500 hover:text-orange-600 dark:hover:text-orange-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📝</span> Templates
+        </button>
+        <button onclick="viewBoxItems()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🍱</span> Box Items
+        </button>
+        <button onclick="viewLaunchSignups()"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
+            <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🚀</span> Signups
+        </button>
+    </div>
+
     <div id="query-results"
         class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 min-h-[200px] shadow-inner">
         <div class="flex flex-col items-center justify-center py-12 text-gray-400 italic">
