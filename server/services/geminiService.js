@@ -2,7 +2,8 @@ const fs = require('fs/promises');
 const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-const DATA_FILE = path.join(__dirname, '../data/config.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
+const DATA_FILE = path.join(DATA_DIR, 'config.json');
 
 class GeminiService {
     async generateContent(prompt, context = '', model = 'gemini-2.5-flash') {

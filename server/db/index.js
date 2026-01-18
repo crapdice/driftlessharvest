@@ -4,8 +4,8 @@ const fs = require('fs');
 const MigrationRunner = require('./migrations');
 const { SqliteAdapter } = require('./adapters');
 
-// Use DATA_DIR if provided (Railway Volume), else default to local dir
-const DATA_DIR = process.env.DATA_DIR || __dirname;
+// Use DATA_DIR if provided (Railway Volume), else default to local server/data dir
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 // Ensure directory exists if it's a custom path
 if (process.env.DATA_DIR && !fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });

@@ -38,7 +38,8 @@ app.use('/marketing', express.static(path.join(__dirname, '../public/marketing')
 // A/B Test Routing for Homepage
 app.get('/', (req, res, next) => {
     const fs = require('fs');
-    const configPath = path.join(__dirname, 'data/config.json');
+    const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+    const configPath = path.join(DATA_DIR, 'config.json');
 
     if (fs.existsSync(configPath)) {
         try {
