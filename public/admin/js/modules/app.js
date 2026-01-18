@@ -1,18 +1,20 @@
 import { setLoginHandler } from './api.js';
 import { loadDashboard, stopPolling } from './dashboard.js';
 import { loadOrders } from './orders.js';
-import { loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal, startProductPolling, stopProductPolling } from './products.js';
-import { loadUsers, saveUser, openUserModal } from './users.js';
+import { loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal, startProductPolling, stopProductPolling, initArchived } from './products.js';
+import { loadUsers, saveUser, openUserModal, initUsers } from './users.js';
 import { loadDelivery, addDeliveryWindow } from './delivery.js';
-import { loadSettings, saveSettings, restoreDefaults } from './settings.js';
+import { loadSettings, saveSettings, restoreDefaults, initSettings } from './settings.js';
 import {
-    loadLayouts, saveLayout, toggleLayoutItem,
+    initLayouts, saveLayout, toggleLayoutItem,
     handleDragStart, handleDragOver, handleDrop,
     openComponentModal, closeComponentModal, setCompTab, saveComponentContent,
     undoLayout, redoLayout
 } from './layouts.js';
 import { initUtilities } from './utilities.js';
 import { initCategories } from './categories.js';
+import { initApiKeys } from './api-keys.js';
+import { initAnalytics } from './analytics.js';
 
 // State
 let currentTab = 'dashboard';
@@ -234,27 +236,27 @@ function setTab(tabName) {
     switch (tabName) {
         case 'dashboard': break; // Already loaded
         case 'orders': loadOrders(); break;
-        case 'customers': loadUsers('customer'); break;
-        case 'users': loadUsers('admin'); break;
+        case 'customers': initUsers('customer'); break;
+        case 'users': initUsers('admin'); break;
         case 'products': startProductPolling(); break;
-        case 'archived': loadArchivedProducts(); break;
+        case 'archived': initArchived(); break;
         case 'categories': initCategories(); break;
         case 'inventory':
             startProductPolling(); // Inventory uses products
             break;
         case 'delivery': loadDelivery(); break;
         case 'templates': startProductPolling(); break; // Templates uses products & templates
-        case 'settings': loadSettings(); break;
+        case 'settings': initSettings(); break;
         case 'utilities':
             initUtilities();
             break;
 
-        case 'layouts': loadLayouts(); break;
+        case 'layouts': initLayouts(); break;
         case 'analytics':
-            if (typeof loadAnalytics === 'function') loadAnalytics();
+            initAnalytics();
             break;
         case 'api-keys':
-            if (typeof loadApiKeys === 'function') loadApiKeys();
+            initApiKeys();
             break;
     }
 }

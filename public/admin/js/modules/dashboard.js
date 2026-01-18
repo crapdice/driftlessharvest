@@ -5,6 +5,11 @@ import { ActiveCarts } from '../components/ActiveCarts.js';
 
 let pollInterval = null;
 
+// Export init function for ViewRouter
+export async function init() {
+    await loadDashboard();
+}
+
 export async function loadDashboard() {
     // Initial Load
     await Promise.all([loadStats(), loadActiveCarts()]);

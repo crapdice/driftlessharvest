@@ -329,42 +329,13 @@ export async function saveUser() {
     }
 }
 
-export async function initUsers(mode = 'customer') {
-    const container = document.getElementById('view-customers');
-    if (!container) return;
-
-    // Only load HTML if not already loaded (or if we want to force refresh)
-    // For now, let's always load it to ensure it's fresh, 
-    // but check if it's already there to avoid unnecessary fetch if needed.
-    // However, since we might switch between 'customer' and 'admin' mode 
-    // which changes the title and buttons, we should focus on the data loading.
-
-    try {
-        const response = await fetch('views/users.html');
-        if (!response.ok) throw new Error('Failed to load users view');
-        const html = await response.text();
-        container.innerHTML = html;
-
-        // Load data
-        await loadUsers(mode);
-
-    } catch (error) {
-        console.error('Error initializing users:', error);
-        container.innerHTML = `<div class="p-8 text-red-500">Error loading users view: ${error.message}</div>`;
-    }
-}
-
 // Make modal functions globally accessible
 window.openUserModal = openUserModal;
 window.saveUser = saveUser;
 window.closeUserModal = function () {
     const modal = document.getElementById('user-modal');
-    if (modal) modal.style.display = 'none';
+    modal.style.display = 'none';
 };
-
-window.markRowAsEdited = markRowAsEdited;
-window.saveUserInline = saveUserInline;
-window.handlePhoneInput = handlePhoneInput;
 
 // Event Delegation for Table Actions
 document.addEventListener('click', (e) => {
@@ -379,9 +350,10 @@ document.addEventListener('click', (e) => {
     if (action === 'edit') openUserModal(id);
 });
 
-// For the modal phone input formatting
-document.addEventListener('input', (e) => {
-    if (e.target.id === 'u-phone') {
+// Phone Formatting Input
+const phoneInput = document.getElementById('u-phone');
+if (phoneInput) {
+    phoneInput.addEventListener('input', (e) => {
         e.target.value = formatPhoneNumber(e.target.value);
-    }
-});
+    });
+}

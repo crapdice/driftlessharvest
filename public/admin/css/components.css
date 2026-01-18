@@ -1,0 +1,59 @@
+/**
+ * Admin Components - Base Styles
+ * Extracted from index.html inline styles
+ */
+
+/* Tab Navigation */
+.tab-active {
+    border-bottom: 2px solid #2563eb;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.tab-inactive {
+    color: #6b7280;
+}
+
+.tab-inactive:hover {
+    color: #111827;
+}
+
+/* Admin Custom Styles */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+/* Custom Scrollbar for Sidebar (Default) */
+.sidebar-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* Slate 300 */
+    border-radius: 4px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* Slate 400 */
+}
+
+/* Toast Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.toast {
+    animation: fadeIn 0.3s ease-out;
+}

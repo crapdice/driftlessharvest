@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Media & Text Debugger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { primary: '#0f172a' } } }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-5xl mx-auto space-y-6">
+        <header class="flex justify-between items-center border-b pb-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                    🛠️ Gemini Media Debugger
+                </h1>
+                <p class="text-gray-500 mt-1">Test Text, Image, and Video Generation</p>
+            </div>
+            <a href="/admin" class="text-blue-600 hover:underline font-medium">Back to Admin</a>
+        </header>
+
+        <!-- Status Card -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4 text-gray-800">1. Connection & Capabilities</h2>
+            <div class="flex gap-4 items-center">
+                <button onclick="checkConnection()"
+                    class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm">
+                    Checks Connection & List Models
+                </button>
+                <div id="status-indicator" class="hidden flex items-center gap-2 text-sm">
+                    <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-green-700 font-medium">Connected</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Testing Tabs -->
+
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+            <div id="model-list-container" class="mt-4 hidden p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Available Models:</label>
+                <div class="flex gap-2 mb-3">
+                    <select id="model-select" class="flex-1 p-2 border rounded-lg bg-white border-gray-300">
+                        <option value="" disabled selected>Select a model...</option>
+                    </select>
+                </div>
+                <pre id="connection-output"
+                    class="text-xs font-mono text-gray-600 overflow-auto max-h-40 bg-white p-3 rounded border"></pre>
+            </div>
+
+
+            <div class="border-b border-gray-200 flex">
+                <button onclick="switchTab('text')" id="tab-text"
+                    class="px-6 py-4 text-sm font-bold text-blue-600 border-b-2 border-blue-600 bg-blue-50/50">
+                    Text Generation
+                </button>
+                <button onclick="switchTab('image')" id="tab-image"
+                    class="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                    Image Generation (Imagen)
+                </button>
+                <button onclick="switchTab('video')" id="tab-video"
+                    class="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                    Video Generation (Veo)
+                </button>
+            </div>
+
+            <!-- TEXT TAB -->
+            <div id="content-text" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Model Name</label>
+                        <input type="text" id="text-model" value="gemini-2.5-flash"
+                            class="w-full p-2.5 border rounded-lg font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Prompt</label>
+                        <textarea id="text-prompt" rows="1"
+                            class="w-full p-2.5 border rounded-lg">Write a haiku about debugging.</textarea>
+                    </div>
+                </div>
+                <button onclick="testText()"
+                    class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold shadow-sm transition-transform active:scale-[0.99]">
+                    Generate Text
+                </button>
+                <div id="text-result"
+                    class="hidden p-6 bg-gray-50 border border-gray-200 rounded-lg whitespace-pre-wrap font-serif text-lg text-gray-800 shadow-inner">
+                </div>
+            </div>
+
+            <!-- IMAGE TAB -->
+            <div id="content-image" class="hidden p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Model Name</label>
+                        <input type="text" id="image-model" value="imagen-4.0-fast-generate-001"
+                            class="w-full p-2.5 border rounded-lg font-mono text-sm bg-gray-50">
+                        <p class="text-xs text-gray-400 mt-1">Available: imagen-4.0-fast-generate-001,
+                            imagen-4.0-generate-001, or imagen-4.0-ultra-generate-001</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Prompt</label>
+                        <textarea id="image-prompt" rows="2"
+                            class="w-full p-2.5 border rounded-lg">A futuristic farm with flying tractors, cyberpunk style.</textarea>
+                    </div>
+                </div>
+                <button onclick="testImage()"
+                    class="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-bold shadow-sm transition-transform active:scale-[0.99]">
+                    Generate Image
+                </button>
+                <div id="image-result"
+                    class="hidden flex justify-center p-6 bg-gray-900 rounded-lg shadow-inner min-h-[300px] items-center">
+                    <!-- Image injected here -->
+                </div>
+            </div>
+
+            <!-- VIDEO TAB -->
+            <div id="content-video" class="hidden p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Model Name</label>
+                        <input type="text" id="video-model" value="veo-2.0-generate-001"
+                            class="w-full p-2.5 border rounded-lg font-mono text-sm bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Prompt</label>
+                        <textarea id="video-prompt" rows="2"
+                            class="w-full p-2.5 border rounded-lg">A timelapse of a seedling growing into a giant beanstalk.</textarea>
+                    </div>
+                </div>
+                <button onclick="testVideo()"
+                    class="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold shadow-sm transition-transform active:scale-[0.99]">
+                    Generate Video (Starts Long-Running Op)
+                </button>
+
+                <div id="video-status"
+                    class="hidden p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 font-mono">
+                    Status: <span id="video-state" class="font-bold">Waiting...</span>
+                </div>
+
+                <div id="video-result" class="hidden p-6 bg-gray-50 border border-gray-200 rounded-lg space-y-4">
+                    <div id="video-player-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    <pre id="video-json"
+                        class="text-xs font-mono text-gray-600 bg-white p-3 rounded border overflow-auto max-h-60"></pre>
+                </div>
+            </div>
+        </div>
+
+        <div id="global-error"
+            class="hidden p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded shadow-sm font-medium"></div>
+
+    </div>
+
+    <script>
+        const token = localStorage.getItem('harvest_token');
+
+        function switchTab(tab) {
+            ['text', 'image', 'video'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('border-b-2', 'border-blue-600', 'bg-blue-50/50', 'text-blue-600');
+                document.getElementById(`tab-${t}`).classList.add('text-gray-500');
+            });
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('border-b-2', 'border-blue-600', 'bg-blue-50/50', 'text-blue-600');
+            document.getElementById(`tab-${tab}`).classList.remove('text-gray-500');
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('global-error');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+
+        async function checkConnection() {
+            try {
+                const res = await fetch('/api/gemini/models', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                document.getElementById('connection-output').textContent = JSON.stringify(data.models.map(m => ({
+                    name: m.name,
+                    methods: m.supportedGenerationMethods
+                })), null, 2);
+
+                // Populate dropdown
+                const select = document.getElementById('model-select');
+                select.innerHTML = '<option value="" disabled selected>Select a model...</option>';
+                data.models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.name.replace('models/', '');
+                    opt.textContent = `${m.displayName} (${m.name})`;
+                    select.appendChild(opt);
+                });
+
+                document.getElementById('model-list-container').classList.remove('hidden');
+                document.getElementById('status-indicator').classList.remove('hidden');
+            } catch (e) {
+                showError(e.message);
+            }
+        }
+
+        async function testText() {
+            const btn = document.querySelector('button[onclick="testText()"]');
+            const resDiv = document.getElementById('text-result');
+
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            resDiv.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/gemini/test-generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        model: document.getElementById('text-model').value,
+                        prompt: document.getElementById('text-prompt').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                resDiv.textContent = data.text;
+                resDiv.classList.remove('hidden');
+            } catch (e) {
+                showError(e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate Text';
+            }
+        }
+
+        async function testImage() {
+            const btn = document.querySelector('button[onclick="testImage()"]');
+            const resDiv = document.getElementById('image-result');
+
+            btn.disabled = true;
+            btn.textContent = 'Generating Image... (Approx 10s)';
+            resDiv.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/gemini/generate-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        model: document.getElementById('image-model').value,
+                        prompt: document.getElementById('image-prompt').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                resDiv.innerHTML = `<img src="data:${data.mimeType};base64,${data.b64}" class="max-w-full rounded shadow-2xl border-4 border-white">`;
+                resDiv.classList.remove('hidden');
+            } catch (e) {
+                showError(e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate Image';
+            }
+        }
+
+        // Handle dropdown selection to update all model fields
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('model-select')?.addEventListener('change', (e) => {
+                const val = e.target.value;
+                document.getElementById('text-model').value = val;
+                document.getElementById('image-model').value = val;
+                document.getElementById('video-model').value = val;
+            });
+        });
+
+        async function testVideo() {
+            const btn = document.querySelector('button[onclick="testVideo()"]');
+            const statusDiv = document.getElementById('video-status');
+            const resDiv = document.getElementById('video-result');
+            const jsonPre = document.getElementById('video-json');
+
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+            statusDiv.classList.add('hidden');
+            resDiv.classList.add('hidden');
+
+            try {
+                const res = await fetch('/api/gemini/generate-video', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        model: document.getElementById('video-model').value,
+                        prompt: document.getElementById('video-prompt').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                const opName = data.operation.name;
+                statusDiv.classList.remove('hidden');
+
+                // Start polling
+                pollOperation(opName);
+
+            } catch (e) {
+                showError(e.message);
+                btn.disabled = false;
+                btn.textContent = 'Generate Video';
+            }
+        }
+
+        async function pollOperation(name) {
+            const stateSpan = document.getElementById('video-state');
+            const btn = document.querySelector('button[onclick="testVideo()"]');
+
+            let poll = setInterval(async () => {
+                try {
+                    // Refactored route uses query parameter: /api/gemini/operation?name=...
+                    const res = await fetch(`/api/gemini/operation?name=${encodeURIComponent(name)}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+
+                    if (data.done) {
+                        clearInterval(poll);
+                        stateSpan.textContent = 'DONE!';
+                        stateSpan.className = 'text-green-600 font-bold';
+
+                        document.getElementById('video-result').classList.remove('hidden');
+                        document.getElementById('video-json').textContent = JSON.stringify(data, null, 2);
+
+                        // Render Video Players
+                        const samples = data.response?.generateVideoResponse?.generatedSamples || [];
+                        const container = document.getElementById('video-player-container');
+                        container.innerHTML = samples.map(s => {
+                            const proxyUrl = `/api/gemini/proxy-media?url=${encodeURIComponent(s.video.uri)}&token=${token}`;
+                            return `
+                                <div class="space-y-2">
+                                    <video src="${proxyUrl}" controls class="w-full rounded shadow-lg border border-gray-200 bg-black"
+                                        onerror="console.error('Video Load Error:', this.error); showError('Video failed to load. Check console or backend logs.')"></video>
+                                    <div class="text-[10px] text-gray-400 break-all font-mono">${s.video.uri}</div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        btn.disabled = false;
+                        btn.textContent = 'Generate Video';
+                    } else {
+                        stateSpan.textContent = 'Processing...';
+                    }
+                } catch (e) {
+                    clearInterval(poll);
+                    showError("Polling failed: " + e.message);
+                    btn.disabled = false;
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,6 +1,412 @@
-<div class="space-y-4">
-    <div class="text-center py-12">
-        <div class="text-gray-400 text-lg mb-2">Admin Configuration View</div>
-        <div class="text-sm text-gray-500">This view will be extracted in the next phase</div>
+<!-- Header with Search and Actions -->
+<div
+    class="pt-6 pb-4 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+    <div>
+        <h2 class="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+            <div class="p-2 bg-gray-900 text-white rounded-lg shadow-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+            Site Configuration
+        </h2>
+        <p class="text-gray-500 mt-2 ml-1">Manage global settings, content, and system behaviors.</p>
+    </div>
+    <div class="flex items-center gap-3 w-full lg:w-auto flex-wrap">
+        <!-- Search Bar -->
+        <div class="relative flex-1 lg:flex-none">
+            <input type="text" id="config-search" oninput="filterConfigSettings(this.value)"
+                placeholder="Search settings..."
+                class="w-full lg:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-100 outline-none">
+            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+        <button onclick="toggleAdvancedConfig()"
+            class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-wider px-3 py-2 transition-colors">JSON
+            Editor</button>
+        <button onclick="restoreDefaults()"
+            class="text-sm font-medium text-red-600 hover:bg-red-50 px-4 py-2.5 rounded-lg transition-colors">Restore
+            Defaults</button>
+        <button onclick="saveConfigForm()"
+            class="bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-bold text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                </path>
+            </svg>
+            Save Changes
+        </button>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="border-b border-gray-200 mb-6 overflow-x-auto">
+    <nav class="flex gap-1 min-w-max">
+        <button onclick="setConfigTab('general')" id="config-tab-general"
+            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
+            ⚙️ General
+        </button>
+        <button onclick="setConfigTab('branding')" id="config-tab-branding"
+            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
+            🎨 Branding
+        </button>
+        <button onclick="setConfigTab('content')" id="config-tab-content"
+            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
+            📄 Content
+        </button>
+        <button onclick="setConfigTab('authentication')" id="config-tab-authentication"
+            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
+            🔐 Authentication
+        </button>
+        <button onclick="setConfigTab('advanced')" id="config-tab-advanced"
+            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
+            🧪 Advanced
+        </button>
+    </nav>
+</div>
+
+<!-- Tab Content Container -->
+<div id="config-tabs-container" class="space-y-6">
+
+    <!-- GENERAL TAB -->
+    <div id="config-content-general" class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Business Information -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Business
+                        Information</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Business
+                            Name</label>
+                        <input type="text" id="cfg-bus-name"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        <p class="text-xs text-gray-400 mt-1">Displayed in header and footer</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Location</label>
+                        <input type="text" id="cfg-bus-loc"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tagline</label>
+                        <input type="text" id="cfg-bus-tagline"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Contact
+                        Information</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contact
+                            Email</label>
+                        <input type="email" id="cfg-bus-email"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Phone
+                            Number</label>
+                        <input type="tel" id="cfg-bus-phone"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operating Hours -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Operating Hours
+                </h3>
+            </div>
+            <div class="p-6">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hours Text</label>
+                <input type="text" id="cfg-bus-hours"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                <p class="text-xs text-gray-400 mt-1">Example: "Mon-Fri 9am-5pm, Sat 10am-2pm"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BRANDING TAB -->
+    <div id="config-content-branding" class="hidden space-y-6">
+        <!-- Homepage Hero -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Homepage Hero</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
+                    <input type="text" id="cfg-hero-headline"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Subheadline</label>
+                    <input type="text" id="cfg-hero-subhead"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Background Image
+                        URL</label>
+                    <input type="text" id="cfg-hero-image"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Products -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Featured Products
+                </h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-500 mb-4">Select up to 6 products to feature on the homepage
+                </p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
+                            1</label>
+                        <select id="cfg-feat-1"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
+                            2</label>
+                        <select id="cfg-feat-2"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
+                            3</label>
+                        <select id="cfg-feat-3"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
+                            4</label>
+                        <select id="cfg-feat-4"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
+                            5</label>
+                        <select id="cfg-feat-5"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
+                            6</label>
+                        <select id="cfg-feat-6"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brand Voice -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Brand Voice</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Farmer Voice
+                        (Quote)</label>
+                    <textarea id="cfg-bus-voice" rows="3"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Personal message from the farmer</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Trust Signals
+                        (One per line)</label>
+                    <textarea id="cfg-bus-trust" rows="3"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-mono"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Key selling points displayed on homepage</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENT TAB -->
+    <div id="config-content-content" class="hidden space-y-6">
+        <!-- How It Works -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">How It Works
+                    Section</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Section
+                        Title</label>
+                    <input type="text" id="cfg-how-title"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Steps (One per
+                        line)</label>
+                    <textarea id="cfg-how-steps" rows="4"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Each line becomes a numbered step</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Farms -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Our Farms Section
+                </h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Section
+                        Title</label>
+                    <input type="text" id="cfg-farms-title"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Intro
+                        Text</label>
+                    <textarea id="cfg-farms-intro" rows="2"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"></textarea>
+                </div>
+                <div id="cfg-farms-list" class="space-y-2 mb-3"></div>
+                <button onclick="addFarm()"
+                    class="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors text-sm font-bold">
+                    + Add Farm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTHENTICATION TAB -->
+    <div id="config-content-authentication" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Login Page -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Login Page</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
+                        <input type="text" id="cfg-auth-login-headline"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Subheadline</label>
+                        <input type="text" id="cfg-auth-login-subhead"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hero Image
+                            URL</label>
+                        <input type="text" id="cfg-auth-login-image"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup Page -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Signup Page
+                    </h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
+                        <input type="text" id="cfg-auth-signup-headline"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Subheadline</label>
+                        <input type="text" id="cfg-auth-signup-subhead"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hero Image
+                            URL</label>
+                        <input type="text" id="cfg-auth-signup-image"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono text-sm">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADVANCED TAB -->
+    <div id="config-content-advanced" class="hidden space-y-6">
+        <!-- Experiments -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">🧪 A/B Testing
+                    Experiments</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="cfg-ab-enabled" class="rounded">
+                    <label for="cfg-ab-enabled" class="text-sm font-medium">Enable Experiments</label>
+                </div>
+                <div id="cfg-experiments-list" class="space-y-4"></div>
+                <p class="text-xs text-gray-400 italic">Experimental features for testing different
+                    configurations</p>
+            </div>
+        </div>
+
+        <!-- JSON Editor Access -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Advanced
+                    Configuration</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">For advanced users: edit the raw JSON
+                    configuration directly</p>
+                <button onclick="toggleAdvancedConfig()"
+                    class="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors font-medium">
+                    Open JSON Editor
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- JSON Editor Modal -->
+<div id="config-json-container"
+    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <h3 class="font-bold">Raw Config Editor</h3>
+            <button onclick="toggleAdvancedConfig()" class="text-gray-500 hover:text-gray-800">&times;</button>
+        </div>
+        <textarea id="config-editor"
+            class="flex-1 w-full bg-gray-900 text-green-400 font-mono text-sm p-6 resize-none outline-none"></textarea>
+        <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+            <button onclick="toggleAdvancedConfig()"
+                class="mr-3 px-4 py-2 text-gray-500 hover:bg-gray-200 rounded">Cancel</button>
+            <button onclick="saveRawConfig()"
+                class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save Raw
+                JSON</button>
+        </div>
     </div>
 </div>

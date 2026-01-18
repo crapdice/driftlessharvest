@@ -1,6 +1,11 @@
-<div class="space-y-4">
-    <div class="text-center py-12">
-        <div class="text-gray-400 text-lg mb-2">Box Templates View</div>
-        <div class="text-sm text-gray-500">This view will be extracted in the next phase</div>
+<div id="view-templates" class="space-y-4">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">Curated Box Templates</h2>
+        <button onclick="openTemplateModal()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm">Create
+            Template</button>
+    </div>
+    <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Cards injected here -->
     </div>
 </div>

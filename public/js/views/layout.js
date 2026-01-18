@@ -125,8 +125,8 @@ export function renderFooter() {
           </div>
           <div class="flex gap-4">
              <!-- Social Placeholders -->
-             <a href="#" class="w-8 h-8 rounded-full bg-nature-800 flex items-center justify-center text-nature-400 hover:bg-harvest-gold hover:text-nature-900 transition-colors">📷</a>
-             <a href="#" class="w-8 h-8 rounded-full bg-nature-800 flex items-center justify-center text-nature-400 hover:bg-harvest-gold hover:text-nature-900 transition-colors">📘</a>
+             <!--<a href="#" class="w-8 h-8 rounded-full bg-nature-800 flex items-center justify-center text-nature-400 hover:bg-harvest-gold hover:text-nature-900 transition-colors">📷</a>-->
+             <a href="https://www.facebook.com/harvestdriftless/" class="w-8 h-8 rounded-full bg-nature-800 flex items-center justify-center text-nature-400 hover:bg-harvest-gold hover:text-nature-900 transition-colors">📘</a>
           </div>
         </div>
         

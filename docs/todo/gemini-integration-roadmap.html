@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Integration Roadmap - Driftless Harvest TODO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d4a22;
+            border-bottom: 3px solid #2d4a22;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #3e3e35;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #2d4a22;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2d4a22;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .roadmap-card {
+            background: #fcfdfc;
+            border: 1px solid #e1e8e1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .badge-visual {
+            background: #e0f2f1;
+            color: #00796b;
+        }
+
+        .badge-seo {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge-content {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-intel {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to TODO Index</a>
+
+        <h1>✨ Gemini AI Integration Roadmap</h1>
+
+        <p><strong>Overview:</strong> Leveraging multimodal LLM capabilities (Text, Image, Video) to transform the admin
+            backend from a data entry tool into an intelligent farm management partner.</p>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <!-- Phase 1: Visual & Branding -->
+        <div class="roadmap-card">
+            <span class="badge badge-visual">Visual & Branding</span>
+            <h3>1. AI Photographic Suite</h3>
+            <p>Moving beyond placeholder images to professional-grade product visuals without expensive photography.</p>
+            <ul>
+                <li><strong>Background Replacement:</strong> Instantly swap out messy barn/field backgrounds for
+                    clinical "white studio" or professional "rustic kitchen" styles.</li>
+                <li><strong>Seasonal Mood Styling:</strong> Apply autumn warmth, spring freshness, or winter crispness
+                    to product images to match the current harvest season.</li>
+                <li><strong>Visual Synthesis:</strong> Generate "Serving Suggestion" images. Input a photo of raw
+                    carrots; the AI generates a beautifully plated roasted carrot side dish for the store page.</li>
+            </ul>
+        </div>
+
+        <!-- Phase 2: Search & Discovery -->
+        <div class="roadmap-card">
+            <span class="badge badge-seo">Search & Discovery</span>
+            <h3>2. Automated SEO & Metadata Engine</h3>
+            <p>Ensure every product and box is perfectly optimized for search engines and accessibility automatically.
+            </p>
+            <ul>
+                <li><strong>Semantic ALT Text:</strong> Automatically generate high-quality accessibility descriptions
+                    for every image uploaded.</li>
+                <li><strong>Smart Categorization:</strong> LLM analyzes product names and attributes to suggest optimal
+                    store categories and search tags.</li>
+                <li><strong>Schema Markup:</strong> Automatically generate JSON-LD structured data for products to
+                    enable "Rich Snippets" (price, availability) in Google Search.</li>
+            </ul>
+        </div>
+
+        <!-- Phase 3: Storytelling -->
+        <div class="roadmap-card">
+            <span class="badge badge-content">Storytelling & Engagement</span>
+            <h3>3. "The Farmer's Voice" Narrative Platform</h3>
+            <p>Automate the bridge between the field and the customer's kitchen.</p>
+            <ul>
+                <li><strong>Narrative Expansion:</strong> Admins provide raw bullet points (e.g., "rainy week," "extra
+                    sweet corn," "first frost"); the AI drafts a poetic, engaging narrative for the home page.</li>
+                <li><strong>Dynamic Recipe Cards:</strong> Analyze the contents of a seasonal box and generate a
+                    downloadable recipe card that uses the exact items in that week's delivery.</li>
+                <li><strong>Newsletter Drafting:</strong> Automatically draft the "What's in the Box" section of the
+                    Resend newsletter based on the current active Box Template.</li>
+            </ul>
+        </div>
+
+        <!-- Phase 4: Intelligence -->
+        <div class="roadmap-card">
+            <span class="badge badge-intel">Business Intelligence</span>
+            <h3>4. Admin Data Assistant</h3>
+            <p>Switch from clicking buttons to asking questions.</p>
+            <ul>
+                <li><strong>Natural Language Dashboard:</strong> Ask the admin bot: <em>"Which products performed best
+                        during the rainy weeks of June?"</em> or <em>"Suggest some items to bundle with our honey to
+                        increase average order value."</em></li>
+                <li><strong>Packaging Logic:</strong> Suggest the most efficient box size for an order based on the
+                    physical dimensions/weight of products (using LLM spatial reasoning).</li>
+                <li><strong>Sentiment Pulse:</strong> Automatically summarize customer feedback from order notes to
+                    identify trending requests or pain points.</li>
+            </ul>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h2>🚀 Implementation Strategy</h2>
+        <p>Following the <strong>/use-downstream</strong> principle, we will integrate these features into existing
+            views without bloat, using the established <code>GeminiService</code> layer.</p>
+
+        <p style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 0.9em;">
+            <strong>Created:</strong> January 17, 2026<br>
+            <strong>Status:</strong> Roadmap Defined<br>
+            <strong>Priority:</strong> Strategic
+        </p>
+    </div>
+</body>
+
+</html>

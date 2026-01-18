@@ -18,368 +18,8 @@
             }
         }
     </script>
-    <style>
-        .tab-active {
-            border-bottom: 2px solid #2563eb;
-            color: #2563eb;
-            font-weight: 600;
-        }
-
-        .tab-inactive {
-            color: #6b7280;
-        }
-
-        .tab-inactive:hover {
-            color: #111827;
-        }
-
-        /* Admin Custom Styles */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Custom Scrollbar for Sidebar (Default) */
-        .sidebar-menu::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            /* Slate 300 */
-            border-radius: 4px;
-        }
-
-        .sidebar-menu::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-            /* Slate 400 */
-        }
-
-        /* Terminal Theme Scrollbar (Black/Green) */
-        body.theme-terminal .sidebar-menu::-webkit-scrollbar-track {
-            background: #000000;
-            border-left: 1px solid #15803d;
-        }
-
-        body.theme-terminal .sidebar-menu::-webkit-scrollbar-thumb {
-            background: #000000;
-            /* As requested: Black */
-            border: 1px solid #22c55e;
-            /* Green border to define it */
-        }
-
-        body.theme-terminal .sidebar-menu::-webkit-scrollbar-thumb:hover {
-            background: #22c55e;
-            color: #000000;
-        }
-
-
-
-        /* Toast Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .toast {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        /* Minimal Theme Overrides (Linear/Vercel Style) */
-        body.theme-minimal {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-            background-color: #ffffff !important;
-        }
-
-        /* Minimal: Layout & Borders */
-        body.theme-minimal .shadow-sm,
-        body.theme-minimal .shadow-md,
-        body.theme-minimal .shadow-lg,
-        body.theme-minimal .shadow-xl,
-        body.theme-minimal .shadow-2xl {
-            box-shadow: none !important;
-            border: 1px solid #e5e7eb !important;
-        }
-
-        body.theme-minimal .rounded-xl,
-        body.theme-minimal .rounded-lg,
-        body.theme-minimal .rounded-2xl {
-            border-radius: 6px !important;
-        }
-
-        /* Minimal: Navbar (White with Border) */
-        body.theme-minimal nav {
-            background-color: #ffffff !important;
-            border-bottom: 1px solid #e5e7eb !important;
-        }
-
-        body.theme-minimal nav .text-white {
-            color: #111827 !important;
-        }
-
-        body.theme-minimal nav .bg-gray-800 {
-            background-color: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            color: #111827 !important;
-        }
-
-        /* Minimal: Buttons (Solid Black Primary) */
-        body.theme-minimal .bg-gradient-to-r,
-        body.theme-minimal .bg-blue-600 {
-            background: #111827 !important;
-            border: 1px solid #111827 !important;
-            color: #ffffff !important;
-            box-shadow: none !important;
-        }
-
-        /* Minimal: Ghost/Secondary Buttons */
-        body.theme-minimal .bg-white {
-            /* Keep white but ensure border */
-            border-color: #e5e7eb !important;
-        }
-
-        /* Minimal: Hide non-essential colorful elements */
-        body.theme-minimal .from-green-500 {
-            background: #111827 !important;
-            /* Logo becomes black */
-            color: white !important;
-        }
-
-        body.theme-minimal .text-green-500 {
-            color: #111827 !important;
-            /* Text accents become black */
-        }
-
-        /* Terminal Theme Overrides (Retro Linux) */
-        body.theme-terminal {
-            font-family: 'Courier New', Courier, monospace !important;
-            background-color: #0c0c0c !important;
-            color: #22c55e !important;
-        }
-
-        /* Terminal: All Text Green */
-        body.theme-terminal .text-gray-500,
-        body.theme-terminal .text-gray-900,
-        body.theme-terminal .text-gray-400,
-        body.theme-terminal .text-white,
-        body.theme-terminal h1,
-        body.theme-terminal h2,
-        body.theme-terminal h3,
-        body.theme-terminal span,
-        body.theme-terminal div,
-        body.theme-terminal input,
-        body.theme-terminal select {
-            color: #22c55e !important;
-        }
-
-        /* Terminal: Containers & Elements (Strict Black) */
-        body.theme-terminal .bg-white,
-        body.theme-terminal .bg-gray-50,
-        body.theme-terminal .bg-gray-100,
-        body.theme-terminal .bg-gray-200,
-        body.theme-terminal .bg-gray-800,
-        body.theme-terminal .bg-gray-900,
-        body.theme-terminal .bg-blue-50,
-        body.theme-terminal .bg-green-50,
-        body.theme-terminal .bg-amber-50,
-        body.theme-terminal .bg-red-50,
-        body.theme-terminal nav,
-        body.theme-terminal .modal-content,
-        body.theme-terminal table,
-        body.theme-terminal thead,
-        body.theme-terminal tbody,
-        body.theme-terminal tr,
-        body.theme-terminal td,
-        body.theme-terminal th {
-            background-color: #000000 !important;
-            border-color: #22c55e !important;
-            box-shadow: none !important;
-        }
-
-        /* Terminal: Ensure Borders exist where shadows used to be */
-        body.theme-terminal .shadow-sm,
-        body.theme-terminal .shadow-md,
-        body.theme-terminal .shadow-lg,
-        body.theme-terminal .rounded-xl,
-        body.theme-terminal .rounded-lg {
-            border: 1px solid #22c55e !important;
-        }
-
-        /* Terminal: Pills & Badges specifically */
-        body.theme-terminal [class*="bg-"] {
-            background-color: #000000 !important;
-            border: 1px solid #22c55e !important;
-            color: #22c55e !important;
-        }
-
-        /* Terminal: Images (Grayscale + Green tint? Optional, but let's keep it simple first) */
-        /* body.theme-terminal img { filter: grayscale(100%) sepia(100%) hue-rotate(90deg) saturate(300%); } */
-
-        /* Terminal: Sharp Corners */
-
-        /* Terminal: Sharp Corners */
-        body.theme-terminal * {
-            border-radius: 0px !important;
-        }
-
-        /* Terminal: Interactive Elements */
-        body.theme-terminal button {
-            background-color: #000000 !important;
-            border: 1px solid #22c55e !important;
-            color: #22c55e !important;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        body.theme-terminal button:hover {
-            background-color: #22c55e !important;
-            color: #000000 !important;
-        }
-
-        /* Terminal: Inputs */
-        body.theme-terminal input,
-        body.theme-terminal select,
-        body.theme-terminal textarea {
-            background-color: #0c0c0c !important;
-            border: 1px solid #15803d !important;
-            color: #22c55e !important;
-        }
-
-        /* Fix Date Picker Icon in Terminal Mode */
-        body.theme-terminal input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            /* Invert to make it white/variable, then sepia/hue-rotate to green if we want, but invert is enough for visibility
-    */
-            cursor: pointer;
-        }
-
-        body.theme-terminal input:focus,
-        body.theme-terminal select:focus {
-            outline: 2px solid #22c55e !important;
-            border-color: #22c55e !important;
-        }
-
-        /* Terminal: Force ALL SVG Icons to Green */
-        body.theme-terminal svg,
-        body.theme-terminal svg path {
-            stroke: #22c55e !important;
-            /* fill: #22c55e !important; Be careful with fill, some icons use none */
-        }
-
-        /* Terminal: Force all text colors to green overrides */
-        body.theme-terminal .text-gray-400,
-        body.theme-terminal .text-gray-500,
-        body.theme-terminal .text-gray-600,
-        body.theme-terminal .text-gray-700,
-        body.theme-terminal .text-gray-800,
-        body.theme-terminal .text-gray-900,
-        body.theme-terminal .text-blue-600,
-        body.theme-terminal .text-blue-800,
-        body.theme-terminal .text-red-600,
-        body.theme-terminal .text-amber-600,
-        body.theme-terminal .text-yellow-400 {
-            color: #22c55e !important;
-        }
-
-        /* Terminal: Borders for Everything */
-        body.theme-terminal .border,
-        body.theme-terminal .border-b,
-        body.theme-terminal .border-t,
-        body.theme-terminal .border-gray-100,
-        body.theme-terminal .border-gray-200,
-        body.theme-terminal .border-gray-300 {
-            border-color: #15803d !important;
-            /* Darker green for structural borders */
-        }
-
-        /* 🚜 JOHN DEERE THEME OVERRIDES 🚜 */
-        body.theme-johndeere {
-            background-color: #f4f6f0 !important;
-            /* Off-white crop background */
-            color: #367C2B !important;
-            /* JD Green */
-        }
-
-        /* Navbar: JD Green with Yellow Accent */
-        body.theme-johndeere nav {
-            background-color: #367C2B !important;
-            border-bottom: 4px solid #FFDE00 !important;
-            color: #FFDE00 !important;
-        }
-
-        body.theme-johndeere nav .text-white,
-        body.theme-johndeere nav .text-gray-200,
-        body.theme-johndeere nav .text-gray-400,
-        body.theme-johndeere nav svg {
-            color: #FFDE00 !important;
-            stroke: #FFDE00 !important;
-        }
-
-        /* Text Colors */
-        body.theme-johndeere h1,
-        body.theme-johndeere h2,
-        body.theme-johndeere h3,
-        body.theme-johndeere h4,
-        body.theme-johndeere strong,
-        body.theme-johndeere b,
-        body.theme-johndeere .text-gray-900,
-        body.theme-johndeere .text-gray-800,
-        body.theme-johndeere .text-gray-700 {
-            color: #367C2B !important;
-        }
-
-        /* Structural Borders: JD Green */
-        body.theme-johndeere .border,
-        body.theme-johndeere .border-b,
-        body.theme-johndeere .border-t {
-            border-color: #367C2B !important;
-        }
-
-        /* Cards: White with Green Border + Yellow Shadow */
-        body.theme-johndeere .bg-white,
-        body.theme-johndeere .modal-content {
-            border: 2px solid #367C2B !important;
-            box-shadow: 4px 4px 0px #FFDE00 !important;
-            /* Retro Pop Shadow */
-        }
-
-        /* Buttons: JD Yellow */
-        body.theme-johndeere button.bg-blue-600,
-        body.theme-johndeere button.bg-gray-900 {
-            background-color: #FFDE00 !important;
-            color: #111111 !important;
-            /* Black text on yellow for legibility */
-            border: 2px solid #367C2B !important;
-            font-weight: 800 !important;
-            text-transform: uppercase !important;
-            box-shadow: 2px 2px 0px #367C2B !important;
-        }
-
-        body.theme-johndeere button:hover {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0px #367C2B !important;
-        }
-
-        /* Pills & Badges */
-        body.theme-johndeere .bg-blue-50,
-        body.theme-johndeere .bg-green-50,
-        body.theme-johndeere .bg-amber-50 {
-            background-color: #367C2B !important;
-            color: #FFDE00 !important;
-            border: 1px solid #FFDE00 !important;
-        }
-    </style>
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
 </head>
 
 <body
@@ -693,47 +333,11 @@
                 </div>
             </div>
 
-            <!-- CUSTOMERS VIEW -->
+            <!-- CUSTOMERS/USER MANAGEMENT VIEW -->
             <div id="view-customers" class="hidden space-y-4">
-                <div
-                    class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800" id="customers-view-title">Customers</h2>
-                        <p class="text-sm text-gray-500">Manage customer accounts and roles.</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="relative">
-                            <span
-                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
-                            <input type="text" placeholder="Search users..." id="search-users-input" autocomplete="nop"
-                                oninput="window.searchUsers(this.value)" readonly
-                                onfocus="this.removeAttribute('readonly');"
-                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                        </div>
-                        <button onclick="openUserModal()" id="btn-add-user"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-all hidden">
-                            + Add User
-                        </button>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Orders</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Address
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customers-table-body" class="divide-y divide-gray-100"></tbody>
-                    </table>
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading User Management...</span>
                 </div>
             </div>
 
@@ -788,36 +392,9 @@
 
             <!-- ARCHIVED PRODUCTS VIEW -->
             <div id="view-archived" class="hidden space-y-6">
-                <div
-                    class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Archived Products</h2>
-                        <p class="text-sm text-gray-500">Restore or permanently delete items. (Stock is 0)</p>
-                    </div>
-                    <button onclick="loadArchivedProducts()"
-                        class="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 border border-blue-100 rounded-lg hover:bg-blue-50 transition-colors">Refresh</button>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">Img
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Farm ID
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="archived-products-table-body" class="divide-y divide-gray-100"></tbody>
-                    </table>
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Archived Items...</span>
                 </div>
             </div>
 
@@ -892,430 +469,13 @@
 
             <!-- SETTINGS/CONFIG VIEW (Refactored with Tabs) -->
             <div id="view-settings" class="hidden pb-32 w-full max-w-7xl mx-auto">
-
-                <!-- Header with Search and Actions -->
-                <div
-                    class="pt-6 pb-4 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-                    <div>
-                        <h2 class="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-                            <div class="p-2 bg-gray-900 text-white rounded-lg shadow-sm">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                            </div>
-                            Site Configuration
-                        </h2>
-                        <p class="text-gray-500 mt-2 ml-1">Manage global settings, content, and system behaviors.</p>
-                    </div>
-                    <div class="flex items-center gap-3 w-full lg:w-auto flex-wrap">
-                        <!-- Search Bar -->
-                        <div class="relative flex-1 lg:flex-none">
-                            <input type="text" id="config-search" oninput="filterConfigSettings(this.value)"
-                                placeholder="Search settings..."
-                                class="w-full lg:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-100 outline-none">
-                            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </div>
-                        <button onclick="toggleAdvancedConfig()"
-                            class="text-xs font-bold text-gray-400 hover:text-blue-600 uppercase tracking-wider px-3 py-2 transition-colors">JSON
-                            Editor</button>
-                        <button onclick="restoreDefaults()"
-                            class="text-sm font-medium text-red-600 hover:bg-red-50 px-4 py-2.5 rounded-lg transition-colors">Restore
-                            Defaults</button>
-                        <button onclick="saveConfigForm()"
-                            class="bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2 font-bold text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
-                                </path>
-                            </svg>
-                            Save Changes
-                        </button>
-                    </div>
+                <!-- Settings content loaded dynamically from views/settings.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Configuration...</span>
                 </div>
-
-                <!-- Tab Navigation -->
-                <div class="border-b border-gray-200 mb-6 overflow-x-auto">
-                    <nav class="flex gap-1 min-w-max">
-                        <button onclick="setConfigTab('general')" id="config-tab-general"
-                            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
-                            ⚙️ General
-                        </button>
-                        <button onclick="setConfigTab('branding')" id="config-tab-branding"
-                            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
-                            🎨 Branding
-                        </button>
-                        <button onclick="setConfigTab('content')" id="config-tab-content"
-                            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
-                            📄 Content
-                        </button>
-                        <button onclick="setConfigTab('authentication')" id="config-tab-authentication"
-                            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
-                            🔐 Authentication
-                        </button>
-                        <button onclick="setConfigTab('advanced')" id="config-tab-advanced"
-                            class="config-tab px-6 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-300 transition-colors whitespace-nowrap">
-                            🧪 Advanced
-                        </button>
-                    </nav>
-                </div>
-
-                <!-- Tab Content Container -->
-                <div id="config-tabs-container" class="space-y-6">
-
-                    <!-- GENERAL TAB -->
-                    <div id="config-content-general" class="space-y-6">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Business Information -->
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Business
-                                        Information</h3>
-                                </div>
-                                <div class="p-6 space-y-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Business
-                                            Name</label>
-                                        <input type="text" id="cfg-bus-name"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                        <p class="text-xs text-gray-400 mt-1">Displayed in header and footer</p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase mb-1">Location</label>
-                                        <input type="text" id="cfg-bus-loc"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase mb-1">Tagline</label>
-                                        <input type="text" id="cfg-bus-tagline"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Contact Information -->
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Contact
-                                        Information</h3>
-                                </div>
-                                <div class="p-6 space-y-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contact
-                                            Email</label>
-                                        <input type="email" id="cfg-bus-email"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Phone
-                                            Number</label>
-                                        <input type="tel" id="cfg-bus-phone"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Operating Hours -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Operating Hours
-                                </h3>
-                            </div>
-                            <div class="p-6">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hours Text</label>
-                                <input type="text" id="cfg-bus-hours"
-                                    class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                <p class="text-xs text-gray-400 mt-1">Example: "Mon-Fri 9am-5pm, Sat 10am-2pm"</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BRANDING TAB -->
-                    <div id="config-content-branding" class="hidden space-y-6">
-                        <!-- Homepage Hero -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Homepage Hero</h3>
-                            </div>
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
-                                    <input type="text" id="cfg-hero-headline"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase mb-1">Subheadline</label>
-                                    <input type="text" id="cfg-hero-subhead"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Background Image
-                                        URL</label>
-                                    <input type="text" id="cfg-hero-image"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono text-sm">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Featured Products -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Featured Products
-                                </h3>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-sm text-gray-500 mb-4">Select up to 6 products to feature on the homepage
-                                </p>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
-                                            1</label>
-                                        <select id="cfg-feat-1"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
-                                            2</label>
-                                        <select id="cfg-feat-2"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
-                                            3</label>
-                                        <select id="cfg-feat-3"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
-                                            4</label>
-                                        <select id="cfg-feat-4"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
-                                            5</label>
-                                        <select id="cfg-feat-5"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Slot
-                                            6</label>
-                                        <select id="cfg-feat-6"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none"></select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Brand Voice -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Brand Voice</h3>
-                            </div>
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Farmer Voice
-                                        (Quote)</label>
-                                    <textarea id="cfg-bus-voice" rows="3"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"></textarea>
-                                    <p class="text-xs text-gray-400 mt-1">Personal message from the farmer</p>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Trust Signals
-                                        (One per line)</label>
-                                    <textarea id="cfg-bus-trust" rows="3"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-mono"></textarea>
-                                    <p class="text-xs text-gray-400 mt-1">Key selling points displayed on homepage</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CONTENT TAB -->
-                    <div id="config-content-content" class="hidden space-y-6">
-                        <!-- How It Works -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">How It Works
-                                    Section</h3>
-                            </div>
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Section
-                                        Title</label>
-                                    <input type="text" id="cfg-how-title"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Steps (One per
-                                        line)</label>
-                                    <textarea id="cfg-how-steps" rows="4"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"></textarea>
-                                    <p class="text-xs text-gray-400 mt-1">Each line becomes a numbered step</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Our Farms -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Our Farms Section
-                                </h3>
-                            </div>
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Section
-                                        Title</label>
-                                    <input type="text" id="cfg-farms-title"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Intro
-                                        Text</label>
-                                    <textarea id="cfg-farms-intro" rows="2"
-                                        class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all"></textarea>
-                                </div>
-                                <div id="cfg-farms-list" class="space-y-2 mb-3"></div>
-                                <button onclick="addFarm()"
-                                    class="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors text-sm font-bold">
-                                    + Add Farm
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AUTHENTICATION TAB -->
-                    <div id="config-content-authentication" class="hidden space-y-6">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Login Page -->
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Login Page</h3>
-                                </div>
-                                <div class="p-6 space-y-4">
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
-                                        <input type="text" id="cfg-auth-login-headline"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase mb-1">Subheadline</label>
-                                        <input type="text" id="cfg-auth-login-subhead"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hero Image
-                                            URL</label>
-                                        <input type="text" id="cfg-auth-login-image"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono text-sm">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Signup Page -->
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                    <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Signup Page
-                                    </h3>
-                                </div>
-                                <div class="p-6 space-y-4">
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
-                                        <input type="text" id="cfg-auth-signup-headline"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase mb-1">Subheadline</label>
-                                        <input type="text" id="cfg-auth-signup-subhead"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hero Image
-                                            URL</label>
-                                        <input type="text" id="cfg-auth-signup-image"
-                                            class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono text-sm">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ADVANCED TAB -->
-                    <div id="config-content-advanced" class="hidden space-y-6">
-                        <!-- Experiments -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">🧪 A/B Testing
-                                    Experiments</h3>
-                            </div>
-                            <div class="p-6 space-y-4">
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox" id="cfg-ab-enabled" class="rounded">
-                                    <label for="cfg-ab-enabled" class="text-sm font-medium">Enable Experiments</label>
-                                </div>
-                                <div id="cfg-experiments-list" class="space-y-4"></div>
-                                <p class="text-xs text-gray-400 italic">Experimental features for testing different
-                                    configurations</p>
-                            </div>
-                        </div>
-
-                        <!-- JSON Editor Access -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider">Advanced
-                                    Configuration</h3>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-sm text-gray-600 mb-4">For advanced users: edit the raw JSON
-                                    configuration directly</p>
-                                <button onclick="toggleAdvancedConfig()"
-                                    class="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors font-medium">
-                                    Open JSON Editor
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- JSON Editor Modal -->
-                <div id="config-json-container"
-                    class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
-                    <div
-                        class="bg-white w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-                        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                            <h3 class="font-bold">Raw Config Editor</h3>
-                            <button onclick="toggleAdvancedConfig()"
-                                class="text-gray-500 hover:text-gray-800">&times;</button>
-                        </div>
-                        <textarea id="config-editor"
-                            class="flex-1 w-full bg-gray-900 text-green-400 font-mono text-sm p-6 resize-none outline-none"></textarea>
-                        <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
-                            <button onclick="toggleAdvancedConfig()"
-                                class="mr-3 px-4 py-2 text-gray-500 hover:bg-gray-200 rounded">Cancel</button>
-                            <button onclick="saveRawConfig()"
-                                class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">Save Raw
-                                JSON</button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
             <!-- ADMIN UTILITIES VIEW -->
             <div id="view-utilities" class="hidden space-y-6">
                 <!-- Content loaded dynamically from views/utilities.html -->
@@ -1327,277 +487,112 @@
 
             <!-- LAYOUT EDITOR VIEW -->
             <div id="view-layouts" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-gray-800">Page Layout Editor</h2>
-                    <div class="text-sm text-gray-500">Drag to reorder home page sections</div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Canvas -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 class="font-bold text-gray-700 mb-4">Home Page Order</h3>
-                        <ul id="layout-list" class="space-y-3">
-                            <!-- Draggable Items Injected Here -->
-                            <li class="text-gray-400 italic">Loading layout...</li>
-                        </ul>
-                        <div class="mt-6 flex justify-end">
-                            <button onclick="saveLayout()"
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
-                                Save Layout
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Instructions / Preview -->
-                    <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
-                        <h3 class="font-bold text-gray-700">How it works</h3>
-                        <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections on
-                            the home page.</p>
-                        <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
-                            <li><strong>Hero</strong>: The main welcome banner.</li>
-                            <li><strong>Featured Products</strong>: The row of 3 highlighted items.</li>
-                            <li><strong>Trust Signals</strong>: The 4-column selling points.</li>
-                            <li><strong>Narrative</strong>: The "Farmer Voice" quote section.</li>
-                        </ul>
-                        <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-100">
-                            <strong>Note:</strong> Changes apply immediately after saving.
-                        </div>
-                    </div>
+                <!-- Layout content loaded dynamically from views/layouts.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Layout Editor...</span>
                 </div>
             </div>
 
             <!-- ANALYTICS VIEW -->
             <div id="view-analytics" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Analytics Dashboard</h2>
-                        <p class="text-sm text-gray-500">Track visitor behavior and conversion metrics</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <select id="analytics-date-range" onchange="loadAnalytics()"
-                            class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="7">Last 7 Days</option>
-                            <option value="30" selected>Last 30 Days</option>
-                            <option value="90">Last 90 Days</option>
-                        </select>
-                        <button onclick="loadAnalytics()"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
-                            Refresh
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Overview Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-sm text-gray-500">Total Visits</div>
-                            <span class="text-2xl">📊</span>
-                        </div>
-                        <div id="stat-total-visits" class="text-3xl font-bold text-gray-900">-</div>
-                        <div id="stat-visits-change" class="text-xs text-gray-500 mt-1">Loading...</div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-sm text-gray-500">Unique Visitors</div>
-                            <span class="text-2xl">👥</span>
-                        </div>
-                        <div id="stat-unique-visitors" class="text-3xl font-bold text-gray-900">-</div>
-                        <div id="stat-unique-change" class="text-xs text-gray-500 mt-1">Loading...</div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-sm text-gray-500">Conversion Rate</div>
-                            <span class="text-2xl">🎯</span>
-                        </div>
-                        <div id="stat-conversion-rate" class="text-3xl font-bold text-green-600">-</div>
-                        <div id="stat-conversion-change" class="text-xs text-gray-500 mt-1">Loading...</div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="text-sm text-gray-500">Mobile Traffic</div>
-                            <span class="text-2xl">📱</span>
-                        </div>
-                        <div id="stat-mobile-percentage" class="text-3xl font-bold text-blue-600">-</div>
-                        <div class="text-xs text-gray-500 mt-1">of all visitors</div>
-                    </div>
-                </div>
-
-                <!-- Traffic Sources & Device Breakdown -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Traffic Sources -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Traffic Sources</h3>
-                        <div id="traffic-sources-chart" class="space-y-3">
-                            <div class="text-center text-gray-400 py-8">Loading...</div>
-                        </div>
-                    </div>
-
-                    <!-- Device Types -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Device Breakdown</h3>
-                        <div id="device-chart" class="space-y-3">
-                            <div class="text-center text-gray-400 py-8">Loading...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- New vs Returning & Conversion Funnel -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- New vs Returning -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">New vs Returning Visitors</h3>
-                        <div id="visitor-type-chart" class="space-y-3">
-                            <div class="text-center text-gray-400 py-8">Loading...</div>
-                        </div>
-                    </div>
-
-                    <!-- Conversion Funnel -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Conversion Funnel</h3>
-                        <div id="conversion-funnel" class="space-y-3">
-                            <div class="text-center text-gray-400 py-8">Loading...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Visitors -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Visitors</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        IP Address</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        User Agent</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Page</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-visitors-table" class="divide-y divide-gray-100">
-                                <tr>
-                                    <td colspan="4" class="px-4 py-8 text-center text-gray-400">Loading...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Analytics content loaded dynamically from views/analytics.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Initializing Analytics Dashboard...</span>
                 </div>
             </div>
 
             <!-- API KEYS VIEW -->
             <div id="view-api-keys" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">API Keys Management</h2>
-                        <p class="text-sm text-gray-500 mt-1">Manage third-party service API keys</p>
-                    </div>
-                </div>
-
-                <!-- Warning Banner -->
-                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                        <div>
-                            <h3 class="text-sm font-semibold text-amber-800">Security Notice</h3>
-                            <p class="text-sm text-amber-700 mt-1">API keys are stored in the configuration file. In
-                                future versions, these will be moved to environment variables for enhanced security.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resend API Key -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                📧 Resend API Key
-                            </h3>
-                            <p class="text-sm text-gray-500 mt-1">Used for sending transactional emails (order
-                                confirmations, delivery notifications)</p>
-                        </div>
-                        <a href="https://resend.com/api-keys" target="_blank"
-                            class="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                            Get API Key
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
-                                </path>
-                            </svg>
-                        </a>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
-                            <div class="relative">
-                                <input type="password" id="resend-api-key"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-                                    placeholder="re_xxxxxxxxxxxxxxxxxxxx">
-                                <button type="button" onclick="toggleApiKeyVisibility('resend-api-key')"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">Starts with "re_" • Keep this secret</p>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <button onclick="saveApiKeys()"
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
-                                Save API Key
-                            </button>
-                            <button onclick="testResendConnection()"
-                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
-                                Test Connection
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Future API Keys (Placeholder) -->
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 border-dashed">
-                    <h3 class="text-lg font-bold text-gray-700 mb-2">Future Integrations</h3>
-                    <p class="text-sm text-gray-500 mb-4">Additional API keys will be added here as new services are
-                        integrated:</p>
-                    <ul class="text-sm text-gray-600 space-y-2">
-                        <li class="flex items-center gap-2">
-                            <span class="text-gray-400">○</span> SMS Provider (Twilio, etc.)
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-gray-400">○</span> Payment Gateway (Stripe - already configured)
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-gray-400">○</span> Shipping/Logistics APIs
-                        </li>
-                    </ul>
+                <!-- API Keys content loaded dynamically from views/api-keys.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Initializing API Management...</span>
                 </div>
             </div>
 
         </main>
     </div>
 
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 space-y-4 z-50"></div>
+
+
+
+    <!-- USER MODAL -->
+    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800" id="u-modal-title">Edit Customer</h3>
+                <button onclick="closeUserModal()"
+                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="u-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="u-email"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <!-- Password (New User) -->
+                <div id="u-password-container" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="u-password" placeholder="Required for new user"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select id="u-role"
+                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                        <option value="user">User (Member)</option>
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" id="u-phone" oninput="handleAdminPhoneInput(this)"
+                            placeholder="(555) 555-5555"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                        <input type="text" id="u-address"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <input type="text" id="u-city"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input type="text" id="u-state" maxlength="2" placeholder="WI" list="us-states-admin"
+                            oninput="this.value = this.value.toUpperCase()"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Zip</label>
+                        <input type="text" id="u-zip"
+                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <button onclick="closeUserModal()"
+                    class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+                <button onclick="saveUser()"
+                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm transition-all">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="product-modals-container"></div>
     <!-- TEMPLATE MODAL -->
     <!-- TEMPLATE MODAL -->
     <div id="template-modal"
@@ -1693,15 +688,36 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Template Name</label>
-                                    <input type="text" id="t-name"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
-                                        placeholder="e.g. Soup Starter">
+                                    <div class="relative">
+                                        <input type="text" id="t-name"
+                                            class="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                            placeholder="e.g. Soup Starter">
+                                        <button onclick="generateContent('t-name', 'box_name')"
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600 transition-colors p-1 rounded-full hover:bg-purple-50"
+                                            title="Generate Name">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-                                    <input type="text" id="t-desc"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
+                                        Description
+                                        <button onclick="generateContent('t-desc', 'box_description')"
+                                            class="text-xs text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1 hover:underline">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            </svg>
+                                            Generate
+                                        </button>
+                                    </label>
+                                    <textarea id="t-desc" rows="2"
                                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder-gray-400"
-                                        placeholder="Brief description...">
+                                        placeholder="Brief description..."></textarea>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Display Price</label>
@@ -1799,82 +815,6 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed bottom-6 right-6 space-y-4 z-50"></div>
-
-
-
-    <!-- USER MODAL -->
-    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-gray-800" id="u-modal-title">Edit Customer</h3>
-                <button onclick="closeUserModal()"
-                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-            </div>
-            <div class="p-6 space-y-4">
-                <input type="hidden" id="u-id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="u-email"
-                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <!-- Password (New User) -->
-                <div id="u-password-container" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="u-password" placeholder="Required for new user"
-                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                    <select id="u-role"
-                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
-                        <option value="user">User (Member)</option>
-                        <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="tel" id="u-phone" oninput="handleAdminPhoneInput(this)"
-                            placeholder="(555) 555-5555"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                        <input type="text" id="u-address"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                        <input type="text" id="u-city"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                        <input type="text" id="u-state" maxlength="2" placeholder="WI" list="us-states-admin"
-                            oninput="this.value = this.value.toUpperCase()"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none uppercase">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Zip</label>
-                        <input type="text" id="u-zip"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                </div>
-            </div>
-            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <button onclick="closeUserModal()"
-                    class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
-                <button onclick="saveUser()"
-                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm transition-all">Save
-                    Changes</button>
-            </div>
-        </div>
-    </div>
-
-
     <!-- SCHEDULE/ORDER DETAILS MODAL -->
     <div id="product-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -1961,9 +901,20 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Product Name</label>
-                                <input type="text" id="p-name"
-                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
-                                    placeholder="e.g. Honeycrisp Apples">
+                                <div class="relative">
+                                    <input type="text" id="p-name"
+                                        class="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                        placeholder="e.g. Honeycrisp Apples">
+                                    <button onclick="generateContent('p-name', 'product_name')"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 transition-colors p-1 rounded-full hover:bg-blue-50"
+                                        title="Generate Name">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -2331,80 +1282,8 @@
         <option value="WI">
         <option value="WY">
     </datalist>
-    <!-- COMPONENT EDITOR MODAL -->
-    <div id="comp-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <div>
-                    <h3 class="font-bold text-gray-800" id="cm-title">Edit Component</h3>
-                    <p class="text-xs text-gray-500" id="cm-subtitle">Customize content & style</p>
-                </div>
-                <button onclick="closeComponentModal()"
-                    class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-            </div>
-
-            <div class="p-6 overflow-y-auto flex-1 space-y-6" id="cm-body">
-                <!-- TABS -->
-                <div class="flex space-x-1 border-b border-gray-200 mb-4" id="cm-tabs">
-                    <button onclick="setCompTab('content')" id="tab-comp-content"
-                        class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">Content</button>
-                    <button onclick="setCompTab('style')" id="tab-comp-style"
-                        class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Style</button>
-                    <button onclick="setCompTab('featured')" id="tab-comp-featured"
-                        class="hidden px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Products</button>
-                </div>
-
-                <!-- CONTENT TAB -->
-                <div id="view-comp-content" class="space-y-4">
-                    <!-- Dynamic Inputs Injected Here -->
-                </div>
-
-                <!-- STYLE TAB -->
-                <div id="view-comp-style" class="hidden space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Vertical Spacing (Padding)</label>
-                        <select id="cm-style-padding"
-                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                            <option value="py-8">Compact (py-8)</option>
-                            <option value="py-16">Standard (py-16)</option>
-                            <option value="py-20">Spacious (py-20)</option>
-                            <option value="py-24">Extra Large (py-24)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
-                        <select id="cm-style-bg" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                            <option value="bg-white">White</option>
-                            <option value="bg-paper">Paper (Off-White)</option>
-                            <option value="bg-stone">Stone (Light Grey)</option>
-                            <option value="bg-gray-50">Subtle Grey</option>
-                            <option value="bg-kale text-white">Kale Green (Dark)</option>
-                            <option value="bg-loam text-white">Loam Brown (Dark)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- FEATURED TAB -->
-                <div id="view-comp-featured" class="hidden space-y-4">
-                    <p class="text-sm text-gray-500 mb-4">Select up to 3 items to highlight.</p>
-                    <div class="space-y-3">
-                        <select id="cm-feat-1" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
-                        <select id="cm-feat-2" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
-                        <select id="cm-feat-3" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                <button onclick="closeComponentModal()"
-                    class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg text-sm">Cancel</button>
-                <button onclick="saveComponentContent()"
-                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 text-sm">Save
-                    Changes</button>
-            </div>
-        </div>
-    </div>
+    <!-- LAYOUT MODALS CONTAINER -->
+    <div id="layout-modals-container"></div>
 
     <!-- CART DETAIL MODAL -->
     <div id="cart-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
@@ -2465,106 +1344,6 @@
         </div>
     </div>
 
-    <!-- USER EDIT/CREATE MODAL -->
-    <div id="user-modal" style="display: none;" class="fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
-            <!-- Header -->
-            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-gray-900" id="u-modal-title">Edit User</h3>
-                <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Body - Two Column Grid -->
-            <div class="p-6">
-                <input type="hidden" id="u-id">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Left Column: Account Info -->
-                    <div class="space-y-4">
-                        <h4 class="font-semibold text-gray-700 text-sm uppercase tracking-wide border-b pb-2">Account
-                        </h4>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                            <input type="email" id="u-email" required
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input type="tel" id="u-phone" oninput="handleAdminPhoneInput(this)"
-                                placeholder="(555) 555-5555"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                            <select id="u-role"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                                <option value="super_admin">Super Admin</option>
-                            </select>
-                        </div>
-
-                        <div id="u-password-container">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                            <input type="password" id="u-password"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Address Info -->
-                    <div class="space-y-4">
-                        <h4 class="font-semibold text-gray-700 text-sm uppercase tracking-wide border-b pb-2">Address
-                        </h4>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Street</label>
-                            <input type="text" id="u-address"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                <input type="text" id="u-city"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                                <input type="text" id="u-state" maxlength="2"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">ZIP</label>
-                            <input type="text" id="u-zip"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
-                <button onclick="closeUserModal()"
-                    class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors">
-                    Cancel
-                </button>
-                <button onclick="saveUser()"
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                    Save User
-                </button>
-            </div>
-        </div>
-    </div>
 
 
     <!-- LOGIN MODAL -->
@@ -2758,346 +1537,170 @@
 
     <!-- Analytics Functions -->
     <script>
-        async function loadAnalytics() {
-            const dateRange = document.getElementById('analytics-date-range')?.value || 30;
-            const token = localStorage.getItem('harvest_token');
 
-            try {
-                const response = await fetch(`/api/admin/analytics/overview?days=${dateRange}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch analytics');
-                }
-
-                const data = await response.json();
-
-                // Update overview cards
-                document.getElementById('stat-total-visits').textContent = data.overview?.totalVisits?.toLocaleString() || '0';
-                document.getElementById('stat-unique-visitors').textContent = data.overview?.uniqueVisitors?.toLocaleString() || '0';
-                document.getElementById('stat-conversion-rate').textContent = `${data.overview?.conversionRate || 0}%`;
-                document.getElementById('stat-mobile-percentage').textContent = `${data.overview?.mobilePercentage || 0}%`;
-
-                // Update change indicators (currently no historical data tracked)
-                document.getElementById('stat-visits-change').textContent = 'No historical data';
-                document.getElementById('stat-unique-change').textContent = 'No historical data';
-                document.getElementById('stat-conversion-change').textContent = 'No historical data';
-
-                // Render charts
-                renderTrafficSources(data.trafficSources || []);
-                renderDeviceBreakdown(data.devices || []);
-                renderVisitorTypes(data.visitorTypes || { new: 0, returning: 0 });
-                renderConversionFunnel(data.conversionFunnel || {});
-
-                // Load recent visitors
-                loadRecentVisitors();
-
-            } catch (error) {
-                console.error('[Analytics] Error loading data:', error);
-                // Show placeholder message
-                document.getElementById('stat-total-visits').textContent = 'N/A';
-                document.getElementById('stat-unique-visitors').textContent = 'N/A';
-                document.getElementById('stat-conversion-rate').textContent = 'N/A';
-                document.getElementById('stat-mobile-percentage').textContent = 'N/A';
-
-                document.getElementById('stat-visits-change').textContent = 'Analytics API not yet configured';
-                document.getElementById('stat-unique-change').textContent = '';
-                document.getElementById('stat-conversion-change').textContent = '';
-            }
-        }
-
-        function renderTrafficSources(sources) {
-            const container = document.getElementById('traffic-sources-chart');
-            if (!container) return;
-
-            if (!sources || sources.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-400 py-8">No data available</div>';
-                return;
-            }
-
-            const total = sources.reduce((sum, s) => sum + s.count, 0);
-
-            container.innerHTML = sources.map(source => {
-                const percentage = total > 0 ? ((source.count / total) * 100).toFixed(1) : 0;
-                return `
-                    <div class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-3 flex-1">
-                            <div class="w-24 text-sm font-medium text-gray-700 capitalize">${source.name}</div>
-                            <div class="flex-1 bg-gray-100 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
-                            </div>
-                        </div>
-                        <div class="text-sm font-semibold text-gray-900 ml-4 w-16 text-right">${percentage}%</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderDeviceBreakdown(devices) {
-            const container = document.getElementById('device-chart');
-            if (!container) return;
-
-            if (!devices || devices.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-400 py-8">No data available</div>';
-                return;
-            }
-
-            const total = devices.reduce((sum, d) => sum + d.count, 0);
-            const icons = { desktop: '🖥️', mobile: '📱', tablet: '📱' };
-
-            container.innerHTML = devices.map(device => {
-                const percentage = total > 0 ? ((device.count / total) * 100).toFixed(1) : 0;
-                return `
-                    <div class="flex items-center justify-between py-2">
-                        <div class="flex items-center gap-3 flex-1">
-                            <span class="text-xl">${icons[device.type] || '💻'}</span>
-                            <div class="w-20 text-sm font-medium text-gray-700 capitalize">${device.type}</div>
-                            <div class="flex-1 bg-gray-100 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: ${percentage}%"></div>
-                            </div>
-                        </div>
-                        <div class="text-sm font-semibold text-gray-900 ml-4 w-16 text-right">${percentage}%</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderVisitorTypes(visitorTypes) {
-            const container = document.getElementById('visitor-type-chart');
-            if (!container) return;
-
-            const total = visitorTypes.new + visitorTypes.returning;
-            const newPercentage = total > 0 ? ((visitorTypes.new / total) * 100).toFixed(1) : 0;
-            const returningPercentage = total > 0 ? ((visitorTypes.returning / total) * 100).toFixed(1) : 0;
-
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 flex-1">
-                            <span class="text-xl">🆕</span>
-                            <div class="w-24 text-sm font-medium text-gray-700">New</div>
-                            <div class="flex-1 bg-gray-100 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${newPercentage}%"></div>
-                            </div>
-                        </div>
-                        <div class="text-sm font-semibold text-gray-900 ml-4 w-20 text-right">${newPercentage}%</div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 flex-1">
-                            <span class="text-xl">🔄</span>
-                            <div class="w-24 text-sm font-medium text-gray-700">Returning</div>
-                            <div class="flex-1 bg-gray-100 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: ${returningPercentage}%"></div>
-                            </div>
-                        </div>
-                        <div class="text-sm font-semibold text-gray-900 ml-4 w-20 text-right">${returningPercentage}%</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderConversionFunnel(funnel) {
-            const container = document.getElementById('conversion-funnel');
-            if (!container) return;
-
-            const steps = [
-                { name: 'Visits', count: funnel.visits || 0, icon: '👁️' },
-                { name: 'Product Views', count: funnel.productViews || 0, icon: '🍎' },
-                { name: 'Add to Cart', count: funnel.addToCart || 0, icon: '🛒' },
-                { name: 'Checkout', count: funnel.checkout || 0, icon: '💳' },
-                { name: 'Purchase', count: funnel.purchase || 0, icon: '✅' }
-            ];
-
-            const maxCount = steps[0].count || 1;
-
-            container.innerHTML = steps.map((step, index) => {
-                const percentage = maxCount > 0 ? ((step.count / maxCount) * 100).toFixed(1) : 0;
-                const dropoff = index > 0 ? steps[index - 1].count - step.count : 0;
-
-                return `
-                    <div class="mb-3">
-                        <div class="flex items-center justify-between mb-1">
-                            <div class="flex items-center gap-2">
-                                <span>${step.icon}</span>
-                                <span class="text-sm font-medium text-gray-700">${step.name}</span>
-                            </div>
-                            <div class="text-sm font-semibold text-gray-900">${step.count.toLocaleString()} (${percentage}%)</div>
-                        </div>
-                        <div class="bg-gray-100 rounded-full h-3">
-                            <div class="bg-gradient-to-r from-blue-600 to-green-600 h-3 rounded-full transition-all" style="width: ${percentage}%"></div>
-                        </div>
-                        ${dropoff > 0 ? `<div class="text-xs text-red-600 mt-1">↓ ${dropoff.toLocaleString()} dropped off</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function loadRecentVisitors() {
-            const token = localStorage.getItem('harvest_token');
-            const tbody = document.getElementById('recent-visitors-table');
-
-            try {
-                const response = await fetch('/api/admin/analytics/recent-visitors', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch recent visitors');
-                }
-
-                const data = await response.json();
-                const visitors = data.visitors || [];
-
-                if (visitors.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">No visitors yet</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = visitors.map(visitor => {
-                    const date = new Date(visitor.created_at);
-                    const timeAgo = getTimeAgo(date);
-                    const userAgent = visitor.user_agent || 'Unknown';
-                    const shortUA = userAgent.length > 60 ? userAgent.substring(0, 60) + '...' : userAgent;
-                    const page = visitor.page_url || '/';
-                    const ip = visitor.ip_address || 'Unknown';
-
-                    return `
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-700 font-mono text-xs">${ip}</td>
-                            <td class="px-4 py-3 text-gray-600 text-xs" title="${userAgent}">${shortUA}</td>
-                            <td class="px-4 py-3 text-gray-700 text-xs">${page}</td>
-                            <td class="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">${timeAgo}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-            } catch (error) {
-                console.error('[Analytics] Error loading recent visitors:', error);
-                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-red-500">Failed to load visitors</td></tr>';
-            }
-        }
-
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-
-            if (seconds < 60) return 'Just now';
-            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-            if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-
-            return date.toLocaleDateString();
-        }
-
-        // Make globally available
-        window.loadAnalytics = loadAnalytics;
     </script>
 
     <!-- API Keys Management Functions -->
     <script>
-        async function loadApiKeys() {
-            try {
-                const response = await fetch('/api/config', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-                });
 
-                if (!response.ok) throw new Error('Failed to load config');
 
-                const config = await response.json();
+    </script>
 
-                // Load Resend API key if it exists
-                if (config.apiKeys?.resend) {
-                    document.getElementById('resend-api-key').value = config.apiKeys.resend;
-                }
-            } catch (error) {
-                console.error('[API Keys] Error loading:', error);
-            }
-        }
+    <script>
+        // ... existing loadApiKeys ...
+    </script>
 
-        async function saveApiKeys() {
-            const resendKey = document.getElementById('resend-api-key').value.trim();
+    <!-- Gemini Generation Script -->
+    <script>
+        async function generateContent(targetId, type) {
+            const input = document.getElementById(targetId);
+            if (!input) return;
 
-            if (!resendKey) {
-                showToast('Please enter a Resend API key', 'error');
-                return;
-            }
-
-            if (!resendKey.startsWith('re_')) {
-                showToast('Invalid Resend API key format (should start with "re_")', 'error');
-                return;
-            }
+            // Show loading state
+            const originalPlaceholder = input.placeholder;
+            const originalValue = input.value;
+            input.value = '';
+            input.placeholder = '✨ Generative Magic in progress...';
+            input.disabled = true;
+            document.body.style.cursor = 'wait';
 
             try {
-                const response = await fetch('/api/config', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-                });
+                // Gather context
+                let prompt = '';
+                let context = '';
 
-                if (!response.ok) throw new Error('Failed to load config');
-
-                const config = await response.json();
-
-                // Add or update apiKeys section
-                if (!config.apiKeys) {
-                    config.apiKeys = {};
+                if (type === 'product_name') {
+                    const category = document.getElementById('p-category')?.value || 'General';
+                    context = `Product Category: ${category}`;
+                    prompt = `Generate 3 creative, appetizing, and short names for a local food product.`;
+                } else if (type === 'box_name') {
+                    prompt = `Generate 3 creative and catchy names for a local food subscription box.`;
+                } else if (type === 'box_description') {
+                    const boxName = document.getElementById('t-name')?.value || 'this box';
+                    context = `Box Name: ${boxName}`;
+                    prompt = `Write a short, appetizing, and inviting description (max 2 sentences) for a food subscription box.`;
                 }
-                config.apiKeys.resend = resendKey;
 
-                // Save updated config
-                const saveResponse = await fetch('/api/config', {
+                // Call API
+                const response = await fetch('/api/gemini/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
                     },
-                    body: JSON.stringify(config)
+                    body: JSON.stringify({
+                        prompt,
+                        context: `${context}. Current Input/Keywords: "${originalValue}"`
+                    })
                 });
 
-                if (!saveResponse.ok) throw new Error('Failed to save config');
+                if (!response.ok) {
+                    let errorMessage = 'Failed to generate content';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        // Fallback if not JSON
+                        errorMessage = `Error ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
 
-                showToast('API key saved successfully!', 'success');
+                const data = await response.json();
+                const text = data.text;
+
+                if (!text) throw new Error('No text generated');
+
+                // Handle result based on type
+                if (type === 'box_description') {
+                    // For description, just fill it (maybe prompt confirm if not empty?)
+                    input.value = text.trim();
+                } else {
+                    // For names, we expect a list. Let's try to parse if it's a numbered list
+                    // or just show the raw text if it's not.
+                    // Ideally we ask Gemini for JSON, but let's stick to text for now and just show it.
+                    // Simple interaction: Update the input with the first option, or show a simple choice.
+
+                    // Let's clean up the text a bit (remove newlines, etc if it's a single line)
+                    // If multiple lines, assume options.
+                    const lines = text.split('\n').filter(line => line.trim().length > 0);
+
+                    if (lines.length > 1) {
+                        // Create a simple custom modal for choices
+                        showChoiceModal(input, lines);
+                    } else {
+                        input.value = text.replace(/["*]/g, '').trim();
+                    }
+                }
+
             } catch (error) {
-                console.error('[API Keys] Error saving:', error);
-                showToast('Failed to save API key', 'error');
+                console.error('Generation Error:', error);
+                showToast('Failed to generate content. Please check your API key.', 'error');
+                input.value = originalValue;
+            } finally {
+                input.placeholder = originalPlaceholder;
+                input.disabled = false;
+                document.body.style.cursor = 'default';
+                if (input.value === '') input.value = originalValue; // Restore if empty (error case)
             }
         }
 
-        function toggleApiKeyVisibility(inputId) {
+        function showChoiceModal(inputElement, choices) {
+            // Remove existing choice modal if any
+            const existing = document.getElementById('gemini-choice-modal');
+            if (existing) existing.remove();
+
+            const modal = document.createElement('div');
+            modal.id = 'gemini-choice-modal';
+            modal.className = 'fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm';
+
+            let choicesHtml = choices.map(choice => {
+                const cleanChoice = choice.replace(/^\d+[\.|)]\s*/, '').replace(/["*]/g, '').trim();
+                return `
+                    <button onclick="applyChoice('${inputElement.id}', '${cleanChoice.replace(/'/g, "\\'")}')" 
+                        class="w-full text-left px-4 py-3 hover:bg-purple-50 hover:text-purple-700 transition-colors border-b border-gray-100 last:border-0 font-medium">
+                        ${cleanChoice}
+                    </button>
+                `;
+            }).join('');
+
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up transform transition-all">
+                    <div class="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 flex justify-between items-center text-white">
+                        <h3 class="font-bold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z"></path></svg>
+                            Choose an Option
+                        </h3>
+                        <button onclick="document.getElementById('gemini-choice-modal').remove()" class="hover:bg-white/20 rounded-full p-1 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="max-h-[60vh] overflow-y-auto">
+                        ${choicesHtml}
+                    </div>
+                    <div class="bg-gray-50 px-6 py-3 text-xs text-gray-500 text-center">
+                        AI Generated Content
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        window.applyChoice = function (inputId, value) {
             const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-            } else {
-                input.type = 'password';
+            if (input) {
+                input.value = value;
+                // Trigger input event to update any listeners (like slug generators)
+                input.dispatchEvent(new Event('input', { bubbles: true }));
             }
-        }
-
-        async function testResendConnection() {
-            const resendKey = document.getElementById('resend-api-key').value.trim();
-
-            if (!resendKey) {
-                showToast('Please enter a Resend API key first', 'error');
-                return;
-            }
-
-            showToast('Testing connection...', 'info');
-
-            // TODO: Implement actual test endpoint on backend
-            // For now, just validate the format
-            if (resendKey.startsWith('re_') && resendKey.length > 20) {
-                setTimeout(() => {
-                    showToast('API key format is valid! (Full test coming soon)', 'success');
-                }, 1000);
-            } else {
-                showToast('Invalid API key format', 'error');
-            }
-        }
+            const modal = document.getElementById('gemini-choice-modal');
+            if (modal) modal.remove();
+        };
 
         // Make globally available
-        window.loadApiKeys = loadApiKeys;
-        window.saveApiKeys = saveApiKeys;
-        window.toggleApiKeyVisibility = toggleApiKeyVisibility;
-        window.testResendConnection = testResendConnection;
+        window.generateContent = generateContent;
     </script>
-
 </body>
 
 </html>

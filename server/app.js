@@ -55,6 +55,13 @@ app.use('/api', generalRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api', require('./routes/utilities.routes'));
 app.use('/api', require('./routes/analytics.routes'));
+app.use('/api', require('./routes/gemini.routes'));
+
+
+// 404 Handler for API
+app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'API Endpoint Not Found' });
+});
 
 
 // Global Error Handler

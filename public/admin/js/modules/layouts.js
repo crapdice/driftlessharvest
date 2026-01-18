@@ -9,6 +9,39 @@ let currentCompId = null;
 let layoutHistory = [];
 let historyPosition = -1;
 
+const MODAL_PATH = 'views/layout-modals.html';
+const VIEW_PATH = 'views/layouts.html';
+
+export async function initLayouts() {
+    const container = document.getElementById('view-layouts');
+    if (!container) return;
+
+    // 1. Load Modals if needed
+    const modalContainer = document.getElementById('layout-modals-container');
+    if (modalContainer && modalContainer.innerHTML.trim() === '') {
+        try {
+            const res = await fetch(MODAL_PATH);
+            modalContainer.innerHTML = await res.text();
+        } catch (e) { console.error("Failed to load layout modals", e); }
+    }
+
+    // 2. Load View if needed
+    if (container.children.length <= 1 || container.querySelector('.animate-spin')) {
+        try {
+            const response = await fetch(VIEW_PATH);
+            if (!response.ok) throw new Error('Failed to load layouts view');
+            const html = await response.text();
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error initializing layouts:', error);
+            showToast('Failed to load Layout Editor', 'error');
+        }
+    }
+
+    // 3. Load actual layout data
+    await loadLayouts();
+}
+
 function saveToHistory(action) {
     // Remove any future states if we're not at the end
     layoutHistory = layoutHistory.slice(0, historyPosition + 1);

@@ -492,10 +492,58 @@ window.filterConfigSettings = (query) => {
     });
 };
 
-// Initialize - set General tab as active on load
-document.addEventListener('DOMContentLoaded', () => {
-    // Only run if we're on the settings view
-    if (document.getElementById('config-tab-general')) {
-        setConfigTab('general');
+export async function initSettings() {
+    const container = document.getElementById('view-settings');
+    if (!container) return;
+
+    try {
+        const response = await fetch('views/settings.html');
+        if (!response.ok) throw new Error('Failed to load settings view');
+        const html = await response.text();
+        container.innerHTML = html;
+
+        // Load data and populate form
+        await loadSettings();
+
+        // Initialize default tab
+        if (window.setConfigTab) {
+            window.setConfigTab('general');
+        }
+
+    } catch (error) {
+        console.error('Error initializing settings:', error);
+        container.innerHTML = `<div class="p-8 text-red-500">Error loading settings: ${error.message}</div>`;
     }
-});
+}
+
+export async function saveRawConfig() {
+    const editor = document.getElementById('config-editor');
+    if (!editor) return;
+
+    try {
+        const data = JSON.parse(editor.value);
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch('/api/config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            showToast("Raw JSON Saved");
+            currentConfig = data;
+            populateForm(data); // Refresh the UI form
+            window.toggleAdvancedConfig(); // Close editor
+        } else {
+            showToast("Failed to save raw JSON", "error");
+        }
+    } catch (e) {
+        showToast("Invalid JSON format", "error");
+    }
+}
+
+// Export to window for inline HTML handlers
+window.saveRawConfig = saveRawConfig;

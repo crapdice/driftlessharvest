@@ -1,0 +1,381 @@
+<!-- PRODUCT MODAL -->
+<div id="product-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <h3 class="text-xl font-bold text-gray-800" id="p-modal-title">Edit Product</h3>
+            <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <!-- Content -->
+        <div class="p-8 overflow-y-auto bg-gray-50/50 flex-1">
+            <input type="hidden" id="p-id">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- LEFT COLUMN: Image & Status -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Image Preview -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Product
+                            Image</label>
+
+                        <div
+                            class="aspect-square rounded-lg bg-gray-100 mb-4 overflow-hidden relative border border-gray-100 group">
+                            <img id="p-preview-img" src="/images/placeholder.jpg" class="w-full h-full object-cover"
+                                onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                            <div
+                                class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <input type="text" id="p-image"
+                                oninput="document.getElementById('p-preview-img').src = this.value || '/images/placeholder.jpg'"
+                                class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                placeholder="Image URL...">
+                        </div>
+                    </div>
+
+                    <!-- Visibility -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <label
+                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Visibility</label>
+                        <label
+                            class="flex items-start gap-3 p-3 border border-blue-100 bg-blue-50/30 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                            <input type="checkbox" id="p-active" class="mt-1 accent-blue-600 w-4 h-4">
+                            <div>
+                                <span class="block text-sm font-bold text-gray-900">Active in Store</span>
+                                <span class="block text-xs text-gray-500 mt-0.5">Product is visible to
+                                    customers.</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Farm ID Card -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Farm
+                            ID</label>
+                        <input type="text" id="p-farm-id" maxlength="100"
+                            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+                            placeholder="e.g. FARM-001">
+                        <p class="text-xs text-gray-400 mt-1.5">Optional. Used for tracking.</p>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Details -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Main Info -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                        <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
+                        </h4>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Product Name</label>
+                            <div class="relative">
+                                <input type="text" id="p-name"
+                                    class="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                    placeholder="e.g. Honeycrisp Apples">
+                                <button onclick="generateContent('p-name', 'product_name')"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 transition-colors p-1 rounded-full hover:bg-purple-50"
+                                    title="Generate Name">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+                                <div class="relative">
+                                    <select id="p-category"
+                                        class="w-full appearance-none px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-700 cursor-pointer">
+                                        <!-- Populated JS -->
+                                    </select>
+                                    <div class="absolute right-3 top-3 pointer-events-none text-gray-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory & Pricing -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                        <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Inventory &
+                            Pricing</h4>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Price</label>
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold">
+                                        $</div>
+                                    <input type="number" id="p-price" step="0.01"
+                                        class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-medium">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Stock Level</label>
+                                <input type="number" id="p-stock"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            </div>
+                            <div class="col-span-1 sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Tags</label>
+                                <input type="text" id="p-tags" placeholder="e.g. lb, organic, fresh"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                <p class="text-xs text-gray-400 mt-1">Comma separated values.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+            <button onclick="closeProductModal()"
+                class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+            <button onclick="saveProduct()"
+                class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm transition-all">Save
+                Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- TEMPLATE MODAL -->
+<div id="template-modal"
+    class="hidden fixed inset-0 bg-gray-900/60 z-50 items-center justify-center backdrop-blur-sm transition-all pb-10">
+    <div
+        class="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden ring-1 ring-black/5 m-4">
+
+        <!-- Header -->
+        <div class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+            <div>
+                <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <span class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                    </span>
+                    <span id="tmpl-modal-title">Create Template</span>
+                </h3>
+                <p class="text-sm text-gray-500 ml-11 mt-0.5">Define curated box contents and pricing.</p>
+            </div>
+            <button onclick="closeTemplateModal()"
+                class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-8 overflow-y-auto bg-gray-50/50 flex-1">
+            <input type="hidden" id="t-id">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- LEFT COLUMN: Image & Status -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Image Preview -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Box
+                            Image</label>
+
+                        <div
+                            class="aspect-square rounded-lg bg-gray-100 mb-4 overflow-hidden relative border border-gray-100 group">
+                            <img id="t-preview-img" src="/images/placeholder.jpg" class="w-full h-full object-cover"
+                                onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                            <div
+                                class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <input type="text" id="t-image"
+                                oninput="document.getElementById('t-preview-img').src = this.value || '/images/placeholder.jpg'"
+                                class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                placeholder="Image URL...">
+                        </div>
+                    </div>
+
+                    <!-- Visibility -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <label
+                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Visibility</label>
+                        <label
+                            class="flex items-start gap-3 p-3 border border-blue-100 bg-blue-50/30 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                            <input type="checkbox" id="t-active" class="mt-1 accent-blue-600 w-4 h-4">
+                            <div>
+                                <span class="block text-sm font-bold text-gray-900">Active in Store</span>
+                                <span class="block text-xs text-gray-500 mt-0.5">Template is visible to
+                                    customers.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Details & Builder -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Basic Information -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                        <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
+                        </h4>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Template Name</label>
+                                <div class="relative">
+                                    <input type="text" id="t-name"
+                                        class="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                        placeholder="e.g. Soup Starter">
+                                    <button onclick="generateContent('t-name', 'box_name')"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600 transition-colors p-1 rounded-full hover:bg-purple-50"
+                                        title="Generate Name">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
+                                    Description
+                                    <button onclick="generateContent('t-desc', 'box_description')"
+                                        class="text-xs text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1 hover:underline">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                        Generate
+                                    </button>
+                                </label>
+                                <textarea id="t-desc" rows="2"
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder-gray-400"
+                                    placeholder="Brief description..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Display Price</label>
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold">
+                                        $</div>
+                                    <input type="number" id="t-price" step="0.01"
+                                        class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-medium">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Builder -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <h4 class="font-bold text-gray-800 text-sm">Box Contents</h4>
+                            <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Add items to configure
+                                bundle</span>
+                        </div>
+
+                        <!-- Add Bar -->
+                        <div class="flex gap-2 p-1 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="relative flex-1">
+                                <input type="hidden" id="t-product-select">
+                                <button onclick="window.toggleProductDropdown()" id="dropdown-trigger"
+                                    class="w-full text-left px-3 py-2 text-sm bg-white border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-100 outline-none flex items-center justify-between transition-shadow hover:bg-gray-50">
+                                    <span id="dropdown-label" class="text-gray-500 truncate mr-2">Select
+                                        Product...</span>
+                                    <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div id="dropdown-options"
+                                    class="hidden absolute top-full left-0 w-[400px] mt-1 bg-white border border-gray-100 rounded-lg shadow-xl max-h-80 overflow-y-auto z-50 divide-y divide-gray-50">
+                                    <!-- Options injected by JS -->
+                                </div>
+                            </div>
+                            <div class="w-px bg-gray-300 my-1"></div>
+                            <input type="number" id="t-qty-input" value="1" min="1"
+                                class="w-20 bg-transparent border-0 px-3 py-2 text-sm text-center focus:ring-0 outline-none font-mono"
+                                placeholder="Qty">
+                            <button onclick="addTemplateItem()"
+                                class="bg-gray-900 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-black shadow-sm transition-all m-1">Add</button>
+                        </div>
+
+                        <!-- List -->
+                        <div class="border border-gray-200 rounded-xl overflow-hidden min-h-[120px] bg-gray-50/30">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase">
+                                    <tr>
+                                        <th class="px-4 py-2 font-semibold">Image</th>
+                                        <th class="px-4 py-2 font-semibold w-full">Product Name</th>
+                                        <th class="px-4 py-2 font-semibold text-center">Qty</th>
+                                        <th class="px-4 py-2 font-semibold text-left">ID</th>
+                                        <th class="px-4 py-2 font-semibold text-left">Farm ID</th>
+                                        <th class="px-4 py-2 font-semibold text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="t-items-list" class="divide-y divide-gray-100 bg-white">
+                                    <!-- Dynamic Items -->
+                                </tbody>
+                            </table>
+                            <p id="t-empty-msg"
+                                class="text-center text-gray-400 text-sm py-8 italic flex flex-col items-center gap-2">
+                                <svg class="w-8 h-8 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                No items added yet
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-8 py-5 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 z-10">
+            <button onclick="closeTemplateModal()"
+                class="px-5 py-2.5 rounded-lg text-gray-600 hover:text-gray-800 hover:bg-white border border-transparent hover:border-gray-200 transition-all font-medium text-sm">Cancel</button>
+            <button onclick="saveTemplate()"
+                class="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all shadow-md hover:shadow-lg text-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Save Template
+            </button>
+        </div>
+    </div>
+</div>

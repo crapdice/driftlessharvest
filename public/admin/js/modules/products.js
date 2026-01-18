@@ -812,6 +812,26 @@ function renderProductDropdownOptions() {
     `).join('');
 }
 
+// View Initializers
+export async function initArchived() {
+    const container = document.getElementById('view-archived');
+    if (!container) return;
+    try {
+        const response = await fetch('views/archived.html');
+        if (!response.ok) throw new Error('Failed to load archived view');
+        container.innerHTML = await response.text();
+        await loadArchivedProducts();
+    } catch (e) { console.error('Error loading archived view:', e); }
+}
+
+// Global exposure for HTML bindings
+window.loadArchivedProducts = loadArchivedProducts;
+window.restoreProduct = restoreProduct;
+window.permanentDeleteProduct = permanentDeleteProduct;
+window.archiveProduct = archiveProduct;
+window.editProduct = editProduct;
+window.toggleProductStatus = toggleProductStatus;
+
 window.toggleProductDropdown = () => {
     const opts = document.getElementById('dropdown-options');
     if (opts) opts.classList.toggle('hidden');

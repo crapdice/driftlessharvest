@@ -1,0 +1,72 @@
+<!-- COMPONENT EDITOR MODAL -->
+<div id="comp-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <div>
+                <h3 class="font-bold text-gray-800" id="cm-title">Edit Component</h3>
+                <p class="text-xs text-gray-500" id="cm-subtitle">Customize content & style</p>
+            </div>
+            <button onclick="closeComponentModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 space-y-6" id="cm-body">
+            <!-- TABS -->
+            <div class="flex space-x-1 border-b border-gray-200 mb-4" id="cm-tabs">
+                <button onclick="setCompTab('content')" id="tab-comp-content"
+                    class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">Content</button>
+                <button onclick="setCompTab('style')" id="tab-comp-style"
+                    class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Style</button>
+                <button onclick="setCompTab('featured')" id="tab-comp-featured"
+                    class="hidden px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Products</button>
+            </div>
+
+            <!-- CONTENT TAB -->
+            <div id="view-comp-content" class="space-y-4">
+                <!-- Dynamic Inputs Injected Here -->
+            </div>
+
+            <!-- STYLE TAB -->
+            <div id="view-comp-style" class="hidden space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vertical Spacing (Padding)</label>
+                    <select id="cm-style-padding" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                        <option value="py-8">Compact (py-8)</option>
+                        <option value="py-16">Standard (py-16)</option>
+                        <option value="py-20">Spacious (py-20)</option>
+                        <option value="py-24">Extra Large (py-24)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Background Color</label>
+                    <select id="cm-style-bg" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                        <option value="bg-white">White</option>
+                        <option value="bg-paper">Paper (Off-White)</option>
+                        <option value="bg-stone">Stone (Light Grey)</option>
+                        <option value="bg-gray-50">Subtle Grey</option>
+                        <option value="bg-kale text-white">Kale Green (Dark)</option>
+                        <option value="bg-loam text-white">Loam Brown (Dark)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- FEATURED TAB -->
+            <div id="view-comp-featured" class="hidden space-y-4">
+                <p class="text-sm text-gray-500 mb-4">Select up to 3 items to highlight.</p>
+                <div class="space-y-3">
+                    <select id="cm-feat-1" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
+                    <select id="cm-feat-2" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
+                    <select id="cm-feat-3" class="w-full border border-gray-200 rounded px-2 py-2 text-sm"></select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+            <button onclick="closeComponentModal()"
+                class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg text-sm">Cancel</button>
+            <button onclick="saveComponentContent()"
+                class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 text-sm">Save
+                Changes</button>
+        </div>
+    </div>
+</div>

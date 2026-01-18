@@ -1,6 +1,37 @@
-<div class="space-y-4">
-    <div class="text-center py-12">
-        <div class="text-gray-400 text-lg mb-2">Page Layout Editor View</div>
-        <div class="text-sm text-gray-500">This view will be extracted in the next phase</div>
+<div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">Page Layout Editor</h2>
+    <div class="text-sm text-gray-500">Drag to reorder home page sections</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Canvas -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="font-bold text-gray-700 mb-4">Home Page Order</h3>
+        <ul id="layout-list" class="space-y-3">
+            <!-- Draggable Items Injected Here -->
+            <li class="text-gray-400 italic">Loading layout...</li>
+        </ul>
+        <div class="mt-6 flex justify-end">
+            <button onclick="saveLayout()"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
+                Save Layout
+            </button>
+        </div>
+    </div>
+
+    <!-- Instructions / Preview -->
+    <div class="bg-gray-50 rounded-xl border border-gray-200 p-6 space-y-4">
+        <h3 class="font-bold text-gray-700">How it works</h3>
+        <p class="text-gray-600 text-sm">Drag the cards on the left to change the order of sections on
+            the home page.</p>
+        <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+            <li><strong>Hero</strong>: The main welcome banner.</li>
+            <li><strong>Featured Products</strong>: The row of 3 highlighted items.</li>
+            <li><strong>Trust Signals</strong>: The 4-column selling points.</li>
+            <li><strong>Narrative</strong>: The "Farmer Voice" quote section.</li>
+        </ul>
+        <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-100">
+            <strong>Note:</strong> Changes apply immediately after saving.
+        </div>
     </div>
 </div>
