@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmers Documentation | Driftless Harvest</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Merriweather:wght@700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2d5a27;
+            --primary-light: #4c7e45;
+            --accent: #d4a373;
+            --bg: #f8f9fa;
+            --text: #1a1a1a;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-light);
+        }
+
+        .card h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .card .meta {
+            font-size: 0.8rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            background: #eee;
+        }
+
+        .status-ready {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-empty {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Farmers Documentation</h1>
+            <p class="subtitle">Operational and Strategic Planning for Viroqua Intensive Market Gardens</p>
+        </header>
+
+        <div class="grid">
+            <a href="Intensive-Market-Garden-Plan.html" class="card">
+                <h2>Strategic Plan</h2>
+                <p>A comprehensive 0.5-acre strategic plan focusing on biointensive methods, season extension, and
+                    profitability in Viroqua, WI.</p>
+                <div class="meta">
+                    <span>HTML Document</span>
+                    <span class="status-badge status-ready">Ready</span>
+                </div>
+            </a>
+
+            <a href="farming-plan.html" class="card">
+                <h2>Interactive Planner</h2>
+                <p>Interactive garden planner with bubble charts for crop intelligence, labor management tools, and
+                    business model visualizations.</p>
+                <div class="meta">
+                    <span>HTML App</span>
+                    <span class="status-badge status-ready">Ready</span>
+                </div>
+            </a>
+
+            <a href="detailed-plan.html" class="card">
+                <h2>Technical Design</h2>
+                <p>Deep-dive into the technical design and operational management of high-density market gardens.</p>
+                <div class="meta">
+                    <span>Pending Content</span>
+                    <span class="status-badge status-empty">Draft</span>
+                </div>
+            </a>
+
+            <a href="technical.html" class="card">
+                <h2>Technical Reference</h2>
+                <p>Reference documentation for technical specifications, infrastructure requirements, and soil
+                    management data.</p>
+                <div class="meta">
+                    <span>Technical Spec</span>
+                    <span class="status-badge status-empty">Draft</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>Driftless Harvest | Viroqua, Wisconsin</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

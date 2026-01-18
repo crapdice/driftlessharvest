@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viroqua Intensive Market Garden Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Custom Font Setup */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfbf7;
+            color: #3d405b;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Merriweather', serif;
+        }
+
+        /* Chart Container Styling - MANDATORY & STRICT */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #fdfbf7;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+
+        /* Garden Bed Grid Styling */
+        .bed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 4px;
+        }
+
+        .garden-bed {
+            aspect-ratio: 4/1;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .garden-bed:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .garden-bed.active {
+            ring: 2px solid #3d405b;
+            transform: scale(1.05);
+        }
+
+        /* Utility Classes for Dynamic Content */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <!-- Chosen Palette: Earth & Efficiency -->
+    <!-- Palette Name: Warm Neutrals with Organic Accents -->
+    <!-- Colors: Background #fdfbf7 (Off-white), Text #3d405b (Dark Slate), Primary #81b29a (Sage Green), Secondary #e07a5f (Terra Cotta), Accent #f2cc8f (Sand) -->
+
+    <!-- Application Structure Plan: 
+         1. Header/Nav: Quick context setting and navigation between 3 core modules.
+         2. Module 1: System Design (The Farm Layout). Interactive visualization of biointensive beds showing rotation. Rationale: Users need to see how 0.5 acres is physically organized.
+         3. Module 2: Crop Intelligence. Data-heavy section comparing crops by revenue/effort. Rationale: Helps decision making on what to plant for max profit.
+         4. Module 3: Business Model. Financials, Labor, and Market channels. Rationale: The "Business" side of the farm.
+         5. Interaction Flow: Users explore the physical layout -> analyze crops -> review financial viability.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Garden Layout: HTML Grid. Goal: Organize. Shows bed structure (NO SVG). Interaction: Click bed to see crop rotation.
+         2. Revenue/SqFt: Chart.js Bar. Goal: Compare. visualizes the "profitability" objective.
+         3. Labor Load: Chart.js Stacked Bar. Goal: Change/Manage. Shows hours per month to ensure 2-3 part-time staff is sufficient.
+         4. Market Mix: Chart.js Doughnut. Goal: Inform. Shows revenue distribution by channel.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+</head>
+
+<body class="antialiased selection:bg-orange-200 selection:text-orange-900">
+
+    <!-- Navigation / Header -->
+    <nav class="sticky top-0 z-50 bg-[#fdfbf7]/95 backdrop-blur border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">🌱</span>
+                    <h1 class="text-xl font-bold text-[#3d405b] tracking-tight">Viroqua <span
+                            class="text-[#81b29a]">Market Garden</span></h1>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <button onclick="switchTab('system')"
+                        class="nav-btn text-[#3d405b] hover:text-[#e07a5f] font-medium transition-colors"
+                        data-tab="system">System Design</button>
+                    <button onclick="switchTab('crops')"
+                        class="nav-btn text-[#5f6c7b] hover:text-[#e07a5f] font-medium transition-colors"
+                        data-tab="crops">Crop Intelligence</button>
+                    <button onclick="switchTab('business')"
+                        class="nav-btn text-[#5f6c7b] hover:text-[#e07a5f] font-medium transition-colors"
+                        data-tab="business">Business Model</button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
+                    class="md:hidden text-[#3d405b]">
+                    <span class="text-2xl">☰</span>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="switchTab('system')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-stone-100">System
+                    Design</button>
+                <button onclick="switchTab('crops')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-stone-100">Crop
+                    Intelligence</button>
+                <button onclick="switchTab('business')"
+                    class="block w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-stone-100">Business
+                    Model</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+
+        <!-- Context Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#81b29a]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Location</p>
+                <p class="text-lg font-bold text-[#3d405b]">Viroqua, WI</p>
+                <p class="text-xs text-gray-500">Zone 5b/6a</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#e07a5f]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Scale</p>
+                <p class="text-lg font-bold text-[#3d405b]">0.5 Acres</p>
+                <p class="text-xs text-gray-500">Intensive Beds</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#f2cc8f]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Team</p>
+                <p class="text-lg font-bold text-[#3d405b]">2-3 Part-Time</p>
+                <p class="text-xs text-gray-500">~60-80 hrs/wk peak</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#3d405b]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Target Revenue</p>
+                <p class="text-lg font-bold text-[#3d405b]">$60k - $80k</p>
+                <p class="text-xs text-gray-500">Gross Sales</p>
+            </div>
+        </div>
+
+        <!-- TAB 1: SYSTEM DESIGN -->
+        <div id="system" class="tab-content fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left: Explanation -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#3d405b] mb-3">Biointensive Layout</h2>
+                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+                            To maximize output on 0.5 acres in Viroqua, we utilize a standardized <strong>permanent bed
+                                system</strong>. This minimizes soil compaction and standardizes equipment.
+                        </p>
+                        <ul class="space-y-3 text-sm text-gray-700">
+                            <li class="flex items-start"><span class="mr-2 text-[#81b29a]">✓</span> <strong>30"
+                                    Beds:</strong> Standard width for hand tools (broadfork, tilther).</li>
+                            <li class="flex items-start"><span class="mr-2 text-[#81b29a]">✓</span> <strong>12"-18"
+                                    Pathways:</strong> Maximizes growing area (approx 60-70% cultivation usage).</li>
+                            <li class="flex items-start"><span class="mr-2 text-[#81b29a]">✓</span> <strong>Season
+                                    Extension:</strong> Blocks A & B equipped for low tunnels (caterpillar tunnels) to
+                                extend harvest into Dec/Jan.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-[#f4f1de] p-4 rounded-lg">
+                        <h3 class="font-bold text-[#3d405b] text-sm mb-2">Detailed Rotation Strategy</h3>
+                        <p id="block-details" class="text-sm text-gray-600 italic">Click a block in the map to see the
+                            rotation plan.</p>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Map -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-[#3d405b]">Field Block Map (Conceptual)</h3>
+                            <div class="flex gap-2 text-xs">
+                                <span class="flex items-center"><span
+                                        class="w-3 h-3 bg-[#81b29a] rounded-sm mr-1"></span> Tunnel Ready</span>
+                                <span class="flex items-center"><span
+                                        class="w-3 h-3 bg-[#e07a5f] rounded-sm mr-1"></span> Field Crops</span>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Grid Visualization -->
+                        <div class="space-y-4">
+                            <!-- Block A -->
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 mb-1">Block A (High Turnover - Tunnel Capable)
+                                </p>
+                                <div class="bed-grid">
+                                    <div class="garden-bed bg-[#81b29a] opacity-90" onclick="showBlockInfo('A')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-90" onclick="showBlockInfo('A')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-90" onclick="showBlockInfo('A')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-90" onclick="showBlockInfo('A')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-90" onclick="showBlockInfo('A')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-90" onclick="showBlockInfo('A')"></div>
+                                </div>
+                            </div>
+                            <!-- Block B -->
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 mb-1">Block B (Salad/Greens Intensive)</p>
+                                <div class="bed-grid">
+                                    <div class="garden-bed bg-[#81b29a] opacity-70" onclick="showBlockInfo('B')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-70" onclick="showBlockInfo('B')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-70" onclick="showBlockInfo('B')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-70" onclick="showBlockInfo('B')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-70" onclick="showBlockInfo('B')"></div>
+                                    <div class="garden-bed bg-[#81b29a] opacity-70" onclick="showBlockInfo('B')"></div>
+                                </div>
+                            </div>
+                            <!-- Block C -->
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 mb-1">Block C (Long Season - Solanaceous)</p>
+                                <div class="bed-grid">
+                                    <div class="garden-bed bg-[#e07a5f] opacity-90" onclick="showBlockInfo('C')"></div>
+                                    <div class="garden-bed bg-[#e07a5f] opacity-90" onclick="showBlockInfo('C')"></div>
+                                    <div class="garden-bed bg-[#e07a5f] opacity-90" onclick="showBlockInfo('C')"></div>
+                                    <div class="garden-bed bg-[#e07a5f] opacity-90" onclick="showBlockInfo('C')"></div>
+                                </div>
+                            </div>
+                            <!-- Block D -->
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 mb-1">Block D (Root Crops & Brassicas)</p>
+                                <div class="bed-grid">
+                                    <div class="garden-bed bg-[#f2cc8f] opacity-90" onclick="showBlockInfo('D')"></div>
+                                    <div class="garden-bed bg-[#f2cc8f] opacity-90" onclick="showBlockInfo('D')"></div>
+                                    <div class="garden-bed bg-[#f2cc8f] opacity-90" onclick="showBlockInfo('D')"></div>
+                                    <div class="garden-bed bg-[#f2cc8f] opacity-90" onclick="showBlockInfo('D')"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CROP INTELLIGENCE -->
+        <div id="crops" class="tab-content hidden fade-in">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-[#3d405b]">Crop Selection Strategy</h2>
+                <p class="text-gray-600 mt-2 max-w-3xl">
+                    For a 0.5-acre site in Viroqua, we cannot compete on volume (e.g., sweet corn, potatoes). We
+                    prioritize crops with
+                    <strong>high value per square foot</strong> and <strong>rapid turnover</strong>. The chart below
+                    highlights our top performers.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Chart Section -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="font-bold text-lg text-[#3d405b] mb-4">Revenue Potential vs. Days to Maturity</h3>
+                    <div class="chart-container">
+                        <canvas id="cropChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-gray-400 mt-2">Bubble Size = Labor Intensity</p>
+                </div>
+
+                <!-- Detail List -->
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-lg border-l-4 border-[#81b29a] shadow-sm">
+                        <h4 class="font-bold text-[#3d405b]">1. Salad Mix & Microgreens</h4>
+                        <p class="text-sm text-gray-600 mt-1"><strong>Role:</strong> The Cash Flow Engine.</p>
+                        <p class="text-sm text-gray-600">Short cycle (28-45 days). Weekly sowings. High demand from CSA
+                            and Restaurants. Can yield $3-5/sq ft per harvest.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border-l-4 border-[#e07a5f] shadow-sm">
+                        <h4 class="font-bold text-[#3d405b]">2. Heirloom Tomatoes (High Tunnel)</h4>
+                        <p class="text-sm text-gray-600 mt-1"><strong>Role:</strong> The Summer Anchor.</p>
+                        <p class="text-sm text-gray-600">Vertical trellising required. High maintenance but commands
+                            premium pricing ($4-6/lb) at Viroqua Farmers Market.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border-l-4 border-[#f2cc8f] shadow-sm">
+                        <h4 class="font-bold text-[#3d405b]">3. Quick Roots (Radish, Salad Turnip)</h4>
+                        <p class="text-sm text-gray-600 mt-1"><strong>Role:</strong> The Bed Filler.</p>
+                        <p class="text-sm text-gray-600">Can be interplanted or rotated quickly between longer crops.
+                            Essential for CSA diversity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: BUSINESS MODEL -->
+        <div id="business" class="tab-content hidden fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+
+                <!-- Financials -->
+                <div>
+                    <h2 class="text-2xl font-bold text-[#3d405b] mb-4">Market Channels & Revenue</h2>
+                    <p class="text-gray-600 mb-6 text-sm">
+                        Diversification is key to risk management. The <strong>CSA (Community Supported
+                            Agriculture)</strong> provides upfront capital, while the <strong>Farmers Market</strong>
+                        offers the highest margins.
+                    </p>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="font-bold text-lg text-[#3d405b] mb-4">Projected Revenue Mix</h3>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Labor Planning -->
+                <div>
+                    <h2 class="text-2xl font-bold text-[#3d405b] mb-4">Labor Management</h2>
+                    <p class="text-gray-600 mb-6 text-sm">
+                        Managing 2-3 part-time staff requires strict scheduling. The bottleneck is always
+                        <strong>Harvest & Wash/Pack</strong>.
+                    </p>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="font-bold text-lg text-[#3d405b] mb-4">Weekly Labor Hours Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="laborChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketing Strategy Grid -->
+            <div class="bg-[#3d405b] rounded-xl p-8 text-white">
+                <h3 class="text-xl font-bold font-serif mb-6 text-[#f2cc8f]">Viroqua Market Strategy</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-[#4a4e69] p-4 rounded-lg">
+                        <h4 class="font-bold text-[#81b29a] mb-2">CSA (30 Members)</h4>
+                        <p class="text-sm text-gray-300">"The Foundation." Early cash flow. Focus on staples + 1 unique
+                            item weekly. Pickup at farm to reduce delivery costs.</p>
+                    </div>
+                    <div class="bg-[#4a4e69] p-4 rounded-lg">
+                        <h4 class="font-bold text-[#e07a5f] mb-2">Farmers Market</h4>
+                        <p class="text-sm text-gray-300">"The Showroom." High aesthetic display. Focus on impulse buys
+                            (cherry tomatoes, salad mix, flowers).</p>
+                    </div>
+                    <div class="bg-[#4a4e69] p-4 rounded-lg">
+                        <h4 class="font-bold text-[#f2cc8f] mb-2">Restaurant Wholesale</h4>
+                        <p class="text-sm text-gray-300">"The Overflow." Sell excess salad greens and specialty herbs to
+                            3-5 key local chefs. Fresh sheet sent weekly via text.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm">© 2024 Viroqua Intensive Market Garden Planner. Design for Biointensive
+                Sustainability.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA STORAGE & STATE ---
+        const blockDetails = {
+            'A': "<strong>Block A Strategy:</strong> High-Tunnel and Low-Tunnel intensive. <br><em>Spring:</em> Overwintered Spinach & Carrots. <br><em>Summer:</em> Heat-loving Greens (Arugula). <br><em>Fall/Winter:</em> Winter Salads under double-cover.",
+            'B': "<strong>Block B Strategy:</strong> Rapid Rotation Greens. <br><em>Spring:</em> Radish/Turnip/Mustards. <br><em>Summer:</em> Lettuce Heads (heat tolerant). <br><em>Fall:</em> Asian Greens & Kale.",
+            'C': "<strong>Block C Strategy:</strong> Long Season Fruiting. <br><em>Spring:</em> Green Garlic / Scallions. <br><em>Summer:</em> Tomatoes, Peppers, Eggplant (Trellised). <br><em>Fall:</em> Cover Crop (Oats/Peas).",
+            'D': "<strong>Block D Strategy:</strong> Storage & Root Crops. <br><em>Spring:</em> Beets, Carrots. <br><em>Summer:</em> Bush Beans / Zucchini. <br><em>Fall:</em> Storage Carrots / Garlic Planting."
+        };
+
+        // --- NAVIGATION LOGIC ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // Remove active style from nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-[#e07a5f]');
+                btn.classList.add('text-[#5f6c7b]');
+            });
+
+            // Show selected tab
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Highlight nav button
+            const activeBtn = document.querySelector(`button[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-[#5f6c7b]');
+                activeBtn.classList.add('text-[#e07a5f]');
+            }
+
+            // Trigger chart resize in case of layout shift
+            if (tabId === 'crops' && cropChartInstance) cropChartInstance.resize();
+            if (tabId === 'business') {
+                if (revenueChartInstance) revenueChartInstance.resize();
+                if (laborChartInstance) laborChartInstance.resize();
+            }
+        }
+
+        // --- INTERACTION LOGIC ---
+        function showBlockInfo(blockId) {
+            const detailContainer = document.getElementById('block-details');
+            detailContainer.innerHTML = blockDetails[blockId];
+            detailContainer.parentElement.classList.add('bg-[#e07a5f]/10');
+            setTimeout(() => {
+                detailContainer.parentElement.classList.remove('bg-[#e07a5f]/10');
+            }, 300);
+        }
+
+        // --- CHART CONFIGURATION (Chart.js) ---
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#3d405b';
+
+        // 1. Crop Intelligence Chart
+        let cropChartInstance;
+        const initCropChart = () => {
+            const ctx = document.getElementById('cropChart').getContext('2d');
+            cropChartInstance = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Crop Performance',
+                        data: [
+                            { x: 30, y: 3.5, r: 8, crop: 'Salad Mix' },
+                            { x: 21, y: 5.0, r: 6, crop: 'Microgreens' },
+                            { x: 75, y: 4.5, r: 12, crop: 'Tomatoes' },
+                            { x: 25, y: 2.0, r: 5, crop: 'Radish' },
+                            { x: 60, y: 2.5, r: 9, crop: 'Peppers' },
+                            { x: 50, y: 1.5, r: 7, crop: 'Beans' }
+                        ],
+                        backgroundColor: function (context) {
+                            const val = context.raw?.y;
+                            return val > 4 ? 'rgba(224, 122, 95, 0.8)' : // High value (Terra Cotta)
+                                val > 2 ? 'rgba(129, 178, 154, 0.8)' : // Med value (Green)
+                                    'rgba(242, 204, 143, 0.8)';  // Low value (Sand)
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `${context.raw.crop}: $${context.raw.y}/sqft, ${context.raw.x} days`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Days to Maturity (DTM)' },
+                            min: 0, max: 100
+                        },
+                        y: {
+                            title: { display: true, text: 'Revenue per Sq Ft ($)' },
+                            min: 0, max: 6
+                        }
+                    }
+                }
+            });
+        };
+
+        // 2. Revenue Mix Chart
+        let revenueChartInstance;
+        const initRevenueChart = () => {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            revenueChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['CSA Subscriptions', 'Farmers Market', 'Restaurant Sales', 'Farm Stand'],
+                    datasets: [{
+                        data: [40, 35, 20, 5],
+                        backgroundColor: ['#81b29a', '#e07a5f', '#3d405b', '#f2cc8f'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+        };
+
+        // 3. Labor Chart
+        let laborChartInstance;
+        const initLaborChart = () => {
+            const ctx = document.getElementById('laborChart').getContext('2d');
+            laborChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [
+                        { label: 'Harvest/Pack', data: [10, 20, 30, 40, 45, 40, 30], backgroundColor: '#e07a5f' },
+                        { label: 'Weeding/Maint', data: [15, 25, 25, 20, 15, 10, 5], backgroundColor: '#81b29a' },
+                        { label: 'Planting', data: [30, 20, 10, 10, 10, 5, 5], backgroundColor: '#f2cc8f' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true, title: { display: true, text: 'Hours per Week' } }
+                    }
+                }
+            });
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize tab 1 view
+            switchTab('system');
+
+            // Init charts (they will render but might need resize when tabs open)
+            initCropChart();
+            initRevenueChart();
+            initLaborChart();
+        });
+
+    </script>
+</body>
+
+</html>
