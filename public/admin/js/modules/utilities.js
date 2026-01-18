@@ -4,6 +4,7 @@
  */
 
 import { confirmChoice } from '../components/ChoiceModal.js';
+import { api } from './api.js';
 
 // --- Internal State & Constants ---
 const VIEW_PATH = 'views/utilities.html';
@@ -51,6 +52,7 @@ function bindGlobalActions() {
     window.cleanUsers = cleanUsers;
     window.cleanAnalytics = cleanAnalytics;
     window.cleanDatabase = cleanDatabase;
+    window.cleanDeliveryWindows = cleanDeliveryWindows;
     window.seedUsers = seedUsers;
     window.seedOrders = seedOrders;
     window.verifyDatabase = verifyDatabase;
@@ -77,32 +79,19 @@ export async function cleanOrders(event) {
     if (event && event.currentTarget) animateToggle(event.currentTarget);
 
     try {
-        const response = await fetch('/api/admin/utilities/clean-orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast('Orders cleaned successfully');
-            updateMaintenanceOutput(`
-                <div class="space-y-2">
-                    <p class="text-[11px] text-orange-400 font-bold uppercase tracking-widest leading-none">✅ CLEANUP COMPLETE</p>
-                    <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
-                        <p>• DELETED ORDERS: ${data.deleted.orders}</p>
-                        <p>• DELETED ITEMS: ${data.deleted.orderItems}</p>
-                        <p>• DELETED CARTS: ${data.deleted.carts}</p>
-                    </div>
+        const data = await api.cleanOrders();
+        showToast('Orders cleaned successfully');
+        updateMaintenanceOutput(`
+            <div class="space-y-2">
+                <p class="text-[11px] text-orange-400 font-bold uppercase tracking-widest leading-none">✅ CLEANUP COMPLETE</p>
+                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                    <p>• DELETED ORDERS: ${data.deleted.orders}</p>
+                    <p>• DELETED ITEMS: ${data.deleted.orderItems}</p>
+                    <p>• DELETED CARTS: ${data.deleted.carts}</p>
                 </div>
-            `);
-            refreshQuickStats();
-        } else {
-            throw new Error(data.error || 'Failed to clean orders');
-        }
+            </div>
+        `);
+        refreshQuickStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -120,31 +109,18 @@ export async function cleanUsers(event) {
     if (event && event.currentTarget) animateToggle(event.currentTarget);
 
     try {
-        const response = await fetch('/api/admin/utilities/clean-users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast('Customer users cleaned successfully');
-            updateMaintenanceOutput(`
-                <div class="space-y-2">
-                    <p class="text-[11px] text-orange-400 font-bold uppercase tracking-widest leading-none">✅ REGISTRY FLUSHED</p>
-                    <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
-                        <p>• DELETED CUSTOMERS: ${data.deleted.users}</p>
-                        <p>• DELETED ADDRESSES: ${data.deleted.addresses}</p>
-                    </div>
+        const data = await api.cleanUsers();
+        showToast('Customer users cleaned successfully');
+        updateMaintenanceOutput(`
+            <div class="space-y-2">
+                <p class="text-[11px] text-orange-400 font-bold uppercase tracking-widest leading-none">✅ REGISTRY FLUSHED</p>
+                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                    <p>• DELETED CUSTOMERS: ${data.deleted.users}</p>
+                    <p>• DELETED ADDRESSES: ${data.deleted.addresses}</p>
                 </div>
-            `);
-            refreshQuickStats();
-        } else {
-            throw new Error(data.error || 'Failed to clean users');
-        }
+            </div>
+        `);
+        refreshQuickStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -161,29 +137,16 @@ export async function cleanAnalytics() {
     if (!confirmed) return;
 
     try {
-        const response = await fetch('/api/admin/utilities/clean-analytics', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast('Analytics data cleaned successfully');
-            updateMaintenanceOutput(`
-                <div class="space-y-2">
-                    <p class="text-[11px] text-purple-400 font-bold uppercase tracking-widest leading-none">✅ ANALYTICS PURGED</p>
-                    <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
-                        <p>• DELETED EVENTS: ${data.deleted.analytics_events}</p>
-                    </div>
+        const data = await api.cleanAnalytics();
+        showToast('Analytics data cleaned successfully');
+        updateMaintenanceOutput(`
+            <div class="space-y-2">
+                <p class="text-[11px] text-purple-400 font-bold uppercase tracking-widest leading-none">✅ ANALYTICS PURGED</p>
+                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                    <p>• DELETED EVENTS: ${data.deleted.analytics_events}</p>
                 </div>
-            `);
-        } else {
-            throw new Error(data.error || 'Failed to clean analytics');
-        }
+            </div>
+        `);
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -200,31 +163,45 @@ export async function seedUsers() {
     if (!confirmed) return;
 
     try {
-        const response = await fetch('/api/admin/utilities/seed-users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast('Users seeded successfully');
-            updateMaintenanceOutput(`
-                <div class="space-y-2">
-                    <p class="text-[11px] text-green-500 font-bold uppercase tracking-widest leading-none">✅ CUSTOMER REGISTRY SEEDED</p>
-                    <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
-                        <p>• USERS CREATED: ${data.created.users}</p>
-                        <p>• ADDRESSES: ${data.created.addresses}</p>
-                    </div>
+        const data = await api.seedUsers();
+        showToast('Users seeded successfully');
+        updateMaintenanceOutput(`
+            <div class="space-y-2">
+                <p class="text-[11px] text-green-500 font-bold uppercase tracking-widest leading-none">✅ CUSTOMER REGISTRY SEEDED</p>
+                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                    <p>• USERS CREATED: ${data.created.users}</p>
+                    <p>• ADDRESSES: ${data.created.addresses}</p>
                 </div>
-            `);
-            refreshQuickStats();
-        } else {
-            throw new Error(data.error || 'Failed to seed users');
-        }
+            </div>
+        `);
+        refreshQuickStats();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+export async function cleanDeliveryWindows() {
+    const confirmed = await confirmChoice({
+        title: 'Purge Delivery Windows',
+        message: 'This will delete ALL delivery windows from the database. This action is irreversible.',
+        confirmText: 'Purge Windows',
+        icon: '🚚'
+    });
+
+    if (!confirmed) return;
+
+    try {
+        const data = await api.cleanDeliveryWindows();
+        showToast('Delivery windows cleaned successfully');
+        updateMaintenanceOutput(`
+            <div class="space-y-2">
+                <p class="text-[11px] text-red-400 font-bold uppercase tracking-widest leading-none">✅ WINDOWS PURGED</p>
+                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                    <p>• DELETED WINDOWS: ${data.deleted.delivery_windows}</p>
+                </div>
+            </div>
+        `);
+        refreshQuickStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -241,29 +218,16 @@ export async function seedOrders() {
     if (!confirmed) return;
 
     try {
-        const response = await fetch('/api/admin/utilities/seed-orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast('Orders seeded successfully');
-            updateMaintenanceOutput(`
-                <div class="text-[11px] text-green-500 font-bold uppercase tracking-widest leading-none">✅ ORDERS SEEDED</div>
-                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
-                    <p>• ORDERS CREATED: ${data.created.orders}</p>
-                    <p>• ITEMS CREATED: ${data.created.orderItems}</p>
-                </div>
-            `);
-            refreshQuickStats();
-        } else {
-            throw new Error(data.error || 'Failed to seed orders');
-        }
+        const data = await api.seedOrders();
+        showToast('Orders seeded successfully');
+        updateMaintenanceOutput(`
+            <div class="text-[11px] text-green-500 font-bold uppercase tracking-widest leading-none">✅ ORDERS SEEDED</div>
+            <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                <p>• ORDERS CREATED: ${data.created.orders}</p>
+                <p>• ITEMS CREATED: ${data.created.orderItems}</p>
+            </div>
+        `);
+        refreshQuickStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -271,21 +235,12 @@ export async function seedOrders() {
 
 export async function refreshQuickStats() {
     try {
-        const response = await fetch('/api/admin/utilities/verify-database', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            const count = data.counts;
-            // Update all stat elements (Standard and Hi-Fi)
-            document.querySelectorAll('.stat-count-users').forEach(el => el.textContent = count.users || 0);
-            document.querySelectorAll('.stat-count-orders').forEach(el => el.textContent = count.orders || 0);
-            document.querySelectorAll('.stat-count-products').forEach(el => el.textContent = count.products || 0);
-        }
+        const data = await api.verifyDatabase();
+        const count = data.counts;
+        // Update all stat elements (Standard and Hi-Fi)
+        document.querySelectorAll('.stat-count-users').forEach(el => el.textContent = count.users || 0);
+        document.querySelectorAll('.stat-count-orders').forEach(el => el.textContent = count.orders || 0);
+        document.querySelectorAll('.stat-count-products').forEach(el => el.textContent = count.products || 0);
     } catch (error) {
         console.error('Failed to refresh stats:', error);
     }
@@ -293,49 +248,38 @@ export async function refreshQuickStats() {
 
 export async function verifyDatabase() {
     try {
-        const response = await fetch('/api/admin/utilities/verify-database', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            refreshQuickStats();
-            const statsEl = document.getElementById('db-diagnostic-stats');
-            if (statsEl) {
-                statsEl.innerHTML = `
-                    <div class="text-sm space-y-2">
-                        <p class="text-green-600 font-semibold flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                            Database verified successfully
-                        </p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                            <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
-                                <p class="text-2xl font-black text-gray-900 dark:text-white">${data.counts.users}</p>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Total Users</p>
-                            </div>
-                            <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
-                                <p class="text-2xl font-black text-purple-600">${data.counts.admins}</p>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Admins</p>
-                            </div>
-                            <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
-                                <p class="text-2xl font-black text-blue-600">${data.counts.orders}</p>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Orders</p>
-                            </div>
-                            <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
-                                <p class="text-2xl font-black text-emerald-600">${data.counts.products}</p>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Products</p>
-                            </div>
+        const data = await api.verifyDatabase();
+        refreshQuickStats();
+        const statsEl = document.getElementById('db-diagnostic-stats');
+        if (statsEl) {
+            statsEl.innerHTML = `
+                <div class="text-sm space-y-2">
+                    <p class="text-green-600 font-semibold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        Database verified successfully
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                        <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <p class="text-2xl font-black text-gray-900 dark:text-white">${data.counts.users}</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Total Users</p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <p class="text-2xl font-black text-purple-600">${data.counts.admins}</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Admins</p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <p class="text-2xl font-black text-blue-600">${data.counts.orders}</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Orders</p>
+                        </div>
+                        <div class="text-center p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <p class="text-2xl font-black text-emerald-600">${data.counts.products}</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Products</p>
                         </div>
                     </div>
-                `;
-            }
-            updateMaintenanceOutput(`<p class="text-green-500 font-bold uppercase tracking-widest text-[11px]">✅ DIAGNOSTIC SCAN COMPLETE</p>`);
-        } else {
-            throw new Error(data.error || 'Failed to verify database');
+                </div>
+            `;
         }
+        updateMaintenanceOutput(`<p class="text-green-500 font-bold uppercase tracking-widest text-[11px]">✅ DIAGNOSTIC SCAN COMPLETE</p>`);
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -353,32 +297,19 @@ export async function cleanDatabase(event) {
     if (event && event.currentTarget) animateToggle(event.currentTarget);
 
     try {
-        const response = await fetch('/api/admin/utilities/clean-database', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast('Database reset successfully');
-            updateMaintenanceOutput(`
-                <div class="space-y-2">
-                    <p class="text-[11px] text-red-500 font-bold uppercase tracking-widest leading-none">☢️ SYSTEM RESET COMPLETE</p>
-                    <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
-                        <p>• ALL CUSTOMER REGISTRY: DELETED</p>
-                        <p>• ALL ORDER HISTORY: DELETED</p>
-                        <p>• SYSTEM STATE: RESET</p>
-                    </div>
+        await api.cleanDatabase();
+        showToast('Database reset successfully');
+        updateMaintenanceOutput(`
+            <div class="space-y-2">
+                <p class="text-[11px] text-red-500 font-bold uppercase tracking-widest leading-none">☢️ SYSTEM RESET COMPLETE</p>
+                <div class="text-[10px] text-gray-400 font-mono mt-2 space-y-1">
+                    <p>• ALL CUSTOMER REGISTRY: DELETED</p>
+                    <p>• ALL ORDER HISTORY: DELETED</p>
+                    <p>• SYSTEM STATE: RESET</p>
                 </div>
-            `);
-            refreshQuickStats();
-        } else {
-            throw new Error(data.error || 'Failed to clean database');
-        }
+            </div>
+        `);
+        refreshQuickStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -395,19 +326,8 @@ export async function cleanTempFiles() {
     if (!confirmed) return;
 
     try {
-        const response = await fetch('/api/admin/utilities/clean-temp-files', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        if (response.ok) {
-            showToast('Temporary files cleaned');
-        } else {
-            throw new Error('Failed to clean temp files');
-        }
+        await api.cleanTempFiles();
+        showToast('Temporary files cleaned');
     } catch (error) {
         showToast(error.message, 'error');
     }
@@ -450,19 +370,8 @@ function showToast(message, type = 'success') {
 
 async function queryTable(tableName) {
     try {
-        const response = await fetch(`/api/admin/utilities/query/${tableName}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            displayQueryResults(tableName, data.results);
-        } else {
-            throw new Error(data.error || 'Failed to query table');
-        }
+        const data = await api.queryTable(tableName);
+        displayQueryResults(tableName, data.results);
     } catch (error) {
         showToast(error.message, 'error');
     }

@@ -58,7 +58,7 @@ export async function loadCategories() {
     try {
         const [products, cats] = await Promise.all([
             api.getProducts(),
-            fetch('/api/categories').then(r => r.json())
+            api.getCategories()
         ]);
 
         productsForTags = products; // Cache for tag dashboard
@@ -131,17 +131,7 @@ export async function addCategory() {
     if (!name) return;
 
     try {
-        const response = await fetch('/api/categories', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            },
-            body: JSON.stringify({ name })
-        });
-
-        if (!response.ok) throw new Error('Failed to add category');
-
+        await api.createCategory(name);
         input.value = '';
         loadCategories();
         showToast("Category added successfully");
@@ -157,13 +147,7 @@ export async function deleteCategory(id) {
     if (!confirm("Are you sure you want to delete this category? Products in this category will become uncategorized.")) return;
 
     try {
-        const response = await fetch(`/api/categories/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-        });
-
-        if (!response.ok) throw new Error('Failed to delete category');
-
+        await api.deleteCategory(id);
         loadCategories();
         showToast("Category deleted");
     } catch (e) {

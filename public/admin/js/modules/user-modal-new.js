@@ -56,8 +56,7 @@ export async function openUserModalNew(userId = null) {
         zip: address.zip
     };
 
-    console.log('🔍 DEBUG - User data:', user);
-    console.log('🔍 DEBUG - FormData:', formData);
+
 
     // Define form fields
     const fields = [
@@ -125,7 +124,6 @@ export async function openUserModalNew(userId = null) {
 
     // Create or reuse modal instance
     if (!userModalInstance) {
-        console.log('[UserModal] Creating new modal with data:', formData);
         userModalInstance = new FormModal({
             title: userId ? 'Edit User' : 'Add New User',
             size: 'lg',
@@ -140,7 +138,6 @@ export async function openUserModalNew(userId = null) {
         });
     } else {
         // Update existing modal
-        console.log('[UserModal] Updating modal with data:', formData);
         userModalInstance.title = userId ? 'Edit User' : 'Add New User';
         userModalInstance.fields = fields;
         userModalInstance.data = formData;

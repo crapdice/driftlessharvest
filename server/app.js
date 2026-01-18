@@ -77,7 +77,8 @@ app.get('/api/admin/test', (req, res) => res.json({ status: 'ok', msg: 'Admin pa
 
 // Mount Routes
 app.use('/api', authRoutes);
-app.use('/api', adminRoutes);
+app.use('/api', require('./routes/admin')); // New modular admin routes (extracted)
+app.use('/api', adminRoutes); // Legacy admin routes (being phased out)
 app.use('/api/admin/marketing', require('./routes/admin-marketing.routes'));
 app.use('/api', productRoutes);
 app.use('/api', cartRoutes);
@@ -85,7 +86,7 @@ app.use('/api', orderRoutes);
 app.use('/api', configRoutes);
 app.use('/api', generalRoutes);
 app.use('/api', paymentRoutes);
-app.use('/api', require('./routes/utilities.routes'));
+// utilities.routes moved to ./routes/admin/utilities.routes.js (mounted via admin aggregator)
 app.use('/api', require('./routes/analytics.routes'));
 app.use('/api', require('./routes/gemini.routes'));
 

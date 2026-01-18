@@ -132,4 +132,64 @@ export const api = {
         });
         return res.json();
     },
+
+    // Product Restore/Permanent Delete
+    restoreProduct: (id) => request(`/products/${id}/restore`, 'POST'),
+    permanentDeleteProduct: (id) => request(`/products/${id}/permanent`, 'DELETE'),
+
+    // Categories (uses /api/categories not /api/admin/categories)
+    getCategories: async () => {
+        const res = await fetch('/api/categories');
+        if (!res.ok) throw new Error('Failed to load categories');
+        return res.json();
+    },
+    createCategory: async (name) => {
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch('/api/categories', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ name })
+        });
+        if (!res.ok) throw new Error('Failed to create category');
+        return res.json();
+    },
+    deleteCategory: async (id) => {
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch(`/api/categories/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to delete category');
+        return res.json();
+    },
+
+    // Analytics
+    getAnalyticsOverview: (days = 30) => request(`/analytics/overview?days=${days}`),
+    getRecentVisitors: () => request('/analytics/recent-visitors'),
+
+    // Config Restore
+    restoreConfig: async () => {
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch('/api/config/restore', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to restore config');
+        return res.json();
+    },
+
+    // Utilities
+    cleanDatabase: () => request('/utilities/clean-database', 'POST'),
+    cleanOrders: () => request('/utilities/clean-orders', 'POST'),
+    cleanUsers: () => request('/utilities/clean-users', 'POST'),
+    cleanAnalytics: () => request('/utilities/clean-analytics', 'POST'),
+    cleanDeliveryWindows: () => request('/utilities/clean-delivery-windows', 'POST'),
+    seedUsers: () => request('/utilities/seed-users', 'POST'),
+    seedOrders: () => request('/utilities/seed-orders', 'POST'),
+    verifyDatabase: () => request('/utilities/verify-database'),
+    cleanTempFiles: () => request('/utilities/clean-temp-files', 'POST'),
+    queryTable: (tableName) => request(`/utilities/query/${tableName}`),
 };

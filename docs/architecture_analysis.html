@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest App Architecture Analysis Report</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-yellow: #eab308;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .priority-critical {
+            color: var(--accent-red);
+        }
+
+        .priority-moderate {
+            color: var(--accent-orange);
+        }
+
+        .priority-low {
+            color: var(--accent-yellow);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .badge-moderate {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--accent-orange);
+            border: 1px solid var(--accent-orange);
+        }
+
+        .badge-low {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--accent-yellow);
+            border: 1px solid var(--accent-yellow);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .files-affected {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+        }
+
+        .files-affected strong {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .files-affected ul {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .files-affected li {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            padding: 0.25rem 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--bg-card);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .comment {
+            color: #6a737d;
+        }
+
+        .keyword {
+            color: #ff7b72;
+        }
+
+        .string {
+            color: #a5d6ff;
+        }
+
+        .function {
+            color: #d2a8ff;
+        }
+
+        .recommendation {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 3px solid var(--accent-green);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .recommendation strong {
+            color: var(--accent-green);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .impact {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--accent-red);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .impact strong {
+            color: var(--accent-red);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-card);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .phase {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .phase-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .phase-time {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .phase ol {
+            margin-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .phase li {
+            margin-bottom: 0.5rem;
+        }
+
+        .executive-summary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ Harvest App Architecture Analysis</h1>
+            <p class="meta">Generated: January 18, 2026 | Scope: Organization, Maintainability, Stability,
+                Extensibility, Scalability, Readability</p>
+        </header>
+
+        <div class="executive-summary">
+            <h2 style="margin-top: 0; border: none;">Executive Summary</h2>
+            <p>The Harvest App is a local food operation management system built with Node.js/Express backend and
+                vanilla JavaScript frontend. While the application functions, there are significant architectural
+                concerns that impact long-term maintainability and scalability.</p>
+            <div class="summary-stats">
+                <div class="stat">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Issues Identified</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--accent-red);">4</div>
+                    <div class="stat-label">Critical Priority</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--accent-orange);">11</div>
+                    <div class="stat-label">Moderate Priority</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--accent-yellow);">3</div>
+                    <div class="stat-label">Low Priority</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: Organization -->
+        <h2>1. Organization Issues</h2>
+
+        <div class="card" style="border-color: var(--accent-green);">
+            <div class="card-header">
+                <span class="badge"
+                    style="background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green);">✅
+                    Resolved</span>
+                <span class="card-title">1.1 Monolithic Route Files</span>
+            </div>
+            <div class="recommendation" style="border-left-color: var(--accent-green);">
+                <strong style="color: var(--accent-green);">Status: Fixed on 2026-01-18 via TDD Route
+                    Refactoring</strong>
+                <p><strong>Original Problem:</strong> <code>admin.routes.js</code> was 752 lines handling users, orders,
+                    inventory, delivery windows, categories, and box templates.</p>
+                <p><strong>Resolution:</strong> Extracted to domain-specific route modules with 16 contract tests:</p>
+                <pre><code>server/routes/admin/
+├── index.js            # Aggregator (28 lines)
+├── stats.routes.js     # Dashboard stats (23 lines)
+├── inventory.routes.js # Low stock, carts (67 lines)
+├── users.routes.js     # User CRUD (180 lines)
+├── orders.routes.js    # Order management (261 lines)
+├── delivery.routes.js  # Delivery windows (180 lines)
+└── categories.routes.js # Categories (47 lines)</code></pre>
+                <p><strong>Result:</strong> <code>admin.routes.js</code> reduced from <span
+                        style="color: var(--accent-red);">752 lines</span> → <span
+                        style="color: var(--accent-green);">56 lines</span></p>
+            </div>
+            <div class="impact">
+                <strong>Remaining Work:</strong>
+                <ul>
+                    <li>product.routes.js (400 lines) - still monolithic</li>
+                    <li>payment.routes.js (358 lines) - still monolithic</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">1.2 Inconsistent Repository Pattern Adoption</span>
+            </div>
+            <div class="files-affected">
+                <strong>Files Affected:</strong>
+                <ul>
+                    <li>server/repositories/UserRepository.js (uses repository pattern ✓)</li>
+                    <li>Route files still use direct db.prepare() calls for orders, products, addresses</li>
+                </ul>
+            </div>
+            <p><strong>Problem:</strong> Only <code>users</code> table has a proper repository. Other entities (orders,
+                products, addresses, delivery_windows) use raw database queries scattered across route files.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Create repositories for all major entities: <code>OrderRepository.js</code>,
+                <code>ProductRepository.js</code>, <code>AddressRepository.js</code>,
+                <code>DeliveryWindowRepository.js</code>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">1.3 Frontend Module Sprawl</span>
+            </div>
+            <div class="files-affected">
+                <strong>Files Affected:</strong>
+                <ul>
+                    <li>public/admin/js/modules/products.js (924 lines)</li>
+                    <li>public/admin/js/modules/settings.js (596 lines)</li>
+                </ul>
+            </div>
+            <p><strong>Problem:</strong> Large JS module files with mixed concerns. <code>products.js</code> handles
+                products, templates, inventory, and categories. <code>settings.js</code> duplicates theme presets from
+                <code>themes.js</code>.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Apply Single Responsibility Principle to frontend modules.
+            </div>
+        </div>
+
+        <!-- SECTION 2: Maintainability -->
+        <h2>2. Maintainability Issues</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-critical">Critical</span>
+                <span class="card-title">2.1 Runtime Schema Detection Anti-Pattern</span>
+            </div>
+            <div class="files-affected">
+                <strong>Files Affected:</strong>
+                <ul>
+                    <li>server/routes/admin.routes.js (lines 25-31, 363-367, 549-553, 598-601, 637-639, 676-678)</li>
+                    <li>server/db/index.js (lines 22-42)</li>
+                </ul>
+            </div>
+            <p><strong>Problem:</strong> Extensive use of <code>PRAGMA table_info()</code> at runtime to check if
+                columns exist before querying. This indicates unstable schema and incomplete migrations.</p>
+            <pre><code><span class="comment">// Pattern repeated 10+ times across codebase</span>
+<span class="keyword">const</span> cols = db.prepare(<span class="string">"PRAGMA table_info(orders)"</span>).all().map(c => c.name);
+<span class="keyword">const</span> hasDeliveryWindow = cols.includes(<span class="string">'delivery_window'</span>);
+<span class="keyword">const</span> hasDeliveryDate = cols.includes(<span class="string">'delivery_date'</span>);
+
+<span class="keyword">if</span> (hasDeliveryWindow && hasDeliveryDate) {
+    <span class="comment">// Query A</span>
+} <span class="keyword">else if</span> (hasDeliveryWindow) {
+    <span class="comment">// Query B</span>
+} <span class="keyword">else</span> {
+    <span class="comment">// Query C (fallback)</span>
+}</code></pre>
+            <div class="impact">
+                <strong>Impact:</strong>
+                <ul>
+                    <li>Performance overhead on every request</li>
+                    <li>Complex branching logic</li>
+                    <li>Indicates migration debt</li>
+                </ul>
+            </div>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                <ol>
+                    <li>Ensure all migrations run reliably on deployment</li>
+                    <li>Remove runtime schema checks once migrations are stable</li>
+                    <li>Add migration versioning checks at startup only</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-critical">Critical</span>
+                <span class="card-title">2.2 Rescue Logic on Every Startup</span>
+            </div>
+            <div class="files-affected">
+                <strong>Files Affected:</strong>
+                <ul>
+                    <li>server/db/index.js (lines 21-141)</li>
+                </ul>
+            </div>
+            <p><strong>Problem:</strong> 120 lines of "rescue logic" runs on every startup to fix database and config
+                issues. This should be handled by migrations and proper initialization.</p>
+            <pre><code><span class="comment">// Lines 21-141: "Rescue Logic"</span>
+<span class="keyword">try</span> {
+    <span class="comment">// 1. Ensure admin_types exist</span>
+    <span class="comment">// 2. Seed Products if empty</span>
+    <span class="comment">// 3. Seed Box Templates if empty</span>
+    <span class="comment">// 4. Fix config.json if images are missing</span>
+} <span class="keyword">catch</span> (e) {
+    console.error(<span class="string">'[Rescue] Verification failed:'</span>, e);
+}</code></pre>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Move seeding to dedicated scripts or migrations. Create proper bootstrap/initialization sequence. Remove
+                rescue logic once system is stable.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">2.3 Code Duplication in Auth Routes</span>
+            </div>
+            <p><strong>Problem:</strong> Login logic is duplicated for <code>/auth/login</code> and <code>/login</code>
+                (legacy alias) - same code appears twice in auth.routes.js (lines 52-122).</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Use express redirect or shared handler function.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">2.4 Deprecated/Dead Code</span>
+            </div>
+            <p><strong>Problem:</strong> 140 lines of commented-out code marked as "DEPRECATED" in order.routes.js
+                (lines 8-148). Should be removed.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Delete deprecated code or move to archive.
+            </div>
+        </div>
+
+        <!-- SECTION 3: Stability -->
+        <h2>3. Stability Issues</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-critical">Critical</span>
+                <span class="card-title">3.1 Mixed Sync/Async Database Patterns</span>
+            </div>
+            <p><strong>Problem:</strong> Codebase mixes synchronous (better-sqlite3) and async patterns inconsistently.
+            </p>
+            <pre><code><span class="comment">// auth.routes.js - Uses 'async' but operations are synchronous</span>
+router.post(<span class="string">'/auth/signup'</span>, validate(signupSchema), <span class="keyword">async</span> (req, res) => {
+    <span class="keyword">const</span> user = userRepository.create({...}); <span class="comment">// Synchronous operation</span>
+});
+
+<span class="comment">// payment.routes.js - Uses await for Stripe but not for database</span>
+router.post(<span class="string">'/create-payment-intent'</span>, <span class="keyword">async</span> (req, res) => {
+    <span class="keyword">const</span> reserveTx = db.transaction(() => {...}); <span class="comment">// Sync</span>
+    <span class="keyword">const</span> paymentIntent = <span class="keyword">await</span> stripe.paymentIntents.create({...}); <span class="comment">// Async</span>
+});</code></pre>
+            <div class="impact">
+                <strong>Impact:</strong>
+                <ul>
+                    <li>Confusion for developers</li>
+                    <li>Blocks event loop on heavy queries</li>
+                    <li>Will break when migrating to PostgreSQL (async)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">3.2 Unsafe Global Window Exposure</span>
+            </div>
+            <p><strong>Problem:</strong> Functions are exposed on global <code>window</code> object for HTML onclick
+                handlers in frontend modules.</p>
+            <pre><code><span class="comment">// Lines 671-680 and 893-899 in products.js</span>
+window.openTemplateModal = openTemplateModal;
+window.addTemplateItem = addTemplateItem;
+window.removeTemplateItem = removeTemplateItem;
+window.saveTemplate = saveTemplate;
+window.saveTemplate = saveTemplate; <span class="comment">// Duplicate!</span>
+window.closeTemplateModal = closeTemplateModal;</code></pre>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Use event delegation or proper event listeners.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">3.3 Error Handling Inconsistency</span>
+            </div>
+            <p><strong>Problem:</strong> Error handling varies widely across routes - from generic single-line catches
+                to detailed logging to file-writing handlers.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Create centralized error handling middleware with consistent logging.
+            </div>
+        </div>
+
+        <!-- SECTION 4: Extensibility -->
+        <h2>4. Extensibility Issues</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">4.1 Incomplete Database Adapter Adoption</span>
+            </div>
+            <p><strong>Problem:</strong> Adapter pattern is defined (<code>DatabaseAdapter.js</code>,
+                <code>SqliteAdapter.js</code>, <code>PostgresAdapter.js</code>) but only used in
+                <code>UserRepository</code>. Most code still uses raw <code>db.prepare()</code>.</p>
+            <pre><code><span class="comment">// db/index.js lines 186-194</span>
+<span class="keyword">const</span> dbAdapter = <span class="keyword">new</span> SqliteAdapter(db);
+
+<span class="comment">// Export both for backward compatibility</span>
+module.exports = db;               <span class="comment">// Legacy - still used everywhere</span>
+module.exports.db = db;            <span class="comment">// Legacy</span>
+module.exports.dbAdapter = dbAdapter;  <span class="comment">// New - barely used</span></code></pre>
+            <div class="impact">
+                <strong>Impact:</strong>
+                Cannot switch to PostgreSQL without rewriting most route files.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">4.2 Hardcoded Service Configuration</span>
+            </div>
+            <p><strong>Problem:</strong> Configuration is mixed between environment variables, config files, and
+                hardcoded values throughout the codebase.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Create centralized configuration service.
+            </div>
+        </div>
+
+        <!-- SECTION 5: Scalability -->
+        <h2>5. Scalability Concerns</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">5.1 No Pagination on List Endpoints</span>
+            </div>
+            <p><strong>Problem:</strong> Several endpoints return all records without pagination (users, orders,
+                products).</p>
+            <div class="impact">
+                <strong>Impact:</strong>
+                Memory issues and slow responses as data grows.
+            </div>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Add LIMIT/OFFSET pagination or cursor-based pagination.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">5.2 N+1 Query Patterns</span>
+            </div>
+            <p><strong>Problem:</strong> Nested queries inside loops (e.g., fetching order items per order in a loop).
+            </p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Use JOINs or batch loading.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-low">Low</span>
+                <span class="card-title">5.3 Single-Threaded Synchronous Database</span>
+            </div>
+            <p><strong>Problem:</strong> better-sqlite3 is synchronous. Heavy queries block the event loop.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Use worker threads for heavy operations. Complete migration to async PostgreSQL adapter.
+            </div>
+        </div>
+
+        <!-- SECTION 6: Readability -->
+        <h2>6. Readability Issues</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">6.1 Inconsistent Naming Conventions</span>
+            </div>
+            <p><strong>Problem:</strong> Mixed naming patterns across routes (kebab-case), variables (snake_case from
+                DB, camelCase in code), and files (PascalCase vs camelCase).</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Establish and document naming conventions.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">6.2 Magic Numbers/Strings</span>
+            </div>
+            <p><strong>Problem:</strong> Scattered magic values like <code>bcrypt.hashSync(password, 10)</code>,
+                <code>{ expiresIn: '24h' }</code>, default sort orders, stock thresholds.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Extract to configuration constants.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-low">Low</span>
+                <span class="card-title">6.3 Missing TypeScript/JSDoc</span>
+            </div>
+            <p><strong>Problem:</strong> No type definitions or comprehensive documentation. Only
+                <code>UserRepository.js</code> has JSDoc comments.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Add TypeScript or JSDoc annotations for better IDE support and documentation.
+            </div>
+        </div>
+
+        <!-- SECTION 7: Security -->
+        <h2>7. Security Observations</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-moderate">Moderate</span>
+                <span class="card-title">7.1 Potentially Sensitive Defaults</span>
+            </div>
+            <pre><code><span class="comment">// middleware/auth.js line 3</span>
+<span class="keyword">const</span> JWT_SECRET = process.env.JWT_SECRET || <span class="string">'harvest-secret-key-change-in-prod'</span>;</code></pre>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Fail on missing secrets in production.
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-low">Low</span>
+                <span class="card-title">7.2 Console Logging of Sensitive Data</span>
+            </div>
+            <p><strong>Problem:</strong> Some console.log statements include email addresses and other potentially
+                sensitive information.</p>
+            <div class="recommendation">
+                <strong>Recommendation:</strong>
+                Implement structured logging that filters sensitive fields.
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Priority Summary Table -->
+        <h2>Priority Summary</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Priority</th>
+                    <th>Count</th>
+                    <th>Key Issues</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge badge-critical">Critical</span></td>
+                    <td>4</td>
+                    <td>Monolithic routes, runtime schema detection, rescue logic, mixed sync/async</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-moderate">Moderate</span></td>
+                    <td>11</td>
+                    <td>Repository adoption, code duplication, error handling, N+1 queries, naming conventions</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-low">Low</span></td>
+                    <td>3</td>
+                    <td>Type definitions, magic numbers, console logging</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <!-- Recommended Action Plan -->
+        <h2>Recommended Action Plan</h2>
+
+        <div class="phase">
+            <div class="phase-header">
+                <div class="phase-number">1</div>
+                <div>
+                    <div class="phase-title">Stability</div>
+                    <div class="phase-time">Estimated: 1-2 weeks</div>
+                </div>
+            </div>
+            <ol>
+                <li>Complete async/await migration across all routes</li>
+                <li>Remove runtime schema detection (ensure migrations work)</li>
+                <li>Remove startup rescue logic (create proper seeds)</li>
+                <li>Standardize error handling</li>
+            </ol>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <div class="phase-number">2</div>
+                <div>
+                    <div class="phase-title">Organization</div>
+                    <div class="phase-time">Estimated: 2-3 weeks</div>
+                </div>
+            </div>
+            <ol>
+                <li>Split monolithic route files by domain</li>
+                <li>Create missing repositories (Order, Product, Address)</li>
+                <li>Migrate all DB access to use adapters</li>
+                <li>Delete deprecated code</li>
+            </ol>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <div class="phase-number">3</div>
+                <div>
+                    <div class="phase-title">Scalability</div>
+                    <div class="phase-time">Estimated: 1-2 weeks</div>
+                </div>
+            </div>
+            <ol>
+                <li>Add pagination to list endpoints</li>
+                <li>Fix N+1 query patterns</li>
+                <li>Centralize configuration</li>
+            </ol>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <div class="phase-number">4</div>
+                <div>
+                    <div class="phase-title">Polish</div>
+                    <div class="phase-time">Ongoing</div>
+                </div>
+            </div>
+            <ol>
+                <li>Add TypeScript/JSDoc</li>
+                <li>Establish naming conventions</li>
+                <li>Implement structured logging</li>
+                <li>Improve test coverage</li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <footer style="text-align: center; color: var(--text-muted); padding: 2rem 0;">
+            <p>Generated by Antigravity Code Analysis • Harvest App v1.0.0</p>
+        </footer>
+    </div>
+</body>
+
+</html>

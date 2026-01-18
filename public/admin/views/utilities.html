@@ -79,6 +79,14 @@
                 <button onclick="cleanAnalytics()"
                     class="px-4 py-2 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
             </div>
+            <div class="flex items-center justify-between p-1">
+                <div>
+                    <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Delivery Windows</p>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Delete all delivery window options.</p>
+                </div>
+                <button onclick="cleanDeliveryWindows()"
+                    class="px-4 py-2 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
+            </div>
             <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
                 <div>
                     <p class="font-bold text-red-700 dark:text-red-400 text-sm">Factory Reset</p>
@@ -236,6 +244,10 @@
                         <div class="hifi-toggle-container">
                             <div onclick="cleanDatabase(event)" class="hifi-toggle"></div>
                             <span class="label-tag bg-red-900 shadow-[0_0_10px_rgba(153,27,27,0.4)]">Total Nuke</span>
+                        </div>
+                        <div class="hifi-toggle-container">
+                            <div onclick="cleanDeliveryWindows(event)" class="hifi-toggle"></div>
+                            <span class="label-tag bg-amber-700">Purge Windows</span>
                         </div>
                     </div>
                     <p class="text-[9px] text-gray-500 mt-6 italic">* Use master bypass for all destructive operations.

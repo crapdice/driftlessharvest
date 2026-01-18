@@ -649,8 +649,6 @@ export async function saveTemplate() {
         data.is_active = false; // Force inactive
     }
 
-    console.log("Saving Template Payload:", data);
-
     try {
         if (id) await api.updateBoxTemplate(id, data);
         else await api.createBoxTemplate(data);

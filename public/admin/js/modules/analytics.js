@@ -1,4 +1,5 @@
 import { showToast } from './utils.js';
+import { api } from './api.js';
 
 const VIEW_PATH = 'views/analytics.html';
 
@@ -27,15 +28,7 @@ export async function loadAnalytics() {
     const token = localStorage.getItem('harvest_token');
 
     try {
-        const response = await fetch(`/api/admin/analytics/overview?days=${dateRange}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch analytics');
-        }
-
-        const data = await response.json();
+        const data = await api.getAnalyticsOverview(dateRange);
 
         // Update overview cards
         const totalVisitsEl = document.getElementById('stat-total-visits');
@@ -209,15 +202,7 @@ async function loadRecentVisitors() {
     if (!tbody) return;
 
     try {
-        const response = await fetch('/api/admin/analytics/recent-visitors', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch recent visitors');
-        }
-
-        const data = await response.json();
+        const data = await api.getRecentVisitors();
         const visitors = data.visitors || [];
 
         if (visitors.length === 0) {

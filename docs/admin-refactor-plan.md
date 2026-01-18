@@ -1,8 +1,8 @@
 # Admin Panel Refactoring Plan
 
 > Created: 2026-01-17
-> Last Updated: 2026-01-17
-> Status: Planning
+> Last Updated: 2026-01-18
+> Status: In Progress
 
 ## Executive Summary
 
@@ -56,31 +56,34 @@ The admin codebase is functional but fragmented, scoring **5/10** overall. It's 
   - [x] `js/core/FeatureFlags.js`
   - [x] `js/core/DataStrategy.js`
 
-- [ ] **Remove debug console.logs** from production paths
+- [x] **Remove debug console.logs** from production paths (5 logs removed)
 
-- [ ] **Extract common utilities**
-  - [ ] `escapeHtml()` used in multiple places → move to utils.js
+- [ ] **Extract common utilities** (LOW PRIORITY - escapeHtml only in 1 file)
+  - [ ] `escapeHtml()` used in InventoryAlertService.js only
 
 ---
 
-### Phase 2: API Consolidation (2-3 hours)
+### Phase 2: API Consolidation (2-3 hours) ✅
 
 **Added to api.js:**
 - [x] `api.getConfig()` 
 - [x] `api.updateConfig(data)`
 - [x] `api.testGemini()`
+- [x] `api.cleanDatabase()`, `cleanOrders()`, `cleanUsers()`, `cleanAnalytics()`, etc. (9 utilities methods)
+- [x] `api.getAnalyticsOverview(days)`, `getRecentVisitors()`
+- [x] `api.getCategories()`, `createCategory()`, `deleteCategory()`
+- [x] `api.restoreProduct()`, `permanentDeleteProduct()`
+- [x] `api.restoreConfig()`
 
 **Files refactored to use api.js:**
 - [x] `api-keys.js` - All inline fetches replaced
 - [x] `app.js` - Config fetch replaced
-
-**Files still needing refactoring:**
-- [ ] `settings.js` - 4 inline fetches
-- [ ] `products.js` - 4 inline fetches  
-- [ ] `layouts.js` - 6 inline fetches
-- [ ] `utilities.js` - 9 inline fetches (utilities endpoints)
-- [ ] `categories.js` - 2 inline fetches
-- [ ] `analytics.js` - 1 inline fetch
+- [x] `utilities.js` - 10 inline fetches replaced → now uses api.js
+- [x] `analytics.js` - 2 inline fetches replaced → now uses api.js
+- [x] `categories.js` - 3 inline fetches replaced → now uses api.js
+- [x] `products.js` - Already using api.js for product operations
+- [x] `settings.js` - Already using api.js (getConfig/updateConfig)
+- [x] `layouts.js` - View HTML fetches only (no API calls to refactor)
 
 ---
 
@@ -151,6 +154,57 @@ modules/products/
 
 ---
 
+### Phase 7: Backend Route Refactoring ✅ (Completed 2026-01-18)
+
+**Goal:** Refactor monolithic `admin.routes.js` (752 lines) into domain-specific modules.
+
+**Approach:** TDD with contract testing - created tests first, then extracted routes incrementally.
+
+**Results:**
+| Metric | Before | After |
+|--------|--------|-------|
+| `admin.routes.js` | 752 lines | 17 lines (deprecated shell) |
+| Route files | 1 | 11 |
+| Contract tests | 0 | 42 |
+
+**Final Structure:**
+```
+server/routes/admin/
+├── index.js              # Route aggregator
+├── stats.routes.js       # GET /admin/stats
+├── inventory.routes.js   # inventory-status, active-carts
+├── users.routes.js       # User CRUD (5 endpoints)
+├── orders.routes.js      # Order management (4 endpoints)
+├── delivery.routes.js    # Delivery windows/schedule (5 endpoints)
+├── categories.routes.js  # POST /admin/categories
+├── products.routes.js    # Product CRUD (8 endpoints)
+├── box-templates.routes.js # Box templates (5 endpoints)
+├── utilities.routes.js   # Database utilities (9 endpoints)
+└── analytics.routes.js   # Analytics (2 endpoints)
+```
+
+**Tests Created:**
+- `tests/helpers/test-utils.js` - HTTP helpers, test runner
+- `tests/routes/admin.routes.test.js` - 16 contract tests
+- `tests/routes/products.routes.test.js` - 9 contract tests
+- `tests/routes/box-templates.routes.test.js` - 6 contract tests
+- `tests/routes/utilities.routes.test.js` - 9 contract tests
+
+- [x] Create test infrastructure
+- [x] Extract `stats.routes.js`
+- [x] Extract `inventory.routes.js`
+- [x] Extract `users.routes.js`
+- [x] Extract `orders.routes.js`
+- [x] Extract `delivery.routes.js`
+- [x] Extract `categories.routes.js`
+- [x] Update `app.js` mounting
+- [x] Verify all tests pass
+- [x] Extract `products.routes.js` (8 endpoints)
+- [x] Extract `box-templates.routes.js` (5 endpoints + helper)
+- [x] Move `utilities.routes.js` to admin/ (9 endpoints)
+
+---
+
 ### Phase 6: Build Tooling (Optional, 2-3 hours)
 
 - [ ] **Add Vite**
@@ -201,12 +255,13 @@ modules/products/
 
 | Phase | Status | Started | Completed |
 |-------|--------|---------|-----------|
-| Phase 1: Quick Cleanup | Not Started | | |
-| Phase 2: API Consolidation | Not Started | | |
+| Phase 1: Quick Cleanup | Partial | 2026-01-17 | |
+| Phase 2: API Consolidation | Partial | 2026-01-17 | |
 | Phase 3: Split God Modules | Not Started | | |
 | Phase 4: Reduce Window Pollution | Not Started | | |
 | Phase 5: Standardize Views | Not Started | | |
 | Phase 6: Build Tooling | Not Started | | |
+| **Phase 7: Backend Routes** | **✅ Complete** | 2026-01-18 | 2026-01-18 |
 
 ---
 
@@ -215,7 +270,9 @@ modules/products/
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-01-17 | Created refactor plan | Codebase assessment revealed 5/10 score |
-| | | |
+| 2026-01-18 | Used TDD for backend route refactoring | Ensures no regressions during extraction |
+| 2026-01-18 | Created route aggregator pattern | Allows gradual extraction without changing app.js |
+| 2026-01-18 | Extracted products, box-templates, utilities | Completed full admin route refactoring |
 
 ---
 
