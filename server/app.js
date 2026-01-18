@@ -33,6 +33,37 @@ app.use((req, res, next) => {
 
 // Serve Admin Panel (Priority)
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
+app.use('/marketing', express.static(path.join(__dirname, '../public/marketing')));
+
+// A/B Test Routing for Homepage
+app.get('/', (req, res, next) => {
+    const fs = require('fs');
+    const configPath = path.join(__dirname, 'data/config.json');
+
+    if (fs.existsSync(configPath)) {
+        try {
+            const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            const launchModeEnabled = config.meta?.launchModeEnabled;
+            const activeVariant = config.meta?.activeLaunchVariant;
+
+            if (launchModeEnabled && activeVariant) {
+                console.log(`[A/B Router] Serving Launch Variant: ${activeVariant}`);
+                // Map variant name to filename: "Artisan Sketch (Design 3)" -> "design_3.html"
+                const match = activeVariant.match(/Design (\d)/);
+                if (match) {
+                    const designFile = `design_${match[1]}.html`;
+                    const designPath = path.join(__dirname, `../public/previews/launching/${designFile}`);
+                    if (fs.existsSync(designPath)) {
+                        return res.sendFile(designPath);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('[A/B Router Error]', e);
+        }
+    }
+    next(); // Fallback to normal static serving
+});
 
 // Serve static files from public/ (Customer App)
 app.use(express.static(path.join(__dirname, '../public')));
@@ -47,6 +78,7 @@ app.get('/api/admin/test', (req, res) => res.json({ status: 'ok', msg: 'Admin pa
 // Mount Routes
 app.use('/api', authRoutes);
 app.use('/api', adminRoutes);
+app.use('/api/admin/marketing', require('./routes/admin-marketing.routes'));
 app.use('/api', productRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', orderRoutes);

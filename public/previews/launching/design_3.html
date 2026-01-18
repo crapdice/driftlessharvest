@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driftless Harvest | Sketching the Future</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Patrick+Hand&family=Work+Sans:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+        }
+
+        .marker {
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        .sans {
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        .paper-texture {
+            background-color: #fdfbf7;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        }
+
+        .wobble {
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+        }
+    </style>
+</head>
+
+<body class="paper-texture text-[#1a1a1a] min-h-screen flex flex-col items-center justify-center p-6 select-none">
+
+    <div class="max-w-3xl w-full text-center space-y-12">
+        <!-- Logo Sketch -->
+        <div class="inline-block p-8 border-4 border-[#1a1a1a] wobble transform -rotate-1 relative group">
+            <div
+                class="absolute -top-6 -right-6 text-4xl transform rotate-12 group-hover:scale-110 transition-transform">
+                🥕</div>
+            <div
+                class="absolute -bottom-6 -left-6 text-4xl transform -rotate-12 group-hover:scale-110 transition-transform">
+                🥬</div>
+            <h1 class="marker text-4xl lg:text-6xl uppercase tracking-tighter">
+                Driftless <br>
+                <span class="text-[#4a6c47]">Harvest</span>
+            </h1>
+        </div>
+
+        <div class="space-y-6">
+            <h2 class="text-3xl lg:text-5xl font-bold leading-tight">
+                We're drawing up something <br>
+                <span class="underline decoration-wavy decoration-[#e6c229] underline-offset-8">really fresh.</span>
+            </h2>
+
+            <p class="sans text-xl text-[#737373] max-w-xl mx-auto font-light italic">
+                Our farm-to-door delivery app is currently under construction.
+                We're out in the fields right now, but we'll be ready to launch soon!
+            </p>
+        </div>
+
+        <div class="relative max-w-md mx-auto w-full">
+            <div class="absolute inset-0 bg-[#e6c229]/20 wobble translate-x-2 translate-y-2"></div>
+            <div class="relative bg-white border-2 border-[#1a1a1a] wobble p-8 space-y-6">
+                <p class="marker text-xl uppercase tracking-widest text-[#d14949]">Want a heads up?</p>
+                <form class="flex flex-col gap-4">
+                    <input type="email" placeholder="Your best email..." required
+                        class="sans w-full bg-[#f7f5f0] border-2 border-[#1a1a1a] wobble px-4 py-3 focus:outline-none focus:ring-4 focus:ring-[#e6c229]/30 transition-shadow">
+                    <button type="submit"
+                        class="marker bg-[#4a6c47] text-white text-2xl uppercase pt-3 pb-2 px-8 wobble hover:scale-105 active:scale-95 transition-all shadow-[6px_6px_0px_0px_rgba(26,26,26,1)]">
+                        Let Me Know!
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="sans pt-12 flex justify-center gap-12 font-medium grayscale hover:grayscale-0 transition-all">
+            <div class="flex flex-col items-center gap-1">
+                <span class="text-2xl">🚜</span>
+                <span class="text-xs uppercase tracking-widest">Local</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+                <span class="text-2xl">🌱</span>
+                <span class="text-xs uppercase tracking-widest">Organic</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+                <span class="text-2xl">📦</span>
+                <span class="text-xs uppercase tracking-widest">Delivery</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Illustration Background: Pencil Sketch of a Barn/Tractor with Tape Look -->
+    <div class="fixed bottom-0 right-0 p-8 opacity-40 pointer-events-none hidden lg:block">
+        <div class="relative bg-white border-2 border-[#1a1a1a] p-2 wobble transform rotate-2 shadow-md">
+            <!-- Reliable Unsplash Pencil Sketch -->
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=300"
+                class="w-48 grayscale contrast-125" alt="Farm Sketch">
+        </div>
+    </div>
+
+    <script>window.LAUNCH_VARIANT = 'Artisan Sketch (Design 3)';</script>
+    <script src="/previews/launching/launch-logic.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Earth/Soil Base -->
+  <path d="M4 24c8-2 16-2 24 0" fill="none" stroke="#3e3e35" stroke-width="2" stroke-linecap="round"/>
+  <!-- Sprout Stem -->
+  <path d="M16 24V14" fill="none" stroke="#2d4a22" stroke-width="2" stroke-linecap="round"/>
+  <!-- Leaves -->
+  <path d="M16 16c-4-1-6-4-4-7 1 2 4 4 4 7z" fill="#2d4a22"/>
+  <path d="M16 16c4-1 6-4 4-7-1 2-4 4-4 7z" fill="#2d4a22"/>
+</svg>

@@ -54,6 +54,35 @@ router.get('/delivery-windows', (req, res) => {
 
 
 
+// POST /api/general/launch-signup (Public)
+router.post('/launch-signup', (req, res) => {
+  const { email, variant, utm_source } = req.body;
+
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ error: 'Valid email is required' });
+  }
+
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const ua = req.get('User-Agent');
+
+    const insert = db.prepare(`
+            INSERT INTO launch_signups (email, source_variant, ip_address, user_agent, utm_source)
+            VALUES (?, ?, ?, ?, ?)
+        `);
+
+    insert.run(email, variant || 'unknown', ip, ua, utm_source || 'organic');
+
+    res.status(201).json({ success: true, message: 'Signed up successfully' });
+  } catch (err) {
+    if (err.message.includes('UNIQUE constraint failed')) {
+      return res.status(409).json({ error: 'This email is already on the waitlist.' });
+    }
+    console.error('[Launch Signup Error]', err);
+    res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+  }
+});
+
 // POST /api/ab-exposure
 router.post('/ab-exposure', (req, res) => res.status(204).send());
 
