@@ -82,7 +82,7 @@ export async function addProductToCart(productId) {
         const res = await api.checkStock(productId, currentQty + 1);
 
         // Add to Store
-        store.addToCart(product, 1);
+        store.addToCart({ ...product, type: 'product' }, 1);
 
         // Optimistic UI Stock Update (Local only)
         if (availableProducts) {
@@ -122,7 +122,8 @@ export async function addTemplateToCart(templateId) {
                 image_url: template.image_url,
                 description: template.description || 'Curated Box',
                 items: res.items, // The contents determine availability
-                isBox: true
+                isBox: true,
+                type: 'box'
             }, 1, true);
 
             showToast('Box added to cart!');

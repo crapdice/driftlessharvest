@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { showToast } from './utils.js';
+import { inventoryAlertService } from '../core/InventoryAlertService.js';
 
 let currentConfig = {};
 
@@ -208,6 +209,10 @@ function populateForm(data) {
     const ab = document.getElementById('cfg-ab-enabled');
     if (ab) ab.checked = data.meta?.abTestingEnabled ?? true;
 
+    // Dashboard: Low Stock Alert
+    const lowStock = document.getElementById('cfg-low-stock-enabled');
+    if (lowStock) lowStock.checked = data.meta?.lowStockAlertEnabled ?? true;
+
     renderExperiments(data.experiments || {});
 }
 
@@ -295,76 +300,101 @@ window.toggleAdvancedConfig = () => {
 };
 
 export async function saveSettings() {
-    // Collect Form Data into currentConfig (simplified for brevity)
-    // In a real implementation we'd map all fields back like the original code
-    // For now assuming live updates to currentConfig via window helpers + specific ID reads
+    // Helper to safely get value or preserve existing
+    const val = (id, current) => {
+        const el = document.getElementById(id);
+        return el ? el.value : current;
+    };
 
-    currentConfig.business.name = document.getElementById('cfg-bus-name').value;
-    currentConfig.business.location = document.getElementById('cfg-bus-loc').value;
-    currentConfig.business.tagline = document.getElementById('cfg-bus-tagline')?.value || '';
-    currentConfig.business.email = document.getElementById('cfg-bus-email')?.value || '';
-    currentConfig.business.phone = document.getElementById('cfg-bus-phone')?.value || '';
-    currentConfig.business.hours = document.getElementById('cfg-bus-hours')?.value || '';
-    currentConfig.business.farmerVoice = document.getElementById('cfg-bus-voice').value;
-    currentConfig.business.trustSignals = document.getElementById('cfg-bus-trust').value.split('\n');
+    // Helper for checkboxes
+    const chk = (id, current) => {
+        const el = document.getElementById(id);
+        return el ? el.checked : current;
+    };
+
+    // Collect Form Data
+    currentConfig.business.name = val('cfg-bus-name', currentConfig.business.name);
+    currentConfig.business.location = val('cfg-bus-loc', currentConfig.business.location);
+    currentConfig.business.tagline = val('cfg-bus-tagline', currentConfig.business.tagline);
+    currentConfig.business.email = val('cfg-bus-email', currentConfig.business.email);
+    currentConfig.business.phone = val('cfg-bus-phone', currentConfig.business.phone);
+    currentConfig.business.hours = val('cfg-bus-hours', currentConfig.business.hours);
+    currentConfig.business.farmerVoice = val('cfg-bus-voice', currentConfig.business.farmerVoice);
+
+    // Trust signals is a textarea, safe to split? Only if element exists.
+    const trustEl = document.getElementById('cfg-bus-trust');
+    if (trustEl) currentConfig.business.trustSignals = trustEl.value.split('\n');
 
     // Hero
     if (!currentConfig.pages.home) currentConfig.pages.home = {};
     if (!currentConfig.pages.home.hero) currentConfig.pages.home.hero = {};
-    currentConfig.pages.home.hero.headline = document.getElementById('cfg-hero-headline')?.value || '';
-    currentConfig.pages.home.hero.subheadline = document.getElementById('cfg-hero-subhead')?.value || '';
-    currentConfig.pages.home.hero.image = document.getElementById('cfg-hero-image')?.value || '';
+    currentConfig.pages.home.hero.headline = val('cfg-hero-headline', currentConfig.pages.home.hero.headline);
+    currentConfig.pages.home.hero.subheadline = val('cfg-hero-subhead', currentConfig.pages.home.hero.subheadline);
+    currentConfig.pages.home.hero.image = val('cfg-hero-image', currentConfig.pages.home.hero.image);
 
     // Featured Config
     if (!currentConfig.meta) currentConfig.meta = {};
-    const invAlert = document.getElementById('cfg-inv-alert') ? document.getElementById('cfg-inv-alert').value : null;
-    currentConfig.meta.inventoryAlertLevel = parseInt(invAlert) || 5;
-    currentConfig.meta.useBentoGrid = document.getElementById('cfg-feat-bento').checked;
-    currentConfig.meta.showBoxTooltips = document.getElementById('cfg-feat-tooltips').checked;
-    currentConfig.meta.featuredTitle = document.getElementById('cfg-feat-title').value;
-    currentConfig.meta.featuredSubtitle = document.getElementById('cfg-feat-subtitle').value;
+    const invAlert = document.getElementById('cfg-inv-alert');
+    if (invAlert) currentConfig.meta.inventoryAlertLevel = parseInt(invAlert.value) || 5;
 
-    currentConfig.pages.howItWorks.title = document.getElementById('cfg-how-title').value;
-    currentConfig.pages.howItWorks.paragraphs = document.getElementById('cfg-how-steps').value.split('\n');
+    currentConfig.meta.useBentoGrid = chk('cfg-feat-bento', currentConfig.meta.useBentoGrid);
+    currentConfig.meta.showBoxTooltips = chk('cfg-feat-tooltips', currentConfig.meta.showBoxTooltips);
+    currentConfig.meta.featuredTitle = val('cfg-feat-title', currentConfig.meta.featuredTitle);
+    currentConfig.meta.featuredSubtitle = val('cfg-feat-subtitle', currentConfig.meta.featuredSubtitle);
+    currentConfig.meta.lowStockAlertEnabled = chk('cfg-low-stock-enabled', currentConfig.meta.lowStockAlertEnabled);
 
-    currentConfig.pages.farms.title = document.getElementById('cfg-farms-title').value;
-    currentConfig.pages.farms.paragraphs = document.getElementById('cfg-farms-intro').value.split('\n');
+    currentConfig.pages.howItWorks.title = val('cfg-how-title', currentConfig.pages.howItWorks.title);
+    const howStepsEl = document.getElementById('cfg-how-steps');
+    if (howStepsEl) currentConfig.pages.howItWorks.paragraphs = howStepsEl.value.split('\n');
 
-    currentConfig.announcement.text = document.getElementById('cfg-anno-text').value;
-    currentConfig.secondaryCTA.headline = document.getElementById('cfg-sec-head').value;
-    currentConfig.secondaryCTA.subhead = document.getElementById('cfg-sec-sub').value;
+    currentConfig.pages.farms.title = val('cfg-farms-title', currentConfig.pages.farms.title);
+    const farmsIntroEl = document.getElementById('cfg-farms-intro');
+    if (farmsIntroEl) currentConfig.pages.farms.paragraphs = farmsIntroEl.value.split('\n');
+
+    currentConfig.announcement.text = val('cfg-anno-text', currentConfig.announcement.text);
+    currentConfig.secondaryCTA.headline = val('cfg-sec-head', currentConfig.secondaryCTA.headline);
+    currentConfig.secondaryCTA.subhead = val('cfg-sec-sub', currentConfig.secondaryCTA.subhead);
 
     if (!currentConfig.auth) currentConfig.auth = { login: {}, signup: {} };
     if (!currentConfig.auth.login) currentConfig.auth.login = {};
     if (!currentConfig.auth.signup) currentConfig.auth.signup = {};
 
-    currentConfig.auth.login.headline = document.getElementById('cfg-auth-login-headline').value;
-    currentConfig.auth.login.subhead = document.getElementById('cfg-auth-login-subhead').value;
-    currentConfig.auth.login.image = document.getElementById('cfg-auth-login-image').value;
+    currentConfig.auth.login.headline = val('cfg-auth-login-headline', currentConfig.auth.login.headline);
+    currentConfig.auth.login.subhead = val('cfg-auth-login-subhead', currentConfig.auth.login.subhead);
+    currentConfig.auth.login.image = val('cfg-auth-login-image', currentConfig.auth.login.image);
 
-    currentConfig.auth.signup.headline = document.getElementById('cfg-auth-signup-headline').value;
-    currentConfig.auth.signup.subhead = document.getElementById('cfg-auth-signup-subhead').value;
-    currentConfig.auth.signup.image = document.getElementById('cfg-auth-signup-image').value;
+    currentConfig.auth.signup.headline = val('cfg-auth-signup-headline', currentConfig.auth.signup.headline);
+    currentConfig.auth.signup.subhead = val('cfg-auth-signup-subhead', currentConfig.auth.signup.subhead);
+    currentConfig.auth.signup.image = val('cfg-auth-signup-image', currentConfig.auth.signup.image);
 
-    currentConfig.featuredProducts = [
-        document.getElementById('cfg-feat-1').value,
-        document.getElementById('cfg-feat-2').value,
-        document.getElementById('cfg-feat-3').value,
-        document.getElementById('cfg-feat-4').value,
-        document.getElementById('cfg-feat-5').value,
-        document.getElementById('cfg-feat-6').value
-    ].filter(id => id); // Remove empty strings
-
-    // Theme: Apply colors from the currently selected preset (stored in localStorage/dropdown)
-    const selectedThemeName = document.getElementById('cfg-theme-select').value || 'nature';
-    if (THEME_PRESETS[selectedThemeName]) {
-        currentConfig.theme = THEME_PRESETS[selectedThemeName];
+    // Featured Products Array construction - tricky if elements missing. 
+    // If elements are missing, we should probably preserve existing array?
+    // Or filter inputs that exist.
+    // Given these are selects likely present in Branding tab, lets check one.
+    if (document.getElementById('cfg-feat-1')) {
+        currentConfig.featuredProducts = [
+            document.getElementById('cfg-feat-1').value,
+            document.getElementById('cfg-feat-2').value,
+            document.getElementById('cfg-feat-3').value,
+            document.getElementById('cfg-feat-4').value,
+            document.getElementById('cfg-feat-5').value,
+            document.getElementById('cfg-feat-6').value
+        ].filter(id => id);
     }
 
-    // Hero Image
+    // Theme: Apply colors from the currently selected preset (stored in localStorage/dropdown)
+    const themeSelect = document.getElementById('cfg-theme-select');
+    if (themeSelect) {
+        const selectedThemeName = themeSelect.value || 'nature';
+        if (THEME_PRESETS[selectedThemeName]) {
+            currentConfig.theme = THEME_PRESETS[selectedThemeName];
+        }
+    }
+
+    // Hero Image Select
     if (!currentConfig.pages.home.hero) currentConfig.pages.home.hero = {};
-    const heroImg = document.getElementById('cfg-hero-select').value;
-    if (heroImg) currentConfig.pages.home.hero.image = heroImg;
+    const heroImg = document.getElementById('cfg-hero-select');
+    if (heroImg && heroImg.value) currentConfig.pages.home.hero.image = heroImg.value;
 
     try {
         const token = localStorage.getItem('harvest_token');
@@ -374,7 +404,23 @@ export async function saveSettings() {
             body: JSON.stringify(currentConfig)
         });
 
-        if (res.ok) showToast("Settings Saved");
+        if (res.ok) {
+            showToast("Settings Saved");
+
+            // Update global config with new values
+            window.globalConfig = currentConfig;
+
+            // Instantly toggle Low Stock Alert polling based on new setting
+            const lowStockEnabled = document.getElementById('cfg-low-stock-enabled')?.checked;
+            const threshold = parseInt(document.getElementById('cfg-inv-alert')?.value) || 5;
+
+            if (lowStockEnabled) {
+                inventoryAlertService.setThreshold(threshold);
+                inventoryAlertService.start();
+            } else {
+                inventoryAlertService.stop();
+            }
+        }
         else showToast("Failed to save", "error");
     } catch (e) { showToast("Error", "error"); }
 }
@@ -507,7 +553,7 @@ export async function initSettings() {
 
         // Initialize default tab
         if (window.setConfigTab) {
-            window.setConfigTab('general');
+            window.setConfigTab('dashboard');
         }
 
     } catch (error) {

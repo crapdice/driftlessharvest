@@ -99,4 +99,37 @@ export const api = {
     createBoxTemplate: (data) => request('/box-templates', 'POST', data),
     updateBoxTemplate: (id, data) => request(`/box-templates/${id}`, 'PUT', data),
     deleteBoxTemplate: (id) => request(`/box-templates/${id}`, 'DELETE'),
+
+    // Config (note: uses /api/config not /api/admin/config)
+    getConfig: async () => {
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch('/api/config', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to load config');
+        return res.json();
+    },
+    updateConfig: async (data) => {
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch('/api/config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to save config');
+        return res.json();
+    },
+
+    // Gemini
+    testGemini: async () => {
+        const token = localStorage.getItem('harvest_token');
+        const res = await fetch('/api/gemini/test', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        return res.json();
+    },
 };

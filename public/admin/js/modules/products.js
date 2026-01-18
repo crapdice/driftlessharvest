@@ -7,13 +7,92 @@ let templatesCache = [];
 let currentTemplateItems = [];
 let pollInterval = null;
 
+// Export init functions for ViewRouter
+
+export async function initProducts() {
+    const container = document.getElementById('view-products');
+    if (!container) return;
+
+    // Load HTML if not already loaded (use data attribute for robustness)
+    if (!container.dataset.loaded) {
+        try {
+            const response = await fetch('views/products.html');
+            if (response.ok) {
+                container.innerHTML = await response.text();
+                container.dataset.loaded = 'true';
+            } else {
+                container.innerHTML = '<div class="p-4 text-red-500">Error loading products view</div>';
+            }
+        } catch (e) {
+            console.error("Error loading products template", e);
+        }
+    }
+    startProductPolling();
+}
+
+export async function initInventory() {
+    const container = document.getElementById('view-inventory');
+    if (!container) return;
+
+    // Load HTML if not already loaded (use data attribute for robustness)
+    if (!container.dataset.loaded) {
+        try {
+            const response = await fetch('views/inventory.html');
+            if (response.ok) {
+                container.innerHTML = await response.text();
+                container.dataset.loaded = 'true';
+            }
+        } catch (e) { console.error(e); }
+    }
+    startProductPolling(); // Inventory needs polling too
+}
+
+export async function initTemplates() {
+    const container = document.getElementById('view-templates');
+    if (!container) return;
+
+    // Load HTML if not already loaded (use data attribute for robustness)
+    if (!container.dataset.loaded) {
+        try {
+            const response = await fetch('views/templates.html');
+            if (response.ok) {
+                container.innerHTML = await response.text();
+                container.dataset.loaded = 'true';
+            }
+        } catch (e) { console.error(e); }
+    }
+    startProductPolling(); // Templates rely on products data
+}
+
+export async function initArchived() {
+    const container = document.getElementById('view-archived');
+    if (!container) return;
+
+    // Load HTML if not already loaded (use data attribute for robustness)
+    if (!container.dataset.loaded) {
+        try {
+            const response = await fetch('views/archived.html');
+            if (response.ok) {
+                container.innerHTML = await response.text();
+                container.dataset.loaded = 'true';
+            } else {
+                container.innerHTML = '<div class="p-4 text-red-500">Error loading archived view</div>';
+            }
+        } catch (e) { console.error(e); }
+    }
+    loadArchivedProducts();
+}
+
 export function startProductPolling() {
     stopProductPolling();
     loadProducts(); // Initial load
     pollInterval = setInterval(() => {
         // Silent reload
-        const isModalOpen = !document.getElementById('product-modal').classList.contains('hidden') ||
-            !document.getElementById('template-modal').classList.contains('hidden');
+        const pModal = document.getElementById('product-modal');
+        const tModal = document.getElementById('template-modal');
+        const isModalOpen = (pModal && !pModal.classList.contains('hidden')) ||
+            (tModal && !tModal.classList.contains('hidden'));
+
         if (!isModalOpen) loadProducts();
     }, 5000);
 }
@@ -812,25 +891,12 @@ function renderProductDropdownOptions() {
     `).join('');
 }
 
-// View Initializers
-export async function initArchived() {
-    const container = document.getElementById('view-archived');
-    if (!container) return;
-    try {
-        const response = await fetch('views/archived.html');
-        if (!response.ok) throw new Error('Failed to load archived view');
-        container.innerHTML = await response.text();
-        await loadArchivedProducts();
-    } catch (e) { console.error('Error loading archived view:', e); }
-}
+
 
 // Global exposure for HTML bindings
 window.loadArchivedProducts = loadArchivedProducts;
-window.restoreProduct = restoreProduct;
-window.permanentDeleteProduct = permanentDeleteProduct;
-window.archiveProduct = archiveProduct;
-window.editProduct = editProduct;
-window.toggleProductStatus = toggleProductStatus;
+
+window.openProductModal = openProductModal;
 
 window.toggleProductDropdown = () => {
     const opts = document.getElementById('dropdown-options');

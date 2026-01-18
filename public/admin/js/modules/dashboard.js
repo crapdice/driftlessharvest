@@ -6,9 +6,30 @@ import { ActiveCarts } from '../components/ActiveCarts.js';
 let pollInterval = null;
 
 // Export init function for ViewRouter
-export async function init() {
+export async function initDashboard() {
+    const container = document.getElementById('view-dashboard');
+    if (!container) return;
+
+    // Load HTML if not already loaded (use data attribute for robustness)
+    if (!container.dataset.loaded) {
+        try {
+            const response = await fetch('views/dashboard.html');
+            if (response.ok) {
+                container.innerHTML = await response.text();
+                container.dataset.loaded = 'true';
+            } else {
+                console.error("Failed to load dashboard view");
+            }
+        } catch (e) {
+            console.error("Error loading dashboard template", e);
+        }
+    }
+
     await loadDashboard();
 }
+
+// Legacy alias if needed, but we'll update app.js
+export const init = initDashboard;
 
 export async function loadDashboard() {
     // Initial Load

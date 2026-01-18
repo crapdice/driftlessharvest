@@ -57,12 +57,24 @@
         <!-- Right Controls -->
         <div class="flex items-center gap-5">
 
-            <!-- Inventory Alert Indicator (Improved Visibility) -->
+            <!-- Inventory Alert Indicator with Tooltip -->
             <div id="inventory-alert-indicator"
-                class="hidden flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-full animate-pulse mr-2"
-                title="Low Inventory Alert">
-                <div class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
-                <span class="text-[10px] font-bold text-rose-400 tracking-wide uppercase">Low Stock</span>
+                class="hidden relative group flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-full mr-2 cursor-pointer">
+                <!-- Pulsing indicator elements -->
+                <div class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse">
+                </div>
+                <span class="text-[10px] font-bold text-rose-400 tracking-wide uppercase animate-pulse">Low Stock</span>
+
+                <!-- Tooltip (appears on hover - no pulse) -->
+                <div id="inventory-alert-tooltip"
+                    class="absolute top-full left-0 mt-2 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div class="px-3 py-2 border-b border-gray-700">
+                        <span class="text-xs font-bold text-rose-400 uppercase">Low Stock Items</span>
+                    </div>
+                    <ul id="inventory-alert-list" class="py-2 max-h-48 overflow-y-auto">
+                        <!-- Populated by InventoryAlertService -->
+                    </ul>
+                </div>
             </div>
 
             <!-- User Info (Populated by JS) -->
@@ -220,34 +232,12 @@
 
 
             <!-- DASHBOARD VIEW -->
-            <div id="view-dashboard" class="space-y-6">
-                <h2 class="text-2xl font-bold text-gray-800">Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Metric Cards -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="text-sm text-gray-500 mb-1">Total Revenue</div>
-                        <div id="stat-revenue" class="text-3xl font-bold text-gray-900">$0.00</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="text-sm text-gray-500 mb-1">Total Orders</div>
-                        <div id="stat-orders" class="text-3xl font-bold text-gray-900">0</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div class="text-sm text-gray-500 mb-1">Pending Orders</div>
-                        <div id="stat-pending" class="text-3xl font-bold text-orange-500">0</div>
-                    </div>
-                </div>
-                <!-- Active Carts Section -->
-                <div class="mt-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        🛒 Active Customer Carts
-                        <span
-                            class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Real-time</span>
-                    </h3>
-                    <div id="active-carts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Carts injected here -->
-                        <div class="text-sm text-gray-400 italic">Loading active carts...</div>
-                    </div>
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="hidden">
+                <!-- Content loaded dynamically from views/dashboard.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Dashboard...</span>
                 </div>
             </div>
 
@@ -290,46 +280,11 @@
             </div>
 
             <!-- ORDERS VIEW -->
-            <div id="view-orders" class="hidden space-y-4">
-                <div
-                    class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Order Management</h2>
-                        <p class="text-sm text-gray-500">Track and manage customer orders.</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="relative">
-                            <span
-                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
-                            <input type="search" placeholder="Search orders..." id="search-orders-input"
-                                name="search_orders_query" autocomplete="nop" role="searchbox" readonly
-                                onfocus="this.removeAttribute('readonly');" oninput="window.searchOrders(this.value)"
-                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                        </div>
-                        <button onclick="loadOrders()"
-                            class="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 border border-blue-100 rounded-lg hover:bg-blue-50 transition-colors">Refresh
-                            Data</button>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order Date
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer
-                                    Name</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Delivery
-                                    Address</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order
-                                    Status</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                                    Order Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orders-table-body" class="divide-y divide-gray-100"></tbody>
-                    </table>
+            <!-- ORDERS VIEW -->
+            <div id="view-orders" class="hidden">
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Orders...</span>
                 </div>
             </div>
 
@@ -342,62 +297,29 @@
             </div>
 
             <!-- PRODUCTS VIEW -->
-            <div id="view-products" class="hidden space-y-6">
-                <div
-                    class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Product Inventory</h2>
-                        <p class="text-sm text-gray-500">Manage your product catalog and stock.</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="relative">
-                            <span
-                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
-                            <input type="search" placeholder="Search products..." id="search-products-input"
-                                name="search_products_query_v2" autocomplete="nop" role="searchbox" readonly
-                                onfocus="this.removeAttribute('readonly');" oninput="window.searchProducts(this.value)"
-                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                        </div>
-                        <button onclick="openProductModal()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2">
-                            <span class="text-lg leading-none">+</span> Add Product
-                        </button>
-                    </div>
+            <!-- PRODUCTS VIEW -->
+            <div id="view-products" class="hidden">
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Products...</span>
                 </div>
+            </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-16">Img
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Farm ID
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category
-                                </th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
-                                <th class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="products-table-body" class="divide-y divide-gray-100"></tbody>
-                    </table>
+            <!-- INVENTORY VIEW -->
+            <div id="view-inventory" class="hidden">
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Inventory...</span>
                 </div>
             </div>
 
             <!-- ARCHIVED PRODUCTS VIEW -->
-            <div id="view-archived" class="hidden space-y-6">
+            <div id="view-archived" class="hidden">
                 <div class="flex items-center justify-center p-12 text-gray-400">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
                     <span>Loading Archived Items...</span>
                 </div>
             </div>
-
 
             <!-- CATEGORIES VIEW -->
             <div id="view-categories" class="hidden space-y-6">
@@ -408,18 +330,11 @@
                 </div>
             </div>
 
-
-
             <!-- TEMPLATES VIEW -->
-            <div id="view-templates" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-gray-800">Curated Box Templates</h2>
-                    <button onclick="openTemplateModal()"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm">Create
-                        Template</button>
-                </div>
-                <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards injected here -->
+            <div id="view-templates" class="hidden">
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Templates...</span>
                 </div>
             </div>
 
@@ -521,75 +436,7 @@
 
 
 
-    <!-- USER MODAL -->
-    <div id="user-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-gray-800" id="u-modal-title">Edit Customer</h3>
-                <button onclick="closeUserModal()"
-                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-            </div>
-            <div class="p-6 space-y-4">
-                <input type="hidden" id="u-id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="u-email"
-                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <!-- Password (New User) -->
-                <div id="u-password-container" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="u-password" placeholder="Required for new user"
-                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                    <select id="u-role"
-                        class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
-                        <option value="user">User (Member)</option>
-                        <option value="admin">Admin</option>
-                        <option value="super_admin">Super Admin</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="tel" id="u-phone" oninput="handleAdminPhoneInput(this)"
-                            placeholder="(555) 555-5555"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-colors">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                        <input type="text" id="u-address"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                        <input type="text" id="u-city"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                        <input type="text" id="u-state" maxlength="2" placeholder="WI" list="us-states-admin"
-                            oninput="this.value = this.value.toUpperCase()"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none uppercase">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Zip</label>
-                        <input type="text" id="u-zip"
-                            class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                </div>
-            </div>
-            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <button onclick="closeUserModal()"
-                    class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
-                <button onclick="saveUser()"
-                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm transition-all">Save
-                    Changes</button>
-            </div>
-        </div>
-    </div>
+    <!-- USER MODAL (Now loaded dynamically in view-customers) -->
 
 
     <div id="product-modals-container"></div>
@@ -629,8 +476,38 @@
                 <input type="hidden" id="t-id">
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
                     <!-- LEFT COLUMN: Image & Status -->
+
                     <div class="lg:col-span-1 space-y-6">
+                        <!-- Display Price -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Display
+                                Price</label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold">
+                                    $</div>
+                                <input type="number" id="t-price" step="0.01"
+                                    class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-medium">
+                            </div>
+                        </div>
+                        <!-- Visibility -->
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Visibility</label>
+                            <label
+                                class="flex items-start gap-3 p-3 border border-blue-100 bg-blue-50/30 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                                <input type="checkbox" id="t-active" class="mt-1 accent-blue-600 w-4 h-4">
+                                <div>
+                                    <span class="block text-sm font-bold text-gray-900">Active in Store</span>
+                                    <span class="block text-xs text-gray-500 mt-0.5">Template is visible to
+                                        customers.</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <!-- Image Preview -->
                         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Box
@@ -661,78 +538,13 @@
                             </div>
                         </div>
 
-                        <!-- Visibility -->
-                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                            <label
-                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Visibility</label>
-                            <label
-                                class="flex items-start gap-3 p-3 border border-blue-100 bg-blue-50/30 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
-                                <input type="checkbox" id="t-active" class="mt-1 accent-blue-600 w-4 h-4">
-                                <div>
-                                    <span class="block text-sm font-bold text-gray-900">Active in Store</span>
-                                    <span class="block text-xs text-gray-500 mt-0.5">Template is visible to
-                                        customers.</span>
-                                </div>
-                            </label>
-                        </div>
+
                     </div>
 
                     <!-- RIGHT COLUMN: Details & Builder -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        <!-- Basic Information -->
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
-                            <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
-                            </h4>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Template Name</label>
-                                    <div class="relative">
-                                        <input type="text" id="t-name"
-                                            class="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
-                                            placeholder="e.g. Soup Starter">
-                                        <button onclick="generateContent('t-name', 'box_name')"
-                                            class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600 transition-colors p-1 rounded-full hover:bg-purple-50"
-                                            title="Generate Name">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
-                                        Description
-                                        <button onclick="generateContent('t-desc', 'box_description')"
-                                            class="text-xs text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1 hover:underline">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                            </svg>
-                                            Generate
-                                        </button>
-                                    </label>
-                                    <textarea id="t-desc" rows="2"
-                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder-gray-400"
-                                        placeholder="Brief description..."></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Display Price</label>
-                                    <div class="relative">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold">
-                                            $</div>
-                                        <input type="number" id="t-price" step="0.01"
-                                            class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono font-medium">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Content Builder -->
+                        <!-- Content Builder (Box Contents) - MOVED UP -->
                         <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
                             <div class="flex justify-between items-center border-b border-gray-100 pb-2">
                                 <h4 class="font-bold text-gray-800 text-sm">Box Contents</h4>
@@ -793,6 +605,49 @@
                                     </svg>
                                     No items added yet
                                 </p>
+                            </div>
+                        </div>
+
+                        <!-- Basic Information - MOVED DOWN -->
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                            <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
+                            </h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Template Name</label>
+                                    <div class="relative">
+                                        <input type="text" id="t-name"
+                                            class="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                                            placeholder="e.g. Soup Starter">
+                                        <button onclick="generateContent('t-name', 'box_name')"
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600 transition-colors p-1 rounded-full hover:bg-purple-50"
+                                            title="Generate Name">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.214L13 21l-2.286-6.857L5 12l5.714-3.214L13 3z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5 flex justify-between">
+                                        Description
+                                        <button onclick="generateContent('t-desc', 'box_description')"
+                                            class="text-xs text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1 hover:underline">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            </svg>
+                                            Generate
+                                        </button>
+                                    </label>
+                                    <textarea id="t-desc" rows="2"
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder-gray-400"
+                                        placeholder="Brief description..."></textarea>
+                                </div>
+
                             </div>
                         </div>
 
@@ -894,7 +749,7 @@
                     <!-- RIGHT COLUMN: Details -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        <!-- Main Info -->
+                        Main Info -->
                         <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-5">
                             <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-2">Basic Information
                             </h4>
@@ -1535,20 +1390,9 @@
     </script>
     <script type="module" src="/admin/js/components/ChoiceModal.js"></script>
 
-    <!-- Analytics Functions -->
-    <script>
-
-    </script>
-
-    <!-- API Keys Management Functions -->
-    <script>
 
 
-    </script>
 
-    <script>
-        // ... existing loadApiKeys ...
-    </script>
 
     <!-- Gemini Generation Script -->
     <script>

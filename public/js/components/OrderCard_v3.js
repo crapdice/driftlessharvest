@@ -71,16 +71,19 @@ export function OrderCard(o) {
         <!-- Items List -->
         <div class="px-6 md:px-8 py-8">
             <ul class="space-y-3 mb-8">
-                ${aggregatedItems.map(i => `
+                ${aggregatedItems.map(i => {
+        const isBox = (i.type === 'box') || i.isBox || i.is_box; // Handle standardized 'type' and legacy flags
+        const displayName = isBox ? `Box: ${i.name}` : i.name;
+        return `
                     <li class="flex justify-between items-baseline group/item text-sm">
                         <div class="flex items-baseline gap-2 flex-1">
                             <span class="font-mono text-nature-400 w-6 text-right font-bold">${i.qty}x</span>
-                            <span class="text-nature-900 font-serif font-medium tracking-wide">${i.name}</span>
+                            <span class="text-nature-900 font-serif font-medium tracking-wide ${isBox ? 'italic' : ''}">${displayName}</span>
                             <span class="flex-1 border-b border-dotted border-nature-200 mx-2 relative top-[-4px]"></span>
                         </div>
                         <span class="font-mono text-nature-500 font-medium">$${(i.price * i.qty).toFixed(2)}</span>
                     </li>
-                `).join('')}
+                `}).join('')}
             </ul>
 
             <!-- Footer -->

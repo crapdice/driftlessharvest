@@ -16,6 +16,36 @@ router.get('/admin/stats', checkRole(['admin', 'super_admin']), (req, res) => {
     res.json({ orderCount, revenue, pending });
 });
 
+// GET /api/admin/inventory-status (Lightweight endpoint for navbar low stock indicator)
+router.get('/admin/inventory-status', checkRole(['admin', 'super_admin']), (req, res) => {
+    try {
+        // Default threshold is 10, but can be overridden by query param
+        const threshold = parseInt(req.query.threshold) || 10;
+
+        // Check if is_archived column exists
+        const cols = db.prepare("PRAGMA table_info(products)").all().map(c => c.name);
+        const hasIsArchived = cols.includes('is_archived');
+
+        // Get active products with stock below threshold (limit to 10 for tooltip)
+        const query = hasIsArchived
+            ? `SELECT id, name, stock FROM products WHERE is_active = 1 AND is_archived = 0 AND stock < ? ORDER BY stock ASC LIMIT 10`
+            : `SELECT id, name, stock FROM products WHERE is_active = 1 AND stock < ? ORDER BY stock ASC LIMIT 10`;
+
+        const products = db.prepare(query).all(threshold);
+
+        console.log(`[Inventory Status] Found ${products.length} low stock items (threshold: ${threshold})`);
+
+        res.json({
+            lowStockCount: products.length,
+            threshold,
+            products: products.map(p => ({ name: p.name, stock: p.stock }))
+        });
+    } catch (e) {
+        console.error('[Inventory Status] Error:', e);
+        res.status(500).json({ error: 'Failed to check inventory status' });
+    }
+});
+
 // GET /api/admin/users
 router.get('/admin/users', checkRole(['admin', 'super_admin']), (req, res) => {
     try {

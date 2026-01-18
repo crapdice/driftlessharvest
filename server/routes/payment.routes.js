@@ -127,7 +127,7 @@ router.post('/create-payment-intent', async (req, res) => {
                 item.name || 'Unknown Item',
                 item.qty,
                 item.price || 0,
-                item.type || 'product'
+                item.type || (item.isBox ? 'box' : 'product')
             );
         }
         console.log('[Payment Init] Order items inserted');

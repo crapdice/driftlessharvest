@@ -1,7 +1,8 @@
-import { setLoginHandler } from './api.js';
-import { loadDashboard, stopPolling } from './dashboard.js';
-import { loadOrders } from './orders.js';
-import { loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal, startProductPolling, stopProductPolling, initArchived } from './products.js';
+import { setLoginHandler, api } from './api.js';
+import { initDashboard, loadDashboard, stopPolling } from './dashboard.js';
+import { loadOrders, initOrders } from './orders.js';
+import { initProducts, initInventory, initTemplates, initArchived, loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal } from './products.js';
+import { inventoryAlertService } from '../core/InventoryAlertService.js';
 import { loadUsers, saveUser, openUserModal, initUsers } from './users.js';
 import { loadDelivery, addDeliveryWindow } from './delivery.js';
 import { loadSettings, saveSettings, restoreDefaults, initSettings } from './settings.js';
@@ -47,12 +48,22 @@ window.redoLayout = redoLayout;
 
 
 // Init
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initAuth();
     initMobileMenu();
     initTheme();
-    startProductPolling(); // Start polling for global alerts (inventory)
 
+    // Check config for low stock alert setting before starting inventory alert polling
+    try {
+        const config = await api.getConfig();
+        window.globalConfig = config;
+        if (config.meta?.lowStockAlertEnabled !== false) {
+            inventoryAlertService.start();
+        }
+    } catch (e) {
+        console.warn('Could not load config for polling decision', e);
+        inventoryAlertService.start(); // Default to enabled if config fails
+    }
 
     // Check URL hash for direct tab navigation
     const hash = window.location.hash.slice(1);
@@ -227,7 +238,7 @@ function setTab(tabName) {
 
     // Load Data
     switch (tabName) {
-        case 'dashboard': loadDashboard(); break;
+        case 'dashboard': initDashboard(); break;
         default:
             stopPolling(); // Stop dashboard polling
             break;
@@ -235,17 +246,17 @@ function setTab(tabName) {
 
     switch (tabName) {
         case 'dashboard': break; // Already loaded
-        case 'orders': loadOrders(); break;
+        case 'orders': initOrders(); break;
         case 'customers': initUsers('customer'); break;
         case 'users': initUsers('admin'); break;
-        case 'products': startProductPolling(); break;
+        case 'products': initProducts(); break;
         case 'archived': initArchived(); break;
         case 'categories': initCategories(); break;
         case 'inventory':
-            startProductPolling(); // Inventory uses products
+            initInventory();
             break;
         case 'delivery': loadDelivery(); break;
-        case 'templates': startProductPolling(); break; // Templates uses products & templates
+        case 'templates': initTemplates(); break; // Templates uses products & templates
         case 'settings': initSettings(); break;
         case 'utilities':
             initUtilities();

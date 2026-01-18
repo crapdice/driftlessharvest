@@ -1,4 +1,5 @@
 import { showToast } from './utils.js';
+import { api } from './api.js';
 
 const VIEW_PATH = 'views/api-keys.html';
 
@@ -6,12 +7,13 @@ export async function initApiKeys() {
     const container = document.getElementById('view-api-keys');
     if (!container) return;
 
-    if (container.children.length <= 1 || container.querySelector('.animate-spin')) {
+    if (!container.dataset.loaded) {
         try {
             const response = await fetch(VIEW_PATH);
             if (!response.ok) throw new Error('Failed to load API keys view');
             const html = await response.text();
             container.innerHTML = html;
+            container.dataset.loaded = 'true';
         } catch (error) {
             console.error('Error initializing API keys:', error);
             showToast('Failed to load API keys management', 'error');
@@ -24,12 +26,7 @@ export async function initApiKeys() {
 
 export async function loadApiKeys() {
     try {
-        const response = await fetch('/api/config', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-        });
-
-        if (!response.ok) throw new Error('Failed to load config');
-        const config = await response.json();
+        const config = await api.getConfig();
 
         // Load Resend API key
         const resendInput = document.getElementById('resend-api-key');
@@ -67,28 +64,14 @@ export async function saveApiKey(type) {
 
     try {
         // 1. Fetch current config
-        const response = await fetch('/api/config', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-        });
-
-        if (!response.ok) throw new Error('Failed to load config');
-        const config = await response.json();
+        const config = await api.getConfig();
 
         // 2. Update specific key
         if (!config.apiKeys) config.apiKeys = {};
         config.apiKeys[type] = key;
 
         // 3. Save back
-        const saveResponse = await fetch('/api/config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('harvest_token')}`
-            },
-            body: JSON.stringify(config)
-        });
-
-        if (!saveResponse.ok) throw new Error('Failed to save config');
+        await api.updateConfig(config);
 
         showToast(`${keyName} API key saved successfully!`, 'success');
     } catch (error) {
@@ -138,14 +121,9 @@ export async function testGeminiConnection() {
     showToast('Testing Gemini connection...', 'info');
 
     try {
-        const response = await fetch('/api/gemini/test', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('harvest_token')}` }
-        });
+        const data = await api.testGemini();
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
+        if (data.success) {
             showToast('Gemini API Connected Successfully!', 'success');
         } else {
             throw new Error(data.error || 'Connection verification failed');
@@ -163,3 +141,4 @@ if (typeof window !== 'undefined') {
     window.testResendConnection = testResendConnection;
     window.testGeminiConnection = testGeminiConnection;
 }
+
