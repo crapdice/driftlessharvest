@@ -1,37 +1,36 @@
-# Blueprint - 404 Routing Resolution & Test Data Cleanup
+# Blueprint: Admin Products Module Refactor (Phase 3)
 
-## Objective
-1. Identify and resolve the root cause of the persistent 404 "API Endpoint Not Found" error for the `/api/admin/utilities/clean-delivery-windows` endpoint.
-2. Manually delete all delivery windows containing the word "test" as requested by the user.
+The `public/admin/js/modules/products.js` file is currently a "God Module" containing 922 lines and at least 4 distinct functional domains: Product Management, Box Templates, Inventory, and Archived Items. This blueprint outlines the strategy for decomposing it into a maintainable folder structure.
 
-## Root Cause Analysis
-[ARCHITECTURAL_HYPOTHESIS]
-The 404 error is highly likely caused by **Zombie Node.js Processes**. 
-- My research shows PID `13264` is currently listening on port `3000`.
-- Other processes (PIDs `22476`, `3128`) are also running.
-- One of these processes was likely started *before* the recent route refactoring, meaning it is serving an old version of the route tree that does not include the standard `/admin/utilities/` paths.
-- Newer server instances (including the one I tried to start) fail to bind to port 3000 if it's already held, or they bind but don't receive the traffic.
+## Architectural Hypothesis [ARCHITECTURAL_HYPOTHESIS]
+Moving to a folder-based module system (`modules/products/`) will allow us to use ES6 imports/exports more effectively, reduce global namespace pollution, and improve testability of individual components.
 
-## Proposed Actions
+## Proposed Changes
 
-### 1. Environment Sanitization
-- Terminate all active Node.js processes associated with the application to ensure no stale code is running.
-- Verify port 3000 is free using `netstat`.
+### 📁 Directory Structure [NEW]
+```text
+public/admin/js/modules/products/
+├── index.js           # Public API aggregator
+├── ProductList.js     # Main product grid and search
+├── ProductModal.js    # Create/Edit product logic
+├── TemplatesBoard.js  # Box templates view
+├── TemplateBuilder.js # Box template creation/edit modal
+├── InventoryView.js   # Stock and inventory management
+└── ArchivedView.js    # View for deleted/archived items
+```
 
-### 2. Manual Data Cleanup
-- Execute a Node.js script to connect to `server/db/harvest.db` using `better-sqlite3`.
-- Delete all rows from the `delivery_windows` table where `date_label` or `date_value` contains the case-insensitive string "test".
+### [MODIFY] [app.js](file:///c:/Users/zackf/Documents/OpenAI/harvest-app/public/admin/js/modules/app.js)
+Update imports to use the new `products/index.js` aggregator.
 
-### 3. Verification & Restart
-- Restart the server using `node server/index.js`.
-- Verify the `/api/admin/utilities/clean-delivery-windows` endpoint is accessible (authenticated) using a diagnostic `curl` or `Invoke-WebRequest`.
-- Verify the manual deletion by querying the database.
+### [DELETE] [products.js](file:///c:/Users/zackf/Documents/OpenAI/harvest-app/public/admin/js/modules/products.js)
+The monolithic file will be removed after successful extraction.
 
-## Reflection (CRITIC-PASS)
-- **Potential Race Conditions**: Killing processes while DB connections are active. SQLite handles this with file locks, but a clean shutdown is preferred if possible. Since we are in a broken state, `taskkill /F` is necessary.
-- **Security Flaws**: The manual cleanup script will use parameterized queries to avoid SQL injection, although the input ("test") is currently hardcoded.
-- **Architectural Debt**: The project currently lacks a robust "dev" process runner (like `nodemon`) that reliably cleans up children on Windows.
+## Internal Reflection [CRITIC]
+1. **Global Bindings**: `products.js` currently binds ~10 functions to `window`. We need to ensure these remain available during the transition (Strangler Fig pattern) or migrate the HTML to use the `ActionDispatcher` if we move to Phase 4.
+2. **State Sharing**: `productsCache` and `templatesCache` are shared across domains. These should be moved to a shared state or passed explicitly.
+3. **Circular Dependencies**: Ensure `ProductModal` and `ProductList` don't create circular import chains.
 
-## Approval Required
-- Approval to terminate all `node.exe` processes (PIDs `13264`, `22476`, `3128`).
-- Approval to run the manual cleanup script.
+## Verification Gatekeeping [VERIFICATION]
+1. **Manual Smoke Test**: Navigate all 4 sub-views (Products, Templates, Inventory, Archived) and verify data loads.
+2. **CRUD Verification**: Create and edit a product; create and edit a box template.
+3. **Inventory Update**: Modify stock and verify persistence.
