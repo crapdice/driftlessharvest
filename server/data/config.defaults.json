@@ -38,7 +38,9 @@
         "useBentoGrid": true,
         "showBoxTooltips": true,
         "featuredTitle": "Fresh from the farm to your table.",
-        "featuredSubtitle": "See What's In Season"
+        "featuredSubtitle": "See What's In Season",
+        "activeLaunchVariant": "Artisan Sketch (Design 3)",
+        "launchModeEnabled": true
     },
     "experiments": {
         "heroMessaging": {
@@ -223,20 +225,20 @@
         "login": {
             "headline": "Fresh from the farm to your table.",
             "subhead": "Join thousands of happy customers eating cleaner, greener, and better.",
-            "image": "/images/ridge_valley_farm.png"
+            "image": "/images/login_hero.png"
         },
         "signup": {
             "headline": "Real food from the Driftless hills.",
             "subhead": "Join our community in Viroqua for weekly organic boxes, harvested from living soil just miles from your door.",
-            "image": ""
+            "image": "/images/signup_hero.png"
         }
     },
     "featuredProducts": [
         "6",
-        "4",
-        "8",
+        "3",
+        "2",
         "5",
-        "9",
+        "1",
         "7"
     ],
     "theme": {
@@ -267,5 +269,9 @@
             "auth-farm": "url('./assets/images/auth_farm.png')"
         }
     },
-    "stripePublishableKey": "pk_test_51SnP5wLt8otmUU9wVt91D9yQiwTYx2vQnYTqYJd6PB5BFG0H0Eyz9T6yRzLUcM2y72ag8SGweVcjNWe546zMz34X00K954NmzJ"
+    "stripePublishableKey": "pk_test_51SnP5wLt8otmUU9wVt91D9yQiwTYx2vQnYTqYJd6PB5BFG0H0Eyz9T6yRzLUcM2y72ag8SGweVcjNWe546zMz34X00K954NmzJ",
+    "apiKeys": {
+        "gemini": "AIzaSyDdYjP7D6yM1tPyE_z6czIENXaFjoG8Q30",
+        "resend": "re_HaxTXWhq_EXZdSJJu6TNJF9xMgURgoDrA"
+    }
 }

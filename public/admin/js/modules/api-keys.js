@@ -39,6 +39,25 @@ export async function loadApiKeys() {
         if (geminiInput && config.apiKeys?.gemini) {
             geminiInput.value = config.apiKeys.gemini;
         }
+
+        // Load Cloudflare API keys
+        const cfAccountInput = document.getElementById('cloudflare-account-id');
+        const cfAccessKeyInput = document.getElementById('cloudflare-access-key-id');
+        const cfSecretKeyInput = document.getElementById('cloudflare-secret-access-key');
+        const cfBucketInput = document.getElementById('cloudflare-r2-bucket');
+
+        if (cfAccountInput && config.apiKeys?.cloudflare?.accountId) {
+            cfAccountInput.value = config.apiKeys.cloudflare.accountId;
+        }
+        if (cfAccessKeyInput && config.apiKeys?.cloudflare?.accessKeyId) {
+            cfAccessKeyInput.value = config.apiKeys.cloudflare.accessKeyId;
+        }
+        if (cfSecretKeyInput && config.apiKeys?.cloudflare?.secretAccessKey) {
+            cfSecretKeyInput.value = config.apiKeys.cloudflare.secretAccessKey;
+        }
+        if (cfBucketInput && config.apiKeys?.cloudflare?.r2Bucket) {
+            cfBucketInput.value = config.apiKeys.cloudflare.r2Bucket;
+        }
     } catch (error) {
         console.error('[API Keys] Error loading:', error);
     }
@@ -58,6 +77,18 @@ export async function saveApiKey(type) {
         keyName = 'Gemini';
         if (!key) return showToast('Please enter a Gemini API key', 'error');
         if (!key.startsWith('AIzaSy')) return showToast('Invalid Gemini API key format (should start with "AIzaSy")', 'error');
+    } else if (type === 'cloudflare') {
+        const accountId = document.getElementById('cloudflare-account-id').value.trim();
+        const accessKeyId = document.getElementById('cloudflare-access-key-id').value.trim();
+        const secretAccessKey = document.getElementById('cloudflare-secret-access-key').value.trim();
+        const r2Bucket = document.getElementById('cloudflare-r2-bucket').value.trim();
+
+        if (!accountId || !accessKeyId || !secretAccessKey) {
+            return showToast('Account ID, Access Key ID, and Secret Access Key are required', 'error');
+        }
+
+        key = { accountId, accessKeyId, secretAccessKey, r2Bucket };
+        keyName = 'Cloudflare';
     } else {
         return;
     }
@@ -134,11 +165,34 @@ export async function testGeminiConnection() {
     }
 }
 
+export async function testCloudflareConnection() {
+    const accountId = document.getElementById('cloudflare-account-id').value.trim();
+    const accessKeyId = document.getElementById('cloudflare-access-key-id').value.trim();
+    const secretAccessKey = document.getElementById('cloudflare-secret-access-key').value.trim();
+
+    if (!accountId || !accessKeyId || !secretAccessKey) {
+        showToast('Please enter Account ID, Access Key, and Secret Key first', 'error');
+        return;
+    }
+
+    showToast('Testing Cloudflare credentials format...', 'info');
+
+    // Simple format checks for now
+    if (accountId.length === 32 && accessKeyId.length >= 32 && secretAccessKey.length >= 40) {
+        setTimeout(() => {
+            showToast('Cloudflare credentials format looks valid!', 'success');
+        }, 1000);
+    } else {
+        showToast('Invalid Cloudflare credential format. Check your IDs and Keys.', 'error');
+    }
+}
+
 // Attach to window for global access from HTML onclick handlers
 if (typeof window !== 'undefined') {
     window.saveApiKey = saveApiKey;
     window.toggleApiKeyVisibility = toggleApiKeyVisibility;
     window.testResendConnection = testResendConnection;
     window.testGeminiConnection = testGeminiConnection;
+    window.testCloudflareConnection = testCloudflareConnection;
 }
 
