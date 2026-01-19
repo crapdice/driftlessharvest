@@ -148,7 +148,7 @@ export async function loadProducts() {
 
         if (!window.globalConfig) {
             try {
-                window.globalConfig = await fetch('/api/config').then(r => r.json());
+                window.globalConfig = await api.getConfig();
             } catch (e) { console.warn("Config load failed", e); }
         }
 
@@ -403,10 +403,7 @@ window.archiveProduct = async (id) => {
 window.restoreProduct = async (id) => {
     if (!confirm("Restore this product? It will be set to 'Disabled' with 0 stock.")) return;
     try {
-        await fetch(`/api/admin/products/${id}/restore`, {
-            method: 'POST',
-            credentials: 'include'
-        });
+        await api.restoreProduct(id);
         showToast("Product Restored");
         loadArchivedProducts();
         loadProducts(); // In case we want to update counters or cache
@@ -415,10 +412,7 @@ window.restoreProduct = async (id) => {
 window.permanentDeleteProduct = async (id) => {
     if (!confirm("PERMANENTLY DELETE this product? This acton cannot be undone!")) return;
     try {
-        await fetch(`/api/admin/products/${id}/permanent`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
+        await api.permanentDeleteProduct(id);
         showToast("Permanently Deleted");
         loadArchivedProducts();
     } catch (e) { showToast("Failed to delete", "error"); }
@@ -450,8 +444,7 @@ export async function openProductModal(p = null) {
     const catSelect = document.getElementById('p-category');
     if (catSelect.children.length <= 1) { // Load if empty
         try {
-            const res = await fetch('/api/categories');
-            const cats = await res.json();
+            const cats = await api.getCategories();
             catSelect.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
         } catch (e) { }
     }
@@ -709,7 +702,7 @@ export async function loadInventory() {
     try {
         // Fetch config for settings (Sonar etc)
         try {
-            const cfg = await fetch('/api/config').then(r => r.json());
+            const cfg = await api.getConfig();
             window.globalConfig = cfg;
         } catch (e) {
             console.warn("Could not load config for product views", e);
@@ -868,8 +861,7 @@ window.updateStock = async (id, delta) => {
 // Helper to check stock levels against config threshold
 async function checkInventoryHealth(products) {
     try {
-        const res = await fetch('/api/config');
-        const config = await res.json();
+        const config = await api.getConfig();
         const alertLevel = config.meta?.inventoryAlertLevel ?? 5;
 
         // Check for ANY active product below threshold (but likely > 0 if we only want "low", or <= if we want "low/out")

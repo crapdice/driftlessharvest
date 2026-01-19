@@ -77,12 +77,8 @@ async function initAuth() {
     // Validate session via API - HttpOnly cookie is sent automatically
     // Do NOT rely on localStorage for auth decisions (deprecated per frontend_architecture_assessment.md)
     try {
-        const res = await fetch('/api/user/profile', {
-            credentials: 'include'
-        });
-
-        if (res.ok) {
-            const user = await res.json();
+        const user = await api.getProfile();
+        if (user) {
             // Update localStorage for UI display purposes only (not for auth)
             localStorage.setItem('harvest_user', JSON.stringify(user));
             renderHeaderUser();
@@ -192,32 +188,21 @@ async function handleLogin(e) {
     const pwd = document.getElementById('login-password').value;
 
     try {
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', // Receive and store HttpOnly cookie
-            body: JSON.stringify({ email, password: pwd })
-        });
-        const data = await res.json();
+        const data = await api.login({ email, password: pwd });
+        // Token now in cookie - only store user info for UI
+        localStorage.setItem('harvest_user', JSON.stringify(data.user));
+        document.getElementById('login-modal').style.display = 'none';
+        renderHeaderUser(); // Update UI
 
-        if (res.ok) {
-            // Token now in cookie - only store user info for UI
-            localStorage.setItem('harvest_user', JSON.stringify(data.user));
-            document.getElementById('login-modal').style.display = 'none';
-            renderHeaderUser(); // Update UI
-
-            // Check for redirect parameter in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectPath = urlParams.get('redirect');
-            if (redirectPath && redirectPath.startsWith('/')) {
-                window.location.href = redirectPath;
-                return;
-            }
-
-            setTab(currentTab);
-        } else {
-            alert("Login Failed: " + (data.error || "Unknown"));
+        // Check for redirect parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectPath = urlParams.get('redirect');
+        if (redirectPath && redirectPath.startsWith('/')) {
+            window.location.href = redirectPath;
+            return;
         }
+
+        setTab(currentTab);
     } catch (e) {
         console.error(e);
         alert("Error logging in");
@@ -227,7 +212,7 @@ async function handleLogin(e) {
 window.logout = async () => {
     // Clear cookie server-side
     try {
-        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        await api.logout();
     } catch (e) {
         console.error('Logout API failed:', e);
     }
