@@ -1,0 +1,222 @@
+[
+    {
+        "firstName": "Lars",
+        "lastName": "Gunderson",
+        "email": "lars@viroqua.net",
+        "phone": "608-637-1234",
+        "street": "101 S Main St",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Ingrid",
+        "lastName": "Olsen",
+        "email": "iolsen@westbyfarmers.com",
+        "phone": "608-634-5678",
+        "street": "200 N Main St",
+        "city": "Westby",
+        "state": "WI",
+        "zip": "54667",
+        "password": "password123"
+    },
+    {
+        "firstName": "Beau",
+        "lastName": "LaFarge",
+        "email": "beau@kickapoo.org",
+        "phone": "608-625-2345",
+        "street": "105 S Main St",
+        "city": "La Farge",
+        "state": "WI",
+        "zip": "54639",
+        "password": "password123"
+    },
+    {
+        "firstName": "Mabel",
+        "lastName": "Jensen",
+        "email": "mabel@coonvalley.coop",
+        "phone": "608-452-9876",
+        "street": "108 Central Ave",
+        "city": "Coon Valley",
+        "state": "WI",
+        "zip": "54623",
+        "password": "password123"
+    },
+    {
+        "firstName": "Sven",
+        "lastName": "Hanson",
+        "email": "sven@ontariowind.com",
+        "phone": "608-337-4321",
+        "street": "205 Garden St",
+        "city": "Ontario",
+        "state": "WI",
+        "zip": "54651",
+        "password": "password123"
+    },
+    {
+        "firstName": "Greta",
+        "lastName": "Miller",
+        "email": "greta@hillsborobrewery.com",
+        "phone": "608-489-1122",
+        "street": "848 Water Ave",
+        "city": "Hillsboro",
+        "state": "WI",
+        "zip": "54634",
+        "password": "password123"
+    },
+    {
+        "firstName": "Ole",
+        "lastName": "Thorson",
+        "email": "ole@readstown.org",
+        "phone": "608-629-5544",
+        "street": "116 S 4th St",
+        "city": "Readstown",
+        "state": "WI",
+        "zip": "54652",
+        "password": "password123"
+    },
+    {
+        "firstName": "Signe",
+        "lastName": "Bjornson",
+        "email": "signe@viola.net",
+        "phone": "608-627-9988",
+        "street": "101 S Commercial St",
+        "city": "Viola",
+        "state": "WI",
+        "zip": "54664",
+        "password": "password123"
+    },
+    {
+        "firstName": "Arvid",
+        "lastName": "Erikson",
+        "email": "arvid@viroqua.net",
+        "phone": "608-637-8877",
+        "street": "502 E Jefferson St",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Birgit",
+        "lastName": "Sorenson",
+        "email": "birgit@westby.org",
+        "phone": "608-634-1122",
+        "street": "401 S Main St",
+        "city": "Westby",
+        "state": "WI",
+        "zip": "54667",
+        "password": "password123"
+    },
+    {
+        "firstName": "Nels",
+        "lastName": "Nelson",
+        "email": "nels@lafarge.com",
+        "phone": "608-625-7766",
+        "street": "201 W Main St",
+        "city": "La Farge",
+        "state": "WI",
+        "zip": "54639",
+        "password": "password123"
+    },
+    {
+        "firstName": "Astrid",
+        "lastName": "Larsen",
+        "email": "astrid@viroqua.org",
+        "phone": "608-637-3344",
+        "street": "120 N East St",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Thor",
+        "lastName": "Hammer",
+        "email": "thor@hillsboro.net",
+        "phone": "608-489-5566",
+        "street": "123 Field Ave",
+        "city": "Hillsboro",
+        "state": "WI",
+        "zip": "54634",
+        "password": "password123"
+    },
+    {
+        "firstName": "Solveig",
+        "lastName": "Johanson",
+        "email": "solveig@viroqua.net",
+        "phone": "608-637-2211",
+        "street": "410 S Rusk Ave",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Knut",
+        "lastName": "Knutson",
+        "email": "knut@westby.net",
+        "phone": "608-634-9900",
+        "street": "110 E State St",
+        "city": "Westby",
+        "state": "WI",
+        "zip": "54667",
+        "password": "password123"
+    },
+    {
+        "firstName": "Helga",
+        "lastName": "Holm",
+        "email": "helga@viroqua.com",
+        "phone": "608-637-4455",
+        "street": "220 W Court St",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Gunnar",
+        "lastName": "Gustafson",
+        "email": "gunnar@driftless.org",
+        "phone": "608-637-6677",
+        "street": "303 E Terhune St",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Freya",
+        "lastName": "Fjord",
+        "email": "freya@organicvalley.com",
+        "phone": "608-625-3322",
+        "street": "ONE Organic Way",
+        "city": "La Farge",
+        "state": "WI",
+        "zip": "54639",
+        "password": "password123"
+    },
+    {
+        "firstName": "Einar",
+        "lastName": "Eklund",
+        "email": "einar@viroqua.net",
+        "phone": "608-637-0011",
+        "street": "704 N Main St",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    },
+    {
+        "firstName": "Dahlia",
+        "lastName": "Bloom",
+        "email": "dahlia@driftlessharvest.com",
+        "phone": "608-637-5588",
+        "street": "515 S Center Ave",
+        "city": "Viroqua",
+        "state": "WI",
+        "zip": "54665",
+        "password": "password123"
+    }
+]
