@@ -15,6 +15,7 @@ import {
 import { initUtilities } from './utilities.js';
 import { initCategories } from './categories.js';
 import { initAnalytics } from './analytics.js';
+import { initPrototypes } from './inventory_prototypes.js';
 
 // State
 let currentTab = 'dashboard';
@@ -44,6 +45,26 @@ window.setCompTab = setCompTab;
 window.saveComponentContent = saveComponentContent;
 window.undoLayout = undoLayout;
 window.redoLayout = redoLayout;
+
+// Prototype Switcher
+window.switchPrototype = (version) => {
+    // UI Update (button states)
+    [1, 2, 3, 4, 5].forEach(v => {
+        const btn = document.getElementById(`proto-btn-${v}`);
+        if (btn) {
+            btn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
+            btn.classList.add('text-gray-500', 'hover:text-gray-700');
+        }
+    });
+    const activeBtn = document.getElementById(`proto-btn-${version}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-gray-500', 'hover:text-gray-700');
+        activeBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
+    }
+
+    // Load content
+    initPrototypes(version);
+};
 
 
 // Init
@@ -307,6 +328,9 @@ function setTab(tabName) {
         case 'layouts': initLayouts(); break;
         case 'analytics':
             initAnalytics();
+            break;
+        case 'inventory-prototypes':
+            window.switchPrototype(1); // Default to V1
             break;
     }
 }

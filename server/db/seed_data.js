@@ -104,4 +104,6 @@ const SEED_BOX_TEMPLATES = [
     }
 ];
 
-module.exports = { SEED_PRODUCTS, SEED_BOX_TEMPLATES };
+const SEED_USERS = require('./mock_users.json');
+
+module.exports = { SEED_PRODUCTS, SEED_BOX_TEMPLATES, SEED_USERS };

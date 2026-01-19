@@ -13,30 +13,27 @@ const fs = require('fs');
 const path = require('path');
 const { checkRole } = require('../../middleware/auth');
 
+const { SEED_USERS } = require('../../db/seed_data');
+
 // POST /admin/utilities/seed-users
 router.post('/admin/utilities/seed-users', checkRole(['super_admin']), (req, res) => {
     try {
-        const testUsers = [
-            { email: 'customer1@test.com', password: 'password123', firstName: 'John', lastName: 'Doe', phone: '5551234567' },
-            { email: 'customer2@test.com', password: 'password123', firstName: 'Jane', lastName: 'Smith', phone: '5552345678' },
-            { email: 'customer3@test.com', password: 'password123', firstName: 'Bob', lastName: 'Wilson', phone: '5553456789' },
-            { email: 'customer4@test.com', password: 'password123', firstName: 'Alice', lastName: 'Brown', phone: '5554567890' },
-            { email: 'customer5@test.com', password: 'password123', firstName: 'Charlie', lastName: 'Davis', phone: '5555678901' }
-        ];
-
         let usersCreated = 0;
         let addressesCreated = 0;
 
         const seedTransaction = db.transaction(() => {
             const insertAddress = db.prepare(`
-                INSERT INTO addresses (user_id, user_email, name, street, city, state, zip, phone, type)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO addresses (
+                    user_id, user_email, name, street, city, state, zip, phone, type, is_default, first_name, last_name
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
 
-            for (const userData of testUsers) {
+            for (const userData of SEED_USERS) {
                 // Skip if user already exists
                 if (userRepository.emailExists(userData.email)) continue;
 
+                // password is included in SEED_USERS (e.g. 'password123')
                 const user = userRepository.create(userData);
                 usersCreated++;
 
@@ -45,12 +42,15 @@ router.post('/admin/utilities/seed-users', checkRole(['super_admin']), (req, res
                     user.id,
                     user.email,
                     `${userData.firstName} ${userData.lastName}`,
-                    '123 Test Street',
-                    'Viroqua',
-                    'WI',
-                    '54665',
+                    userData.street,
+                    userData.city,
+                    userData.state,
+                    userData.zip,
                     userData.phone,
-                    'shipping'
+                    'shipping',
+                    1, // is_default
+                    userData.firstName,
+                    userData.lastName
                 );
                 addressesCreated++;
             }
@@ -74,14 +74,19 @@ router.post('/admin/utilities/seed-users', checkRole(['super_admin']), (req, res
 // POST /admin/utilities/seed-orders
 router.post('/admin/utilities/seed-orders', checkRole(['super_admin']), (req, res) => {
     try {
-        const users = db.prepare('SELECT id, email FROM users WHERE admin_type_id IS NULL LIMIT 5').all();
-        const products = db.prepare('SELECT id, name, price FROM products LIMIT 5').all();
+        const users = db.prepare('SELECT id, email FROM users WHERE admin_type_id IS NULL').all();
+        const products = db.prepare('SELECT id, name, price FROM products WHERE is_active = 1').all();
+        const templates = db.prepare('SELECT id, name, base_price FROM box_templates WHERE is_active = 1').all();
+        const windows = db.prepare('SELECT * FROM delivery_windows WHERE is_active = 1').all();
 
         if (users.length === 0) {
             return res.status(400).json({ error: 'No customers found to seed orders for. Please seed users first.' });
         }
-        if (products.length === 0) {
-            return res.status(412).json({ error: 'No products found. Please ensure catalog is seeded.' });
+        if (products.length === 0 && templates.length === 0) {
+            return res.status(412).json({ error: 'No products or boxes found. Please ensure catalog is seeded.' });
+        }
+        if (windows.length === 0) {
+            return res.status(412).json({ error: 'No delivery windows found. Create windows in Configuration > Delivery first.' });
         }
 
         let ordersCreated = 0;
@@ -89,40 +94,82 @@ router.post('/admin/utilities/seed-orders', checkRole(['super_admin']), (req, re
 
         const seedTransaction = db.transaction(() => {
             const insertOrder = db.prepare(`
-                INSERT INTO orders (user_id, user_email, total, status, delivery_window, items)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO orders (user_id, user_email, total, status, delivery_window, items, address_id, delivery_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `);
             const insertOrderItem = db.prepare(`
                 INSERT INTO order_items (order_id, product_id, product_name, quantity, price_at_purchase, item_type)
                 VALUES (?, ?, ?, ?, ?, ?)
             `);
-            const insertAddress = db.prepare(`
-                INSERT INTO addresses (user_id, user_email, name, street, city, state, zip, phone, type)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `);
 
-            for (const user of users) {
-                // Create a basic address for the user
-                const addr = insertAddress.run(
-                    user.id, user.email, 'Seed User', '123 Main St', 'Viroqua', 'WI', '54665', '555-0100', 'shipping'
-                );
+            // Seed up to 100 random orders spread across users for better data density
+            const numOrders = Math.min(100, users.length * 5);
 
-                // Create an order
-                const total = products.reduce((sum, p) => sum + p.price, 0);
+            for (let i = 0; i < numOrders; i++) {
+                const user = users[Math.floor(Math.random() * users.length)];
+                // Find a default address for this user
+                const address = db.prepare('SELECT id FROM addresses WHERE user_id = ? AND is_default = 1').get(user.id);
+                const window = windows[Math.floor(Math.random() * windows.length)];
+
+                const orderItemsList = [];
+                let orderTotal = 0;
+
+                // Pick 1-4 random products
+                const numProds = Math.floor(Math.random() * 4) + 1;
+                const shuffledProds = [...products].sort(() => 0.5 - Math.random());
+                const selectedProds = shuffledProds.slice(0, numProds);
+
+                selectedProds.forEach(p => {
+                    const qty = Math.floor(Math.random() * 3) + 1;
+                    orderItemsList.push({
+                        id: p.id,
+                        name: p.name,
+                        price: p.price,
+                        qty: qty,
+                        type: 'product'
+                    });
+                    orderTotal += p.price * qty;
+                });
+
+                // 40% chance of adding a box template
+                if (templates.length > 0 && Math.random() > 0.6) {
+                    const template = templates[Math.floor(Math.random() * templates.length)];
+                    orderItemsList.push({
+                        id: template.id,
+                        name: template.name,
+                        price: template.base_price,
+                        qty: 1,
+                        type: 'box'
+                    });
+                    orderTotal += template.base_price;
+                }
+
+                const windowStr = `${window.date_label} (${window.start_time} - ${window.end_time})`;
+
                 const orderResult = insertOrder.run(
                     user.id,
                     user.email,
-                    total,
+                    orderTotal,
                     'Paid',
-                    'Friday 4pm-6pm',
-                    JSON.stringify(products.map(p => ({ id: p.id, name: p.name, price: p.price, qty: 1 })))
+                    windowStr,
+                    JSON.stringify(orderItemsList),
+                    address ? address.id : null,
+                    window.date_value
                 );
+
                 const orderId = orderResult.lastInsertRowid;
                 ordersCreated++;
 
-                // Add items
-                for (const product of products) {
-                    insertOrderItem.run(orderId, product.id, product.name, 1, product.price, 'product');
+                // Add individual items
+                for (const item of orderItemsList) {
+                    insertOrderItem.run(
+                        orderId,
+                        item.type === 'product' ? item.id : null,
+                        item.name,
+                        item.qty,
+                        item.price,
+                        item.type
+                    );
                     itemsCreated++;
                 }
             }

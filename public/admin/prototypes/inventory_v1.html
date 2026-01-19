@@ -1,0 +1,29 @@
+<div class="space-y-6">
+    <div class="bg-gradient-to-r from-emerald-600 to-green-700 p-8 rounded-3xl text-white shadow-xl">
+        <h3 class="text-3xl font-black tracking-tight">HARVEST COMMAND</h3>
+        <p class="text-emerald-100 mt-2 font-medium opacity-80">Batch operations and visual stock health monitoring.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">Critical Alerts</div>
+                <div class="text-2xl font-black mt-1" id="v1-critical-count">...</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">Total SKUs</div>
+                <div class="text-2xl font-black mt-1" id="v1-total-skus">...</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div class="text-[10px] font-bold uppercase tracking-widest opacity-60">System Health</div>
+                <div class="text-2xl font-black mt-1 text-emerald-300">OPTIMAL</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="v1-inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Injected by JS -->
+        <div class="col-span-full py-20 flex flex-col items-center justify-center text-gray-400">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mb-4"></div>
+            <p>Syncing harvest data...</p>
+        </div>
+    </div>
+</div>

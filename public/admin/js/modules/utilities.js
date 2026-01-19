@@ -167,7 +167,7 @@ export async function cleanAnalytics() {
 export async function seedUsers() {
     const confirmed = await confirmChoice({
         title: 'Initialize Test Signal',
-        message: 'This will create 5 test customer accounts with default addresses.',
+        message: 'This will create 20 test customer accounts with real Vernon County addresses.',
         confirmText: 'Spawn Users',
         icon: '👤'
     });
@@ -222,7 +222,7 @@ export async function cleanDeliveryWindows() {
 export async function seedOrders() {
     const confirmed = await confirmChoice({
         title: 'Generate Test Traffic',
-        message: 'This will create 5 test orders for existing customers.',
+        message: 'This will create 100 randomized test orders using real delivery windows.',
         confirmText: 'Spawn Orders',
         icon: '🛒'
     });
