@@ -1,7 +1,7 @@
 import { setLoginHandler, api } from './api.js';
 import { initDashboard, loadDashboard, stopPolling } from './dashboard.js';
 import { loadOrders, initOrders } from './orders.js';
-import { initProducts, initInventory, initTemplates, initArchived, loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal } from './products.js';
+import { initProducts, initInventory, initTemplates, initArchived, loadProducts, loadInventory, loadArchivedProducts, saveProduct, openProductModal, openTemplateModal } from './products/index.js';
 import { inventoryAlertService } from '../core/InventoryAlertService.js';
 import { loadUsers, saveUser, openUserModal, initUsers } from './users.js';
 import { loadDelivery, addDeliveryWindow } from './delivery.js';

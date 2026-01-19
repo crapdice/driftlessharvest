@@ -359,8 +359,7 @@ async function loadFeaturedPicker(curSelected) {
 export async function saveComponentContent() {
     try {
         // 1. Get current full config
-        const res = await fetch('/api/config');
-        const fullConfig = await res.json();
+        const fullConfig = await api.getConfig();
 
         // 2. Update Content based on ID
         if (!fullConfig.pages) fullConfig.pages = {};
