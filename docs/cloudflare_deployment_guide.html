@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest App - Cloudflare Deployment Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px border var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1e293b;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .instruction-list {
+            list-style: none;
+        }
+
+        .instruction-item {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 3px solid var(--border);
+        }
+
+        .instruction-item h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #e11d48;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .tag-required {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Cloudflare R2 Deployment Guide</h1>
+            <p class="subtitle">A step-by-step guide to setting up image management for Harvest Admin</p>
+        </header>
+
+        <!-- STEP 1: App Installation -->
+        <div class="card">
+            <h2><span class="step-number">1</span> Initial App Setup</h2>
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <h3>Dependencies</h3>
+                    <p>Ensure you have Node.js installed, then run the following in the root directory:</p>
+                    <pre>npm install</pre>
+                </div>
+                <div class="instruction-item">
+                    <h3>Environment Configuration</h3>
+                    <p>Create a <code>.env</code> file in the root and add your required secrets:</p>
+                    <pre>JWT_SECRET=your_super_secret_key
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Account ID & Bucket -->
+        <div class="card">
+            <h2><span class="step-number">2</span> Account ID & Bucket Creation</h2>
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <h3>Find Your Account ID</h3>
+                    <p>On the <strong>Cloudflare Home</strong> dashboard, look at the <strong>right-hand
+                            sidebar</strong> (you might need to scroll down). You will see a box labeled <strong>Account
+                            ID</strong>. Copy this string; you'll need it for the Harvest Admin settings.</p>
+                    <img src="./images/cloudflare_r2_overview.png" alt="Cloudflare R2 Overview"
+                        style="width: 100%; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border);">
+                </div>
+                <div class="instruction-item">
+                    <h3>Create Your Storage Bucket</h3>
+                    <p>Click <strong>R2</strong> in the left-hand sidebar navigation.</p>
+                    <p>Click the blue <strong>"Create bucket"</strong> button.</p>
+                    <p>Name your bucket (e.g., <code>harvest-images</code>) and click <strong>Create bucket</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Public Access & CORS -->
+        <div class="card">
+            <h2><span class="step-number">3</span> Public Access & CORS <span class="tag tag-required">Critical</span>
+            </h2>
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <h3>Enable Public Development URL</h3>
+                    <p>In your new bucket's dashboard, click the <strong>Settings</strong> tab.</p>
+                    <p>Scroll down to <strong>Public Development URL</strong> and click <strong>Enable</strong>. A
+                        confirmation box will appear; click <strong>Confirm</strong>.</p>
+                    <p>Copy the URL that appears (e.g., <code>https://pub-xxx.r2.dev</code>). This is your
+                        <strong>Public R2 URL</strong>.
+                    </p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Configure CORS Policy</h3>
+                    <p>Still in the <strong>Settings</strong> tab, scroll to <strong>CORS Policy</strong> and click
+                        <strong>Edit CORS Policy</strong>.
+                    </p>
+                    <p>Paste the following JSON exactly as shown:</p>
+                    <pre>[
+  {
+    "AllowedOrigins": ["http://localhost:3000"],
+    "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": []
+  }
+]</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: API Key Generation -->
+        <div class="card">
+            <h2><span class="step-number">4</span> Generate R2 API Keys</h2>
+            <p>This is the most critical step to allow the Harvest server to talk to Cloudflare.</p>
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <h3>Navigate to Tokens</h3>
+                    <p>Click <strong>R2</strong> in the main left-hand sidebar to go back to the R2 Overview.</p>
+                    <p>On the right side of the page, click the link <strong>"Manage R2 API Tokens"</strong>.</p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Configure the Token</h3>
+                    <p>Click the <strong>"Create API token"</strong> button.</p>
+                    <ol style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
+                        <li><strong>Token name:</strong> Enter <code>Harvest Admin Uploads</code>.</li>
+                        <li><strong>Permissions:</strong> Select <strong>Object Read & Write</strong>.</li>
+                        <li><strong>Bucket scope:</strong> Choose <strong>Specific buckets</strong> and select your
+                            <code>harvest-images</code> bucket from the list.
+                        </li>
+                        <li><strong>TTL (Time to Live):</strong> Set this to <strong>Forever</strong> so your keys don't
+                            expire unexpectedly.</li>
+                    </ol>
+                    <p>Click the <strong>"Create API Token"</strong> button at the bottom.</p>
+                </div>
+                <div class="instruction-item">
+                    <h3>Copy Your Credentials</h3>
+                    <div class="alert alert-warning">
+                        <strong>IMPORTANT:</strong> These keys are only shown once. Copy them now!
+                    </div>
+                    <p>You need to copy two specific values for the Harvest Admin:</p>
+                    <ul>
+                        <li><strong>Access Key ID</strong></li>
+                        <li><strong>Secret Access Key</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: Final Integration -->
+        <div class="card">
+            <h2><span class="step-number">5</span> Configure Harvest Admin</h2>
+            <div class="instruction-list">
+                <div class="instruction-item">
+                    <h3>Update API Keys</h3>
+                    <p>Open your Harvest Admin dashboard, go to <strong>Configuration > API Keys</strong>.</p>
+                    <p>Fill in the Cloudflare fields:</p>
+                    <ul>
+                        <li><strong>Account ID:</strong> Found on your Cloudflare dashboard sidebar.</li>
+                        <li><strong>R2 Bucket Name:</strong> The name you gave your bucket.</li>
+                        <li><strong>R2 Access Key ID & Secret:</strong> The keys you just generated.</li>
+                        <li><strong>Public R2 URL:</strong> The <code>.r2.dev</code> URL (or custom domain).</li>
+                    </ul>
+                </div>
+                <div class="instruction-item">
+                    <h3>Verify</h3>
+                    <p>Open a Product or Template modal and drag an image into the preview area. It should show a
+                        "Success" toast and display the preview!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Security Tip:</strong> Never commit your <code>config.json</code> or <code>.env</code> files. They
+            contain sensitive keys that should stay local or in your production secrets manager.
+        </div>
+
+        <footer>
+            <p>Harvest Admin &copy; 2026 | Built for Driftless Harvest</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>
