@@ -1,6 +1,7 @@
 import { api } from './api.js';
 import { showToast, formatCurrency } from './utils.js';
 import { AdminBoxCard } from '../components/AdminBoxCard.js';
+import { ImageDropZone } from '../components/ImageDropZone.js';
 
 let productsCache = [];
 let templatesCache = [];
@@ -459,7 +460,18 @@ export async function openProductModal(p = null) {
     document.getElementById('p-price').value = p ? p.price : '';
     document.getElementById('p-stock').value = p ? p.stock : '100';
     document.getElementById('p-image').value = p ? p.image_url : '';
-    document.getElementById('p-preview-img').src = (p && p.image_url) ? p.image_url : '/images/placeholder.jpg';
+    const pPreviewImg = document.getElementById('p-preview-img');
+    pPreviewImg.src = (p && p.image_url) ? p.image_url : '/images/placeholder.jpg';
+
+    // Initialize DropZone
+    if (!pPreviewImg.parentElement._dropzone) {
+        pPreviewImg.parentElement._dropzone = new ImageDropZone({
+            container: pPreviewImg.parentElement,
+            imgElement: pPreviewImg,
+            inputElement: document.getElementById('p-image'),
+            category: 'products'
+        });
+    }
 
     document.getElementById('p-tags').value = p ? (Array.isArray(p.tags) ? p.tags.join(', ') : p.tags) : '';
     document.getElementById('p-farm-id').value = p ? (p.farm_id || '') : '';
@@ -511,7 +523,19 @@ export function openTemplateModal(t = null) {
     document.getElementById('t-desc').value = t ? t.description : '';
     document.getElementById('t-price').value = t ? (typeof t.base_price === 'number' ? t.base_price : t.base_price || '') : '';
     document.getElementById('t-image').value = t ? t.image_url : '';
-    document.getElementById('t-preview-img').src = (t && t.image_url) ? t.image_url : '/images/placeholder.jpg';
+    const tPreviewImg = document.getElementById('t-preview-img');
+    tPreviewImg.src = (t && t.image_url) ? t.image_url : '/images/placeholder.jpg';
+
+    // Initialize DropZone
+    if (!tPreviewImg.parentElement._dropzone) {
+        tPreviewImg.parentElement._dropzone = new ImageDropZone({
+            container: tPreviewImg.parentElement,
+            imgElement: tPreviewImg,
+            inputElement: document.getElementById('t-image'),
+            category: 'templates'
+        });
+    }
+
     document.getElementById('t-active').checked = t ? !!t.is_active : true;
 
     // Init Items

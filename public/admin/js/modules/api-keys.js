@@ -45,6 +45,7 @@ export async function loadApiKeys() {
         const cfAccessKeyInput = document.getElementById('cloudflare-access-key-id');
         const cfSecretKeyInput = document.getElementById('cloudflare-secret-access-key');
         const cfBucketInput = document.getElementById('cloudflare-r2-bucket');
+        const cfPublicUrlInput = document.getElementById('cloudflare-public-url');
 
         if (cfAccountInput && config.apiKeys?.cloudflare?.accountId) {
             cfAccountInput.value = config.apiKeys.cloudflare.accountId;
@@ -57,6 +58,9 @@ export async function loadApiKeys() {
         }
         if (cfBucketInput && config.apiKeys?.cloudflare?.r2Bucket) {
             cfBucketInput.value = config.apiKeys.cloudflare.r2Bucket;
+        }
+        if (cfPublicUrlInput && config.apiKeys?.cloudflare?.publicUrl) {
+            cfPublicUrlInput.value = config.apiKeys.cloudflare.publicUrl;
         }
     } catch (error) {
         console.error('[API Keys] Error loading:', error);
@@ -82,12 +86,13 @@ export async function saveApiKey(type) {
         const accessKeyId = document.getElementById('cloudflare-access-key-id').value.trim();
         const secretAccessKey = document.getElementById('cloudflare-secret-access-key').value.trim();
         const r2Bucket = document.getElementById('cloudflare-r2-bucket').value.trim();
+        const publicUrl = document.getElementById('cloudflare-public-url').value.trim();
 
         if (!accountId || !accessKeyId || !secretAccessKey) {
             return showToast('Account ID, Access Key ID, and Secret Access Key are required', 'error');
         }
 
-        key = { accountId, accessKeyId, secretAccessKey, r2Bucket };
+        key = { accountId, accessKeyId, secretAccessKey, r2Bucket, publicUrl };
         keyName = 'Cloudflare';
     } else {
         return;

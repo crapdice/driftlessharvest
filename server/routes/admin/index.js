@@ -21,6 +21,7 @@ const boxTemplatesRoutes = require('./box-templates.routes');
 const utilitiesRoutes = require('./utilities.routes');
 const analyticsRoutes = require('./analytics.routes');
 const marketingRoutes = require('./marketing.routes');
+const imageRoutes = require('./image.routes');
 
 // Mount sub-routers (routes maintain their full paths like /admin/stats)
 router.use(statsRoutes);
@@ -34,6 +35,7 @@ router.use(boxTemplatesRoutes);
 router.use(utilitiesRoutes);
 router.use(analyticsRoutes);
 router.use(marketingRoutes);
+router.use(imageRoutes);
 
 module.exports = router;
 
