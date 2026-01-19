@@ -1,7 +1,9 @@
-/**
- * Orders UI Rendering
- */
 import { formatCurrency, formatDate } from '../utils.js';
+import { mapUI } from './map.js';
+
+// Export Map UI methods
+export const renderMapMarkers = (orders) => mapUI.renderMapMarkers(orders);
+export const renderMapList = (orders) => mapUI.renderMapList(orders);
 
 // Helper for Icons
 export function getStatusIcons(status) {
@@ -369,7 +371,7 @@ export function renderOrdersTable(orders, templatesCache, productsCache, activeS
         const statusClass = statusColors[o.status] || 'bg-gray-100 text-gray-800 border-gray-200';
 
         return `
-        <tr class="hover:bg-blue-50/50 border-b border-gray-100 cursor-pointer transition-all group" onclick="window.ordersController.toggleOrderDetails('${o.id}')">
+        <tr class="hover:bg-blue-50/50 border-b border-gray-100 cursor-pointer transition-all group" onclick="selectOrder('${o.id}')">
             <td class="p-4 align-middle">
                 <span class="font-mono text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded-md group-hover:bg-white group-hover:shadow-sm transition-all border border-transparent group-hover:border-gray-200">
                     #${String(o.id).slice(0, 8)}
@@ -415,11 +417,6 @@ export function renderOrdersTable(orders, templatesCache, productsCache, activeS
                 <span class="font-bold text-gray-900">${formatCurrency(o.total)}</span>
             </td>
         </tr>
-        <tr id="details-${o.id}" class="hidden bg-gray-50/50 border-b border-gray-100 shadow-inner">
-            <td colspan="6" class="p-0">
-                ${renderOrderDetails(o, street, city, zip, window, isTerminal, templatesCache, productsCache)}
-            </td>
-        </tr>
         `;
     }).join('');
 }
@@ -443,3 +440,186 @@ export function renderEditModalItems(items) {
         </tr>
         `).join('');
 }
+
+
+export function renderOrderDrawer(order) {
+    // 1. Data Normalization (Match renderOrdersTable logic)
+    const shipping = order.shipping_details || {};
+    // Fallback logic for various schema versions
+    const street = shipping.street || (shipping.shipping ? shipping.shipping.street : 'N/A');
+    const city = shipping.city || (shipping.shipping ? shipping.shipping.city : '');
+    const state = shipping.state || (shipping.shipping ? shipping.shipping.state : '');
+    const zip = shipping.zip || (shipping.shipping ? shipping.shipping.zip : '');
+
+    let name = shipping.name || (order.billing_details ? order.billing_details.name : null) || (order.customer ? order.customer.name : null) || 'Guest';
+    if (name === 'undefined undefined') name = 'Guest';
+    const email = order.userEmail || order.email || 'No Email'; // usage in table was order.userEmail
+
+    // Helper for status colors (matching Concept 9)
+    const getStatusColor = (s) => {
+        const colors = {
+            'Paid': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+            'Pending': 'bg-amber-100 text-amber-700 border-amber-200',
+            'Packed': 'bg-indigo-100 text-indigo-700 border-indigo-200',
+            'Shipped': 'bg-blue-100 text-blue-700 border-blue-200',
+            'Delivered': 'bg-gray-100 text-gray-700 border-gray-200'
+        };
+        const cls = colors[s] || 'bg-gray-100 text-gray-600';
+        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${cls}">${s}</span>`;
+    };
+
+    // Calculate dynamic values for buttons
+    const isTerminal = ['Delivered', 'Canceled', 'Cancelled'].includes(order.status);
+    const btnBase = "w-full flex items-center justify-center gap-2 px-4 py-3 text-white text-sm font-bold rounded-xl shadow-md transform transition-all hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2";
+
+    return `
+        <div class="h-full flex flex-col bg-white">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Order Details</h3>
+                    <div class="text-xl font-black text-gray-800 flex items-center gap-2">
+                        ${order.id}
+                        <span id="drawer-status-badge">${getStatusColor(order.status)}</span>
+                    </div>
+                </div>
+                <button onclick="closeDrawer()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                <!-- 1. Progress Stepper -->
+                ${renderOrderStepper(order.status)}
+
+                <!-- 2. Customer Info -->
+                <div class="flex items-start gap-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                        ${name.charAt(0)}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">${name}</h4>
+                        <div class="text-sm text-gray-500">${email}</div>
+                    </div>
+                </div>
+
+                <!-- 3. Next Step Action (Dynamic) -->
+                 ${(() => {
+            if (order.status === 'Paid') {
+                return `
+                        <div class="bg-gradient-to-br from-emerald-50 to-white p-4 rounded-xl border border-emerald-100 shadow-sm">
+                            <h4 class="font-bold text-emerald-800 text-xs uppercase tracking-wider mb-3">Next Step</h4>
+                            <button onclick="window.ordersController.quickUpdateStatus('${order.id}', 'Packed')" class="${btnBase} bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-500 border-2 border-transparent">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                Mark as Packed
+                            </button>
+                        </div>`;
+            } else if (order.status === 'Packed') {
+                return `
+                        <div class="bg-gradient-to-br from-blue-50 to-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                            <h4 class="font-bold text-blue-800 text-xs uppercase tracking-wider mb-3">Next Step</h4>
+                            <button onclick="window.ordersController.quickUpdateStatus('${order.id}', 'Shipped')" class="${btnBase} bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 border-2 border-transparent">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                Mark as Shipped
+                            </button>
+                        </div>`;
+            } else if (order.status === 'Shipped') {
+                return `
+                        <div class="bg-gradient-to-br from-teal-50 to-white p-4 rounded-xl border border-teal-100 shadow-sm">
+                            <h4 class="font-bold text-teal-800 text-xs uppercase tracking-wider mb-3">Next Step</h4>
+                            <button onclick="window.ordersController.quickUpdateStatus('${order.id}', 'Delivered')" class="${btnBase} bg-teal-500 hover:bg-teal-600 focus:ring-teal-500 border-2 border-transparent">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Mark as Delivered
+                            </button>
+                        </div>`;
+            }
+            return '';
+        })()}
+
+                <!-- 4. Items List -->
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex justify-between">
+                        <span>Items</span>
+                        <span class="text-gray-300">${order.items?.length || 0} Items</span>
+                    </h4>
+                    <div class="space-y-2">
+                        ${(order.items || []).map(i => `
+                            <div class="flex justify-between items-center p-3 bg-white border border-gray-100 rounded-lg shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs font-bold bg-gray-100 px-2 py-1 rounded text-gray-600">x${i.qty}</span>
+                                    <span class="text-sm font-medium text-gray-800">${i.name}</span>
+                                </div>
+                                <span class="text-sm font-mono text-gray-600 font-bold">${formatCurrency(i.price * i.qty)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                        <div class="text-right">
+                             <div class="text-xs text-gray-400 uppercase font-bold">Total</div>
+                             <div class="text-2xl font-black text-gray-900 tracking-tight">${formatCurrency(order.total)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Pick List (Detailed Breakdown) -->
+                ${renderPickList(order, window.globalState?.templates || [], window.globalState?.products || [])}
+
+                <!-- 6. Management Actions -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Management</h4>
+                    
+                    <!-- Edit -->
+                    <button onclick="window.ordersController.openEditOrderModal('${order.id}')" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg transition-all mb-2">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Edit Details / Status
+                    </button>
+
+                    <!-- Sync Payment -->
+                     ${order.status === 'Pending Payment' ? `
+                        <button id="sync-btn-${order.id}" onclick="window.ordersController.syncPayment('${order.id}')" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-sm font-medium rounded-lg transition-all mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Check Payment Status
+                        </button>
+                    ` : ''}
+
+                    <!-- Reschedule -->
+                    ${!isTerminal ? `
+                        <button onclick="window.ordersController.openDateModal('${order.id}')" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg transition-all mb-2">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            Reschedule Delivery
+                        </button>
+                    ` : ''}
+
+                    <!-- Cancel (Danger) -->
+                     ${!['Canceled', 'Cancelled', 'Delivered'].includes(order.status) ? `
+                        <div class="border-t border-gray-100 mt-3 pt-3">
+                             <button onclick="if(confirm('Are you sure you want to CANCEL this order? This cannot be undone.')) window.ordersController.quickUpdateStatus('${order.id}', 'Canceled')" class="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 text-xs font-semibold rounded transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                Cancel Order
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- 7. Shipping Address -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Shipping Details</h4>
+                    <p class="text-sm font-bold text-gray-800">${name}</p>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        ${street}<br>
+                        ${city}, ${state} ${zip}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer Stats -->
+            <div class="p-4 border-t border-gray-100 bg-gray-50 text-center text-xs text-gray-400">
+                Order Placed: ${formatDate(order.created_at)}
+            </div>
+        </div>
+    `;
+}
+

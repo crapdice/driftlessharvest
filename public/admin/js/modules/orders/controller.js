@@ -22,14 +22,53 @@ export const controller = {
             state.setTemplates(templates);
             state.setProducts(products);
 
-            this.render();
+            // Render active view
+            if (this.currentView === 'map') {
+                this.renderMap();
+            } else {
+                this.renderList();
+            }
         } catch (e) {
             console.error(e);
             showToast("Failed to load orders", "error");
         }
     },
 
-    render() {
+    toggleView(viewName) {
+        this.currentView = viewName;
+
+        // Update Buttons
+        const listBtn = document.getElementById('btn-view-list');
+        const mapBtn = document.getElementById('btn-view-map');
+
+        if (viewName === 'map') {
+            listBtn.classList.remove('bg-white', 'text-gray-800', 'shadow-sm');
+            listBtn.classList.add('text-gray-500', 'hover:text-gray-700');
+
+            mapBtn.classList.add('bg-white', 'text-gray-800', 'shadow-sm');
+            mapBtn.classList.remove('text-gray-500', 'hover:text-gray-700');
+
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-map').classList.remove('hidden');
+            document.getElementById('view-map').classList.add('flex');
+
+            this.renderMap(); // Initial render if needed
+        } else {
+            mapBtn.classList.remove('bg-white', 'text-gray-800', 'shadow-sm');
+            mapBtn.classList.add('text-gray-500', 'hover:text-gray-700');
+
+            listBtn.classList.add('bg-white', 'text-gray-800', 'shadow-sm');
+            listBtn.classList.remove('text-gray-500', 'hover:text-gray-700');
+
+            document.getElementById('view-map').classList.add('hidden');
+            document.getElementById('view-map').classList.remove('flex');
+            document.getElementById('view-list').classList.remove('hidden');
+
+            this.renderList(); // Ensure list is fresh
+        }
+    },
+
+    renderList() {
         const query = state.getSearchQuery();
         let orders = state.getOrders();
 
@@ -46,14 +85,58 @@ export const controller = {
         UI.renderOrdersTable(orders, state.getTemplates(), state.getProducts(), query);
     },
 
+    renderMap() {
+        const orders = state.getOrders();
+        // We need to implement renderMap in UI first, but calling it here as placeholder
+        if (UI.renderMapMarkers) {
+            UI.renderMapMarkers(orders);
+        }
+        if (UI.renderMapList) {
+            UI.renderMapList(orders);
+        }
+    },
+
+    render() {
+        // This render method is now deprecated or should call renderList/renderMap based on currentView
+        // For now, it will just call renderList to maintain existing functionality if not using toggleView
+        this.renderList();
+    },
+
     searchOrders(query) {
         state.setSearchQuery(query);
-        this.render();
+        if (this.currentView === 'map') {
+            this.renderMap();
+        } else {
+            this.renderList();
+        }
     },
 
     toggleOrderDetails(id) {
+        // Legacy Accordion - Keeping for fallback or removal
         const row = document.getElementById(`details-${id}`);
         if (row) row.classList.toggle('hidden');
+    },
+
+    selectOrder(id) {
+        const order = state.findOrder(id);
+        if (!order) return;
+
+        const html = UI.renderOrderDrawer(order);
+        document.getElementById('order-drawer-content').innerHTML = html;
+
+        const drawer = document.getElementById('order-drawer');
+        drawer.classList.remove('translate-x-full');
+
+        const backdrop = document.getElementById('drawer-backdrop');
+        backdrop.classList.remove('hidden');
+    },
+
+    closeDrawer() {
+        const drawer = document.getElementById('order-drawer');
+        drawer.classList.add('translate-x-full');
+
+        const backdrop = document.getElementById('drawer-backdrop');
+        backdrop.classList.add('hidden');
     },
 
     // ------------------------------------
@@ -227,8 +310,32 @@ export const controller = {
         try {
             // Use dedicated status endpoint
             await api.updateOrderStatus(id, newStatus);
-            showToast(`Order marked as ${newStatus}`, "success");
-            this.loadOrders();
+            showToast(`Order marked as ${newStatus}`);
+
+            // Refresh LIST
+            await this.loadOrders();
+
+            // Refresh DRAWER if open and matching ID
+            // We can check if the drawer is currently showing this ID
+            // Or simpler: just re-call selectOrder(id) if the drawer contains this ID header
+            const currentDrawerTitle = document.querySelector('#order-drawer-content h3'); // weak check
+            // Better: state.findOrder(id) will be updated by loadOrders, so just re-select
+            // Check if the drawer is actually open
+            const drawer = document.getElementById('order-drawer');
+            // We need to know which order is currently in the drawer. 
+            // Let's store a data attribute on the drawer content?
+            // Or, simpler hack: if the user clicked the button INSIDE the drawer, they are viewing it.
+
+            // Re-render the drawer with the NEW state
+            if (!drawer.classList.contains('translate-x-full')) {
+                // Only if it's the SAME order
+                // We can re-select it safely.
+                // To be safe, let's just re-select it. 
+                // If the user was viewing a DIFFERENT order (unlikely if they clicked a button), this might jump.
+                // But quickUpdateStatus comes from the drawer buttons usually.
+                this.selectOrder(id);
+            }
+
         } catch (e) {
             console.error(e);
             showToast("Failed to update status", "error");

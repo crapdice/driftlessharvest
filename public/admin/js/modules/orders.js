@@ -4,9 +4,22 @@
  */
 import { controller } from './orders/controller.js';
 
+// Export for Module usage (app.js)
 export const loadOrders = () => controller.loadOrders();
+export const searchOrders = (q) => controller.searchOrders(q);
 export const openEditOrderModal = (id) => controller.openEditOrderModal(id);
 export const saveOrderDetails = () => controller.saveOrderDetails();
+export const selectOrder = (id) => controller.selectOrder(id);
+export const closeDrawer = () => controller.closeDrawer();
+
+// Bind to Window for HTML event handlers
+window.loadOrders = loadOrders;
+window.searchOrders = searchOrders;
+window.openEditOrderModal = openEditOrderModal;
+window.saveOrderDetails = saveOrderDetails;
+window.selectOrder = selectOrder;
+window.closeDrawer = closeDrawer;
+
 // Other globals are bound to window in controller.js
 
 export async function initOrders() {

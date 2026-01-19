@@ -4,7 +4,30 @@
             <h2 class="text-2xl font-bold text-gray-800">Order Management</h2>
             <p class="text-sm text-gray-500">Track and manage customer orders.</p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-3 items-center">
+            <!-- View Toggle -->
+            <div class="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+                <button onclick="window.ordersController.toggleView('list')" id="btn-view-list"
+                    class="px-3 py-1.5 rounded-md text-sm font-bold bg-white text-gray-800 shadow-sm transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    List
+                </button>
+                <button onclick="window.ordersController.toggleView('map')" id="btn-view-map"
+                    class="px-3 py-1.5 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 hover:bg-white/50 transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                        </path>
+                    </svg>
+                    Map
+                </button>
+            </div>
+
+            <div class="h-8 w-px bg-gray-200 mx-2"></div>
+
             <div class="relative">
                 <span
                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">🔍</span>
@@ -18,7 +41,9 @@
                 Data</button>
         </div>
     </div>
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <!-- VIEW: LIST -->
+    <div id="view-list" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <table class="w-full text-left">
             <thead class="bg-gray-50 border-b border-gray-100">
                 <tr>
@@ -38,4 +63,60 @@
             <tbody id="orders-table-body" class="divide-y divide-gray-100"></tbody>
         </table>
     </div>
+
+    <!-- VIEW: MAP -->
+    <!-- Structure matches admin-order-concept-12.html layout (Sidebar + Map) -->
+    <div id="view-map"
+        class="hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-[600px] flex">
+        <!-- Sidebar List -->
+        <div class="w-[350px] flex flex-col border-r border-gray-200 bg-white z-10">
+            <div class="p-3 border-b border-gray-100 flex gap-2 bg-gray-50">
+                <button
+                    class="flex-1 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100">Pending</button>
+                <button
+                    class="flex-1 bg-white text-gray-500 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-200 hover:bg-gray-50">Shipped</button>
+            </div>
+            <div id="map-order-list" class="flex-1 overflow-y-auto">
+                <!-- Items injected by ui.renderMapList() -->
+            </div>
+        </div>
+
+        <!-- Map Canvas -->
+        <div class="flex-1 bg-blue-50 relative overflow-hidden group">
+            <!-- Fake Map Pattern -->
+            <div class="absolute inset-0 opacity-20"
+                style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;">
+            </div>
+
+            <!-- Map Markers Container -->
+            <div id="map-markers" class="w-full h-full relative">
+                <!-- Markers injected by ui.renderMapMarkers() -->
+            </div>
+
+            <!-- Map Controls (Fake) -->
+            <div class="absolute top-4 right-4 flex flex-col gap-2">
+                <button class="bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 text-gray-600"><svg class="w-5 h-5"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg></button>
+                <button class="bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 text-gray-600"><svg class="w-5 h-5"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDE DRAWER CONTAINER -->
+    <div id="order-drawer"
+        class="fixed top-0 right-0 h-full w-[450px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+        <!-- Content injected by ui.renderOrderDrawer() -->
+        <div id="order-drawer-content" class="h-full"></div>
+    </div>
+
+    <!-- Backdrop (Optional, but good for UX) -->
+    <div id="drawer-backdrop" onclick="closeDrawer()"
+        class="fixed inset-0 bg-black/20 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+
 </div>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>UI Test Harness</title>
+</head>
+
+<body>
+    <!-- Mock Container -->
+    <div id="test-output"></div>
+
+    <script type="module">
+        import { renderOrderDrawer } from '../../public/admin/js/modules/orders/ui.js';
+
+        console.log('🧪 Starting UI Tests in Browser...');
+
+        const mockOrder = {
+            id: 'ORD-123',
+            status: 'Pending',
+            customer: { name: 'Sarah Connor', email: 'sarah@example.com' },
+            shipping_address: { street: '309 Pico Blvd', city: 'Los Angeles', zip: '90001' },
+            items: [
+                { name: 'Box A', qty: 1, price: 20 },
+                { name: 'Box B', qty: 2, price: 15 }
+            ],
+            total: 50
+        };
+
+        const results = [];
+
+        try {
+            // Test 1: Function exists
+            if (typeof renderOrderDrawer !== 'function') throw new Error('renderOrderDrawer is not a function');
+            results.push('✅ renderOrderDrawer exists');
+
+            // Test 2: Output Generation
+            const html = renderOrderDrawer(mockOrder);
+
+            // Basic assertions
+            if (!html.includes('Sarah Connor')) throw new Error('HTML missing customer name');
+            if (!html.includes('ORD-123')) throw new Error('HTML missing Order ID');
+            if (!html.includes('Pending')) throw new Error('HTML missing Status');
+            if (!html.includes('Box A')) throw new Error('HTML missing Items');
+
+            results.push('✅ HTML content verified');
+
+            // Signal Success
+            console.log('ALL TESTS PASSED');
+            window.__TEST_RESULT__ = true;
+
+        } catch (e) {
+            console.error('TEST FAILED:', e.message);
+            window.__TEST_RESULT__ = false;
+        }
+    </script>
+</body>
+
+</html>
