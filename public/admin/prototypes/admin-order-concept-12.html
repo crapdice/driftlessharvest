@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 12: Geospatial Logistics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Mapbox GL JS (using placeholder for demo) -->
+    <style>
+        .map-marker {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 h-screen flex font-sans overflow-hidden">
+
+    <!-- SIDEBAR LIST (30%) -->
+    <div class="w-[400px] flex flex-col bg-white border-r border-gray-200 z-10 shadow-xl">
+        <header class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+            <div>
+                <h1 class="font-bold text-gray-800 flex items-center gap-2">
+                    <span
+                        class="w-6 h-6 bg-blue-600 text-white rounded flex items-center justify-center text-xs font-mono">P12</span>
+                    The Dispatcher
+                </h1>
+                <p class="text-xs text-gray-500 mt-0.5">Route density optimization</p>
+            </div>
+            <a href="admin-order-concept-13.html"
+                class="text-xs font-medium text-gray-400 hover:text-gray-900 flex items-center gap-1">Next <i
+                    class="ri-arrow-right-line"></i></a>
+        </header>
+
+        <!-- Filters -->
+        <div class="p-3 border-b border-gray-100 flex gap-2">
+            <button
+                class="flex-1 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100">Pending
+                (3)</button>
+            <button
+                class="flex-1 bg-white text-gray-500 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-200 hover:bg-gray-50">Shipped
+                (12)</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto" id="order-list">
+            <!-- Items injected JS -->
+        </div>
+
+        <div class="p-4 border-t border-gray-100 bg-gray-50">
+            <button
+                class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                <i class="ri-printer-line"></i> Print Route Batch (3 Selected)
+            </button>
+        </div>
+    </div>
+
+    <!-- MAP VIEW (70%) -->
+    <div class="flex-1 bg-blue-50 relative overflow-hidden">
+
+        <!-- Fake Map Visual -->
+        <div class="absolute inset-0 opacity-20"
+            style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+        <!-- Map Overlay UI -->
+        <div class="absolute top-4 right-4 flex flex-col gap-2">
+            <button class="bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 text-gray-600"><i
+                    class="ri-add-line text-xl"></i></button>
+            <button class="bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 text-gray-600"><i
+                    class="ri-subtract-line text-xl"></i></button>
+        </div>
+
+        <div
+            class="absolute bottom-6 left-6 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg text-xs font-bold text-gray-600 flex items-center gap-2 border border-gray-200">
+            <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 3 Pending Orders
+            <span class="w-px h-3 bg-gray-300 mx-1"></span>
+            <span class="w-2 h-2 bg-gray-300 rounded-full"></span> 12 Shipped Orders
+        </div>
+
+        <!-- Markers Container -->
+        <div id="map-markers" class="w-full h-full relative">
+            <!-- Markers injected JS -->
+        </div>
+
+    </div>
+
+    <script>
+        const orders = [
+            { id: "ORD-991", customer: "Sarah Connor", status: "Pending", address: "309 Pico Blvd", lat: 40, lng: 30 },
+            { id: "ORD-992", customer: "Kyle Reese", status: "Pending", address: "101 Ocean Ave", lat: 35, lng: 45 },
+            { id: "ORD-993", customer: "Dr. Silberman", status: "Pending", address: "400 State St", lat: 55, lng: 35 },
+            { id: "ORD-994", customer: "T-800", status: "Shipped", address: "Cyberdyne Sys", lat: 20, lng: 60 },
+            { id: "ORD-995", customer: "John Connor", status: "Shipped", address: "Hidden Bunker", lat: 70, lng: 20 },
+        ];
+
+        function init() {
+            renderList();
+            renderMarkers();
+        }
+
+        function renderList() {
+            const list = document.getElementById('order-list');
+            list.innerHTML = orders.map((o, idx) => `
+                <div class="p-4 border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors group relative" onmouseenter="highlightMarker(${idx})" onmouseleave="unhighlightMarker(${idx})">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="font-bold text-sm text-gray-800">${o.customer}</span>
+                        <span class="text-[10px] font-bold uppercase px-1.5 rounded ${o.status === 'Pending' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}">${o.status}</span>
+                    </div>
+                    <div class="text-xs text-gray-500 flex items-center gap-1">
+                        <i class="ri-map-pin-line"></i> ${o.address}
+                    </div>
+                    ${o.status === 'Pending' ? '<div class="absolute right-4 bottom-4 w-4 h-4 rounded border-2 border-gray-300 group-hover:border-blue-500 bg-white"></div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderMarkers() {
+            const container = document.getElementById('map-markers');
+            const w = container.offsetWidth;
+            const h = container.offsetHeight;
+
+            // Simple fake projection
+            container.innerHTML = orders.map((o, idx) => {
+                const left = (o.lng / 100) * w;
+                const top = (o.lat / 100) * h;
+                const color = o.status === 'Pending' ? 'bg-blue-600' : 'bg-gray-400';
+
+                return `
+                    <div id="marker-${idx}" class="absolute transform -translate-x-1/2 -translate-y-full hover:z-50 cursor-pointer group" style="left: ${left}px; top: ${top}px">
+                        <div class="relative">
+                            <i class="ri-map-pin-fill text-4xl ${o.status === 'Pending' ? 'text-blue-600' : 'text-gray-400'} drop-shadow-md transition-transform group-hover:scale-110"></i>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-white px-3 py-1 rounded-lg shadow-xl border border-gray-100 text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                ${o.customer}<br>
+                                <span class="font-normal text-gray-400">#${o.id}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.highlightMarker = (idx) => {
+            const el = document.querySelector(`#marker-${idx} i`);
+            if (el) el.classList.add('scale-125', 'text-red-500');
+        }
+
+        window.unhighlightMarker = (idx) => {
+            const el = document.querySelector(`#marker-${idx} i`);
+            if (el) el.classList.remove('scale-125', 'text-red-500');
+        }
+
+        // Init on load
+        setTimeout(init, 100);
+        window.addEventListener('resize', init);
+    </script>
+</body>
+
+</html>

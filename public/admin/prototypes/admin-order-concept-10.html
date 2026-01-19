@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 10: Kanban Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+    <style>
+        .kanban-col {
+            min-height: 100vh;
+        }
+
+        .order-card:active {
+            cursor: grabbing;
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 h-screen flex flex-col font-sans overflow-hidden">
+
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-20">
+        <div>
+            <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <span
+                    class="w-8 h-8 bg-purple-600 text-white rounded-lg flex items-center justify-center text-sm font-mono">P10</span>
+                Visual Kanban
+            </h1>
+            <p class="text-xs text-gray-500 mt-1">Status-driven workflow managed by drag-and-drop</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Search -->
+            <div
+                class="flex items-center bg-gray-100 rounded-lg px-3 py-1.5 border border-transparent focus-within:border-purple-300 focus-within:bg-white transition-colors">
+                <i class="ri-search-line text-gray-400"></i>
+                <input type="text" placeholder="Search..."
+                    class="bg-transparent border-none text-sm ml-2 focus:outline-none w-48">
+            </div>
+            <a href="admin-order-concept-11.html"
+                class="ml-4 text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors">Next Concept
+                &rarr;</a>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-x-auto overflow-y-hidden p-6 gap-6 flex whitespace-nowrap bg-gray-50/50">
+
+        <!-- PENDING -->
+        <div class="w-[320px] flex-shrink-0 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 class="font-bold text-gray-700 uppercase text-xs tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span> Pending
+                </h3>
+                <span
+                    class="bg-white border border-gray-200 shadow-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-500">2</span>
+            </div>
+            <div class="flex-1 space-y-3 overflow-y-auto px-1 custom-scroll" id="col-pending">
+                <!-- JS Injected -->
+            </div>
+        </div>
+
+        <!-- PAID -->
+        <div class="w-[320px] flex-shrink-0 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 class="font-bold text-gray-700 uppercase text-xs tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Paid
+                </h3>
+                <span
+                    class="bg-white border border-gray-200 shadow-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-500">2</span>
+            </div>
+            <div class="flex-1 space-y-3 overflow-y-auto px-1 custom-scroll" id="col-paid">
+            </div>
+        </div>
+
+        <!-- PACKED -->
+        <div class="w-[320px] flex-shrink-0 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 class="font-bold text-gray-700 uppercase text-xs tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Packed
+                </h3>
+                <span
+                    class="bg-white border border-gray-200 shadow-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-500">1</span>
+            </div>
+            <div class="flex-1 space-y-3 overflow-y-auto px-1 custom-scroll" id="col-packed">
+            </div>
+        </div>
+
+        <!-- SHIPPED -->
+        <div class="w-[320px] flex-shrink-0 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 class="font-bold text-gray-700 uppercase text-xs tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Shipped
+                </h3>
+                <span
+                    class="bg-white border border-gray-200 shadow-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-500">1</span>
+            </div>
+            <div class="flex-1 space-y-3 overflow-y-auto px-1 custom-scroll" id="col-shipped">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const orders = [
+            { id: "ORD-1123", date: "Oct 23", customer: "Dr. Silberman", status: "Pending", total: 210.00, items: 3, problem: false },
+            { id: "ORD-9912", date: "Oct 24", customer: "T-1000", status: "Pending", total: 550.00, items: 12, problem: true },
+            { id: "ORD-7829", date: "Oct 24", customer: "Sarah Connor", status: "Paid", total: 124.50, items: 2, problem: false },
+            { id: "ORD-5511", date: "Oct 20", customer: "Miles Dyson", status: "Paid", total: 340.20, items: 8, problem: false },
+            { id: "ORD-9921", date: "Oct 24", customer: "Kyle Reese", status: "Packed", total: 45.00, items: 1, problem: false },
+            { id: "ORD-4492", date: "Oct 21", customer: "John Connor", status: "Shipped", total: 88.50, items: 5, problem: false },
+        ];
+
+        function init() {
+            orders.forEach(o => {
+                const el = createCard(o);
+                const col = document.getElementById(`col-${o.status.toLowerCase()}`);
+                if (col) col.appendChild(el);
+            });
+        }
+
+        function createCard(o) {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md cursor-grab active:cursor-grabbing transition-all order-card group relative overflow-hidden';
+            if (o.problem) {
+                div.className += ' border-l-4 border-l-red-500';
+            }
+
+            div.draggable = true;
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <span class="font-mono text-xs font-bold text-gray-400">#${o.id.split('-')[1]}</span>
+                    ${o.problem ? '<span class="text-red-500 text-[10px] font-bold uppercase bg-red-50 px-1 rounded">Issue</span>' : ''}
+                </div>
+                <div class="font-bold text-gray-800 text-sm mb-1">${o.customer}</div>
+                <div class="flex justify-between items-center text-xs text-gray-500 mt-3">
+                    <div class="flex items-center gap-1">
+                        <i class="ri-shopping-basket-line"></i> ${o.items} items
+                    </div>
+                    <div class="font-mono font-medium text-gray-900">$${o.total.toFixed(2)}</div>
+                </div>
+                
+                <!-- Quick Actions Hover -->
+                <div class="absolute inset-0 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button class="w-8 h-8 rounded-full bg-white border border-gray-200 shadow text-gray-600 hover:text-blue-600 flex items-center justify-center"><i class="ri-eye-line"></i></button>
+                    ${o.status === 'Paid' ? '<button class="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded shadow hover:bg-indigo-700">Pack</button>' : ''}
+                </div>
+            `;
+            return div;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

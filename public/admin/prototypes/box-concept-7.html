@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 7: Restaurant Menu Style</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+    <style>
+        .category-nav-item.active {
+            border-bottom-color: black;
+            font-weight: bold;
+            color: black;
+        }
+
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-white h-screen flex font-sans overflow-hidden">
+
+    <!-- LEFT: MENU NAV -->
+    <aside class="w-64 border-r border-gray-100 flex flex-col h-full bg-gray-50/50">
+        <div class="p-6 border-b border-gray-100 bg-white">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span
+                    class="w-8 h-8 bg-orange-500 rounded-lg text-white flex items-center justify-center font-mono text-sm">P7</span>
+                Ordering App
+            </h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <a href="#cat-veg"
+                class="block px-4 py-3 rounded-lg bg-orange-50 text-orange-700 font-bold border-l-4 border-orange-500">Vegetables</a>
+            <a href="#cat-fruit"
+                class="block px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 border-l-4 border-transparent">Fruits</a>
+            <a href="#cat-pantry"
+                class="block px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 border-l-4 border-transparent">Pantry</a>
+            <a href="#cat-dairy"
+                class="block px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 border-l-4 border-transparent">Dairy &
+                Eggs</a>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <a href="box-concept-8.html"
+                class="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors">
+                <span>Next Concept</span> <i class="ri-arrow-right-line"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- CENTER: MENU LIST -->
+    <div class="flex-1 overflow-y-auto bg-white relative scroll-smooth p-8 pb-32" id="menu-container">
+
+        <div class="max-w-3xl mx-auto space-y-12">
+
+            <!-- Category Section -->
+            <section id="cat-veg">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Vegetables</h2>
+                <div class="space-y-6">
+                    <!-- Item -->
+                    <div class="flex gap-4 group">
+                        <div class="flex-1 border-b border-gray-100 pb-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 group-hover:underline cursor-pointer">
+                                        Organic Carrots</h3>
+                                    <p class="text-gray-500 text-sm mt-1 line-clamp-2">Fresh organic carrots harvested
+                                        daily. Perfect for soups, salads, and snacking.</p>
+                                    <div class="mt-2 font-medium text-gray-900">$2.99</div>
+                                </div>
+                                <div class="w-32 h-24 bg-gray-100 rounded-xl overflow-hidden shrink-0 ml-4 relative">
+                                    <img src="https://placehold.co/200x200/orange/white?text=Carrots"
+                                        class="w-full h-full object-cover">
+                                    <button onclick="addToOrder(1, 'Organic Carrots', 2.99)"
+                                        class="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-colors">
+                                        <i class="ri-add-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 group">
+                        <div class="flex-1 border-b border-gray-100 pb-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 group-hover:underline cursor-pointer">Red
+                                        Potatoes</h3>
+                                    <p class="text-gray-500 text-sm mt-1 line-clamp-2">Locally grown red potatoes.</p>
+                                    <div class="mt-2 font-medium text-gray-900">$3.49</div>
+                                </div>
+                                <div class="w-32 h-24 bg-gray-100 rounded-xl overflow-hidden shrink-0 ml-4 relative">
+                                    <img src="https://placehold.co/200x200/brown/white?text=Potatoes"
+                                        class="w-full h-full object-cover">
+                                    <button onclick="addToOrder(2, 'Red Potatoes', 3.49)"
+                                        class="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-colors">
+                                        <i class="ri-add-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cat-fruit">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-6 mt-8">Fruits</h2>
+                <div class="space-y-6">
+                    <div class="flex gap-4 group">
+                        <div class="flex-1 border-b border-gray-100 pb-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 group-hover:underline cursor-pointer">
+                                        Honeycrisp Apple</h3>
+                                    <p class="text-gray-500 text-sm mt-1 line-clamp-2">Sweet and crisp.</p>
+                                    <div class="mt-2 font-medium text-gray-900">$0.89</div>
+                                </div>
+                                <div class="w-32 h-24 bg-gray-100 rounded-xl overflow-hidden shrink-0 ml-4 relative">
+                                    <img src="https://placehold.co/200x200/red/white?text=Apple"
+                                        class="w-full h-full object-cover">
+                                    <button onclick="addToOrder(4, 'Honeycrisp Apple', 0.89)"
+                                        class="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-orange-600 hover:bg-orange-600 hover:text-white transition-colors">
+                                        <i class="ri-add-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY (Sticky) -->
+    <div class="w-80 shadow-2xl bg-white border-l border-gray-200 z-10 flex flex-col">
+        <div class="p-6 bg-white border-b border-gray-100 text-center">
+            <h2 class="text-lg font-bold">Your Order</h2>
+            <div class="text-xs text-gray-500 mt-1">Editing 'Standard Box'</div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-3" id="cart-list">
+            <div id="empty-cart" class="text-center py-10 text-gray-400 text-sm flex flex-col items-center">
+                <i class="ri-shopping-bag-3-line text-4xl mb-2 opacity-30"></i>
+                Start adding items
+            </div>
+        </div>
+
+        <div class="p-6 bg-gray-50 border-t border-gray-100 space-y-3">
+            <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Subtotal</span>
+                <span class="font-bold text-gray-900" id="cart-total">$0.00</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Service Fee</span>
+                <span class="font-bold text-gray-900">$0.00</span>
+            </div>
+            <div class="border-t border-gray-200 pt-3 flex justify-between text-lg font-bold">
+                <span>Total</span>
+                <span id="final-total">$0.00</span>
+            </div>
+            <button
+                class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-bold shadow-lg shadow-orange-200 transition-colors">
+                Save Order
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let cart = {};
+
+        function addToOrder(id, name, price) {
+            if (!cart[id]) cart[id] = { id, name, price, qty: 0 };
+            cart[id].qty++;
+            renderCart();
+        }
+
+        function removeFromOrder(id) {
+            if (cart[id]) {
+                cart[id].qty--;
+                if (cart[id].qty <= 0) delete cart[id];
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-list');
+            const empty = document.getElementById('empty-cart');
+            const items = Object.values(cart);
+
+            if (items.length === 0) {
+                list.innerHTML = '';
+                list.appendChild(empty);
+                empty.style.display = 'flex';
+                updateTotal(0);
+                return;
+            }
+
+            empty.style.display = 'none';
+
+            list.innerHTML = items.map(item => `
+                <div class="flex items-center gap-3 bg-white border border-gray-100 p-2 rounded-lg shadow-sm">
+                    <div class="w-8 h-8 rounded border border-gray-200 flex items-center justify-center font-bold text-xs bg-gray-50">${item.qty}x</div>
+                    <div class="flex-1 text-sm font-medium text-gray-800 line-clamp-1">${item.name}</div>
+                    <div class="text-sm font-gray-500">$${(item.price * item.qty).toFixed(2)}</div>
+                    <div class="flex flex-col">
+                        <button onclick="addToOrder(${item.id}, '${item.name}', ${item.price})" class="text-gray-400 hover:text-orange-500"><i class="ri-arrow-up-s-fill"></i></button>
+                        <button onclick="removeFromOrder(${item.id})" class="text-gray-400 hover:text-red-500"><i class="ri-arrow-down-s-fill"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateTotal(items.reduce((acc, i) => acc + (i.price * i.qty), 0));
+        }
+
+        function updateTotal(val) {
+            document.getElementById('cart-total').innerText = '$' + val.toFixed(2);
+            document.getElementById('final-total').innerText = '$' + val.toFixed(2);
+        }
+    </script>
+</body>
+
+</html>

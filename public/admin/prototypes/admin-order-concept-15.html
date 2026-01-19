@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 15: Command Line</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+    <style>
+        .mono-list {
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+
+        .selected-line {
+            background-color: #333333;
+            border-left: 2px solid #50fa7b;
+            color: #f8f8f2;
+        }
+
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#1e1e1e] h-screen flex flex-col font-mono text-[#a9b7c6] overflow-hidden selection:bg-[#214283]">
+
+    <!-- STATUS BAR -->
+    <div class="h-8 bg-[#2d2d2d] flex items-center px-4 text-xs select-none border-b border-[#3e3e3e] justify-between">
+        <div class="flex gap-4">
+            <span class="text-[#50fa7b] font-bold">⚡ ADMIN_CLI v2.0</span>
+            <span>ORDERS_DB <span class="text-[#f1fa8c]">CONNECTED</span></span>
+            <span><span class="text-[#ff79c6]">14</span> PENDING</span>
+        </div>
+        <div class="flex gap-4 opacity-50">
+            <span>CTRL+K COMMANDS</span>
+            <a href="admin-order-concept-16.html" class="hover:text-white">NEXT &rarr;</a>
+        </div>
+    </div>
+
+    <!-- COMMAND INPUT -->
+    <div class="p-4 border-b border-[#3e3e3e] flex items-center gap-3">
+        <span class="text-[#ff79c6] font-bold text-lg">➜</span>
+        <input type="text" id="cmd-input"
+            class="bg-transparent border-none outline-none text-[#f8f8f2] text-lg w-full placeholder-gray-600 font-bold"
+            placeholder="Type /filter or /search to begin..." autofocus>
+        <span class="cursor-blink w-2.5 h-5 bg-[#f8f8f2] -ml-2"></span>
+    </div>
+
+    <!-- MAIN LIST -->
+    <div class="flex-1 overflow-y-auto p-2" id="console-output">
+        <!-- Generated JS -->
+    </div>
+
+    <!-- COMMAND PALETTE (Overlay) -->
+    <div id="cmd-palette"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] bg-[#282a36] border border-[#6272a4] shadow-2xl rounded-lg hidden flex-col overflow-hidden z-50">
+        <div class="p-3 border-b border-[#44475a] bg-[#44475a] text-white font-bold text-sm">Action Palette</div>
+        <div class="p-2 space-y-1" id="palette-items">
+            <div class="p-2 hover:bg-[#44475a] cursor-pointer text-[#50fa7b] flex justify-between"><span>Mark as
+                    Paid</span> <span class="opacity-50 text-[10px]">CMD+P</span></div>
+            <div class="p-2 hover:bg-[#44475a] cursor-pointer text-[#8be9fd] flex justify-between"><span>Print Packing
+                    Slip</span> <span class="opacity-50 text-[10px]">CMD+L</span></div>
+            <div class="p-2 hover:bg-[#44475a] cursor-pointer text-[#ff5555] flex justify-between"><span>Cancel
+                    Order</span> <span class="opacity-50 text-[10px]">CMD+D</span></div>
+        </div>
+    </div>
+
+    <script>
+        const orders = [
+            { id: "ORD-7829", user: "sarah_connor", date: "2026-10-24", amount: 124.50, status: "PAID", type: "standard_box" },
+            { id: "ORD-9921", user: "kyle_reese", date: "2026-10-24", amount: 45.00, status: "PACKED", type: "fruit_sack" },
+            { id: "ORD-1123", user: "silberman_dr", date: "2026-10-23", amount: 210.00, status: "PENDING", type: "mega_box" },
+            { id: "ORD-3321", user: "t_800", date: "2026-10-22", amount: 15.99, status: "DELIVERED", type: "sunglasses" },
+            { id: "ORD-4492", user: "john_connor", date: "2026-10-21", amount: 88.50, status: "SHIPPED", type: "veggie_mix" },
+        ];
+
+        let selectedIndex = 0;
+
+        function renderLines() {
+            const container = document.getElementById('console-output');
+            container.innerHTML = orders.map((o, idx) => {
+                const isSelected = idx === selectedIndex;
+                const statusColor = getStatusColor(o.status);
+
+                return `
+                <div class="flex items-center gap-4 py-1.5 px-3 font-mono text-sm cursor-pointer ${isSelected ? 'selected-line' : 'hover:bg-[#2a2a2a]'}" onclick="selectLine(${idx})">
+                    <span class="w-24 opacity-50">${o.id}</span>
+                    <span class="w-32 text-[#8be9fd]">${o.date}</span>
+                    <span class="w-48 font-bold text-[#f8f8f2]">${o.user}</span>
+                    <span class="w-32 ${statusColor}">${o.status}</span>
+                    <span class="w-24 text-right text-[#f1fa8c]">$${o.amount.toFixed(2)}</span>
+                    <span class="opacity-40 italic ml-4 text-xs">&lt;${o.type}&gt;</span>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusColor(s) {
+            if (s === 'PAID') return 'text-[#50fa7b]';
+            if (s === 'PENDING') return 'text-[#ffb86c]';
+            if (s === 'SHIPPED') return 'text-[#bd93f9]';
+            if (s === 'PACKED') return 'text-[#8be9fd]';
+            return 'text-gray-500';
+        }
+
+        window.selectLine = (idx) => {
+            selectedIndex = idx;
+            renderLines();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                selectedIndex = (selectedIndex + 1) % orders.length;
+                renderLines();
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp') {
+                selectedIndex = (selectedIndex - 1 + orders.length) % orders.length;
+                renderLines();
+                e.preventDefault();
+            } else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                const palette = document.getElementById('cmd-palette');
+                palette.classList.toggle('hidden');
+                palette.classList.toggle('flex');
+            } else if (e.key === 'Escape') {
+                const palette = document.getElementById('cmd-palette');
+                palette.classList.add('hidden');
+                palette.classList.remove('flex');
+            }
+        });
+
+        const input = document.getElementById('cmd-input');
+        input.addEventListener('input', (e) => {
+            // Fake interactivity
+            if (e.target.value.includes('/')) {
+                e.target.classList.add('text-[#bd93f9]');
+            } else {
+                e.target.classList.remove('text-[#bd93f9]');
+            }
+        });
+
+        renderLines();
+    </script>
+</body>
+
+</html>

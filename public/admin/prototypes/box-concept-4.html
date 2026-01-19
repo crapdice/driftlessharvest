@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 4: Kanban Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+    <style>
+        .kanban-col {
+            min-height: 400px;
+        }
+
+        .draggable-source {
+            cursor: grab;
+        }
+
+        .draggable-source:active {
+            cursor: grabbing;
+        }
+
+        .is-dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body class="bg-blue-50 h-screen flex flex-col font-sans overflow-hidden">
+
+    <header class="bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center shadow-sm z-10">
+        <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <span
+                class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center text-sm font-mono">P4</span>
+            Kanban Builder
+        </h1>
+        <div class="flex gap-4 items-center">
+            <div class="text-xs text-gray-500 font-medium">
+                Drag items to the "My Box" column
+            </div>
+            <a href="box-concept-5.html"
+                class="text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors">Next Concept &rarr;</a>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-x-auto overflow-y-hidden p-6 gap-6 flex">
+
+        <!-- Column 1: Produce -->
+        <div class="w-80 flex-shrink-0 flex flex-col bg-gray-100/50 rounded-xl border border-gray-200">
+            <div
+                class="p-3 font-bold text-gray-600 border-b border-gray-200 bg-gray-100 rounded-t-xl flex justify-between">
+                <span>Vegetables</span>
+                <span class="text-xs bg-gray-200 px-2 py-0.5 rounded-full text-gray-500">Source</span>
+            </div>
+            <div class="p-3 space-y-3 overflow-y-auto flex-1 custom-scroll" ondrop="drop(event)"
+                ondragover="allowDrop(event)">
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 group draggable-source relative"
+                    draggable="true" ondragstart="drag(event)" data-id="1" data-name="Organic Carrots" data-price="2.99"
+                    data-img="https://placehold.co/100x100/orange/white?text=Carrots">
+                    <img src="https://placehold.co/100x100/orange/white?text=Carrots"
+                        class="w-full h-24 object-cover rounded-md mb-2">
+                    <div class="font-bold text-gray-800">Organic Carrots</div>
+                    <div class="text-xs text-gray-500">$2.99</div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="ri-drag-move-2-fill text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 group draggable-source relative"
+                    draggable="true" ondragstart="drag(event)" data-id="2" data-name="Red Potatoes" data-price="3.49"
+                    data-img="https://placehold.co/100x100/brown/white?text=Potatoes">
+                    <img src="https://placehold.co/100x100/brown/white?text=Potatoes"
+                        class="w-full h-24 object-cover rounded-md mb-2">
+                    <div class="font-bold text-gray-800">Red Potatoes</div>
+                    <div class="text-xs text-gray-500">$3.49</div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="ri-drag-move-2-fill text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 group draggable-source relative"
+                    draggable="true" ondragstart="drag(event)" data-id="3" data-name="Kale Bunch" data-price="1.99"
+                    data-img="https://placehold.co/100x100/green/white?text=Kale">
+                    <img src="https://placehold.co/100x100/green/white?text=Kale"
+                        class="w-full h-24 object-cover rounded-md mb-2">
+                    <div class="font-bold text-gray-800">Kale Bunch</div>
+                    <div class="text-xs text-gray-500">$1.99</div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="ri-drag-move-2-fill text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 2: Fruit -->
+        <div class="w-80 flex-shrink-0 flex flex-col bg-gray-100/50 rounded-xl border border-gray-200">
+            <div
+                class="p-3 font-bold text-gray-600 border-b border-gray-200 bg-gray-100 rounded-t-xl flex justify-between">
+                <span>Fruits</span>
+                <span class="text-xs bg-gray-200 px-2 py-0.5 rounded-full text-gray-500">Source</span>
+            </div>
+            <div class="p-3 space-y-3 overflow-y-auto flex-1 custom-scroll" ondrop="drop(event)"
+                ondragover="allowDrop(event)">
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 group draggable-source relative"
+                    draggable="true" ondragstart="drag(event)" data-id="4" data-name="Honeycrisp Apple"
+                    data-price="0.89" data-img="https://placehold.co/100x100/red/white?text=Apple">
+                    <img src="https://placehold.co/100x100/red/white?text=Apple"
+                        class="w-full h-24 object-cover rounded-md mb-2">
+                    <div class="font-bold text-gray-800">Honeycrisp Apple</div>
+                    <div class="text-xs text-gray-500">$0.89</div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="ri-drag-move-2-fill text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 group draggable-source relative"
+                    draggable="true" ondragstart="drag(event)" data-id="5" data-name="Bananas" data-price="0.69"
+                    data-img="https://placehold.co/100x100/yellow/black?text=Bananas">
+                    <img src="https://placehold.co/100x100/yellow/black?text=Bananas"
+                        class="w-full h-24 object-cover rounded-md mb-2">
+                    <div class="font-bold text-gray-800">Bananas</div>
+                    <div class="text-xs text-gray-500">$0.69</div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="ri-drag-move-2-fill text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 group draggable-source relative"
+                    draggable="true" ondragstart="drag(event)" data-id="9" data-name="Blueberries" data-price="3.99"
+                    data-img="https://placehold.co/100x100/blue/white?text=Berries">
+                    <img src="https://placehold.co/100x100/blue/white?text=Berries"
+                        class="w-full h-24 object-cover rounded-md mb-2">
+                    <div class="font-bold text-gray-800">Blueberries</div>
+                    <div class="text-xs text-gray-500">$3.99</div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i class="ri-drag-move-2-fill text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARGET Column: MY BOX -->
+        <div
+            class="w-96 flex-shrink-0 flex flex-col bg-white rounded-xl border-2 border-dashed border-blue-300 shadow-xl overflow-hidden ring-4 ring-blue-50/50">
+            <div class="p-4 bg-blue-600 text-white font-bold flex justify-between items-center shadow-md z-10">
+                <span>My Box</span>
+                <span id="box-total" class="font-mono bg-blue-800 px-2 py-1 rounded text-sm">$0.00</span>
+            </div>
+
+            <div id="box-target" class="flex-1 p-4 space-y-3 overflow-y-auto bg-blue-50/30" ondrop="dropInBox(event)"
+                ondragover="allowDrop(event)">
+
+                <div id="drop-hint"
+                    class="h-full flex flex-col items-center justify-center text-blue-300 border-2 border-dashed border-blue-100 rounded-xl">
+                    <i class="ri-drag-drop-line text-4xl mb-2"></i>
+                    <p class="font-bold">Drop Here</p>
+                </div>
+
+                <!-- Dropped items -->
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-100">
+                <button
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-lg shadow-blue-200 transition-all">Save
+                    Box</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let boxItems = [];
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text/plain", JSON.stringify({
+                id: ev.target.dataset.id,
+                name: ev.target.dataset.name,
+                price: parseFloat(ev.target.dataset.price),
+                img: ev.target.dataset.img
+            }));
+            ev.target.classList.add('is-dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            // Optional: Handle dropping back to source
+            document.querySelectorAll('.is-dragging').forEach(el => el.classList.remove('is-dragging'));
+        }
+
+        function dropInBox(ev) {
+            ev.preventDefault();
+            document.querySelectorAll('.is-dragging').forEach(el => el.classList.remove('is-dragging'));
+
+            const data = JSON.parse(ev.dataTransfer.getData("text/plain"));
+
+            // Add to array
+            const existing = boxItems.find(i => i.id == data.id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                boxItems.push({ ...data, qty: 1 });
+            }
+
+            renderBox();
+        }
+
+        function renderBox() {
+            const container = document.getElementById('box-target');
+            const hint = document.getElementById('drop-hint');
+            const totalEl = document.getElementById('box-total');
+
+            if (boxItems.length > 0) {
+                hint.classList.add('hidden');
+            } else {
+                hint.classList.remove('hidden');
+            }
+
+            // Simple re-render for proto (inefficient but fine for demo)
+            // We want to keep the hint element though
+
+            // Clear items but keep hint
+            Array.from(container.children).forEach(child => {
+                if (child.id !== 'drop-hint') container.removeChild(child);
+            });
+
+            boxItems.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex items-center gap-3 animate-in zoom-in-95 duration-200';
+                el.innerHTML = `
+                    <img src="${item.img}" class="w-12 h-12 rounded bg-gray-100 object-cover">
+                    <div class="flex-1">
+                        <div class="font-bold text-gray-800 text-sm">${item.name}</div>
+                        <div class="text-xs text-gray-500">$${item.price} x ${item.qty}</div>
+                    </div>
+                    <div class="font-bold text-blue-600">$${(item.price * item.qty).toFixed(2)}</div>
+                `;
+                container.appendChild(el);
+            });
+
+            const total = boxItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            totalEl.textContent = '$' + total.toFixed(2);
+        }
+
+        // Reset drag style on end
+        document.addEventListener('dragend', () => {
+            document.querySelectorAll('.is-dragging').forEach(el => el.classList.remove('is-dragging'));
+        });
+    </script>
+</body>
+
+</html>

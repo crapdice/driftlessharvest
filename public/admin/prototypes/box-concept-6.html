@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 6: Wizard Stepper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 h-screen flex flex-col font-sans items-center justify-center">
+
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[600px]">
+
+        <!-- Header / Progress -->
+        <div class="bg-white border-b border-gray-200 px-8 py-6 relative z-10">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Build New Template</h1>
+                <a href="box-concept-7.html"
+                    class="text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors">Next Concept
+                    &rarr;</a>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="relative flex items-center justify-between">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 -z-10"></div>
+                <div id="progress-line"
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-1 bg-green-500 transition-all duration-500 -z-10">
+                </div>
+
+                <div class="step-dot active w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-white"
+                    data-step="1">1</div>
+                <div class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-white"
+                    data-step="2">2</div>
+                <div class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-white"
+                    data-step="3">3</div>
+            </div>
+            <div class="flex justify-between text-xs font-semibold text-gray-500 uppercase mt-2">
+                <span>Vegetables</span>
+                <span class="pl-2">Fruits & Extras</span>
+                <span>Review</span>
+            </div>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-hidden relative">
+            <div id="slide-track" class="flex w-[300%] h-full transition-transform duration-500 ease-in-out">
+
+                <!-- STEP 1: VEG -->
+                <div class="w-full h-full overflow-y-auto p-8 custom-scroll">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700">Select Vegetables</h2>
+                    <div class="grid grid-cols-3 gap-4" id="step1-grid">
+                        <!-- Standard checkbox cards -->
+                    </div>
+                </div>
+
+                <!-- STEP 2: FRUIT -->
+                <div class="w-full h-full overflow-y-auto p-8 custom-scroll">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700">Select Fruits & Pantry</h2>
+                    <div class="grid grid-cols-3 gap-4" id="step2-grid">
+                        <!-- Cards -->
+                    </div>
+                </div>
+
+                <!-- STEP 3: REVIEW -->
+                <div class="w-full h-full p-8 flex flex-col items-center justify-center">
+                    <div class="w-full max-w-md bg-gray-50 rounded-xl p-6 border border-gray-200 text-center space-y-4">
+                        <div
+                            class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                            <i class="ri-check-line"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">Ready to Create?</h3>
+                        <p class="text-gray-500">You've selected <span id="summary-count"
+                                class="font-bold text-gray-900">0 items</span> with a total value of <span
+                                id="summary-total" class="font-bold text-gray-900">$0.00</span>.</p>
+
+                        <div class="bg-white rounded-lg border border-gray-200 p-4 text-left max-h-48 overflow-y-auto"
+                            id="summary-list">
+                            <!-- List -->
+                        </div>
+
+                        <button
+                            class="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-3 font-bold shadow-lg transition-transform hover:scale-105">
+                            Create Complete Box
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer / Navigation -->
+        <div class="bg-white border-t border-gray-200 px-8 py-5 flex justify-between items-center z-10">
+            <button id="prev-btn" onclick="goToStep(currentStep - 1)"
+                class="px-6 py-2 rounded-lg text-gray-600 font-bold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>Back</button>
+            <div class="flex items-center gap-2 text-sm font-medium text-gray-500">
+                Current Total: <span class="text-gray-900 font-bold" id="footer-total">$0.00</span>
+            </div>
+            <button id="next-btn" onclick="goToStep(currentStep + 1)"
+                class="px-6 py-2 bg-green-600 text-white rounded-lg font-bold shadow-md hover:bg-green-700 transition-colors">Next
+                Step &rarr;</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        let selectedItems = {}; // id -> {qty, price, name}
+
+        const products = [
+            { id: 1, name: "Organic Carrots", cat: "Vegetables", price: 2.99, img: "https://placehold.co/100x100/orange/white?text=Carrots" },
+            { id: 2, name: "Red Potatoes", cat: "Vegetables", price: 3.49, img: "https://placehold.co/100x100/brown/white?text=Potatoes" },
+            { id: 3, name: "Kale Bunch", cat: "Vegetables", price: 1.99, img: "https://placehold.co/100x100/green/white?text=Kale" },
+            { id: 8, name: "Avocado", cat: "Vegetables", price: 1.50, img: "https://placehold.co/100x100/darkgreen/white?text=Avocado" },
+            { id: 4, name: "Honeycrisp Apple", cat: "Fruits", price: 0.89, img: "https://placehold.co/100x100/red/white?text=Apple" },
+            { id: 5, name: "Bananas", cat: "Fruits", price: 0.69, img: "https://placehold.co/100x100/yellow/black?text=Bananas" },
+            { id: 6, name: "Sourdough Bread", cat: "Pantry", price: 5.99, img: "https://placehold.co/100x100/burlywood/white?text=Bread" },
+            { id: 7, name: "Free Range Eggs", cat: "Pantry", price: 4.49, img: "https://placehold.co/100x100/white/black?text=Eggs" },
+        ];
+
+        function init() {
+            renderGrid('step1-grid', products.filter(p => p.cat === 'Vegetables'));
+            renderGrid('step2-grid', products.filter(p => p.cat !== 'Vegetables'));
+            updateUI();
+        }
+
+        function renderGrid(containerId, items) {
+            document.getElementById(containerId).innerHTML = items.map(p => `
+                <div class="border border-gray-200 rounded-xl p-3 hover:border-green-400 transition-colors cursor-pointer bg-white group relative selection-card" onclick="toggleItem(this, ${p.id})">
+                    <div class="flex gap-3">
+                        <img src="${p.img}" class="w-16 h-16 rounded-lg object-cover bg-gray-100">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800 text-sm">${p.name}</h4>
+                            <p class="text-xs text-gray-500 mt-1">$${p.price}</p>
+                        </div>
+                        <div class="checkbox-ring w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors">
+                            <i class="ri-check-line text-white opacity-0 transform scale-50 transition-all"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.toggleItem = (el, id) => {
+            const product = products.find(p => p.id === id);
+            const ring = el.querySelector('.checkbox-ring');
+            const icon = el.querySelector('i');
+
+            if (selectedItems[id]) {
+                delete selectedItems[id];
+                el.classList.remove('ring-2', 'ring-green-500', 'bg-green-50');
+                ring.classList.remove('bg-green-500', 'border-green-500');
+                icon.classList.add('opacity-0', 'scale-50');
+            } else {
+                selectedItems[id] = { ...product, qty: 1 };
+                el.classList.add('ring-2', 'ring-green-500', 'bg-green-50');
+                ring.classList.add('bg-green-500', 'border-green-500');
+                icon.classList.remove('opacity-0', 'scale-50');
+            }
+            updateFooter();
+        };
+
+        function goToStep(step) {
+            if (step < 1 || step > totalSteps) return;
+            currentStep = step;
+
+            // Move Track
+            const track = document.getElementById('slide-track');
+            track.style.transform = `translateX(-${(step - 1) * 33.333}%)`;
+
+            // Functionality per step
+            if (step === 3) renderSummary();
+
+            updateUI();
+        }
+
+        function updateUI() {
+            // Dots
+            document.querySelectorAll('.step-dot').forEach((dot, idx) => {
+                const step = idx + 1;
+                if (step < currentStep) {
+                    dot.className = 'step-dot w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-white';
+                    dot.innerHTML = '<i class="ri-check-line"></i>';
+                } else if (step === currentStep) {
+                    dot.className = 'step-dot w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-green-100 scale-110 transition-transform';
+                    dot.innerHTML = step;
+                } else {
+                    dot.className = 'step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm shadow-md ring-4 ring-white';
+                    dot.innerHTML = step;
+                }
+            });
+
+            // Line
+            const line = document.getElementById('progress-line');
+            if (currentStep === 1) line.style.width = '0%';
+            if (currentStep === 2) line.style.width = '50%';
+            if (currentStep === 3) line.style.width = '100%';
+
+            // Buttons
+            document.getElementById('prev-btn').disabled = currentStep === 1;
+            const nextBtn = document.getElementById('next-btn');
+            if (currentStep === 3) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+            }
+        }
+
+        function renderSummary() {
+            const list = document.getElementById('summary-list');
+            const items = Object.values(selectedItems);
+
+            document.getElementById('summary-count').innerText = items.length + ' items';
+
+            list.innerHTML = items.map(item => `
+                <div class="flex justify-between text-sm py-1 border-b border-gray-100 last:border-0">
+                    <span class="text-gray-600">${item.name}</span>
+                    <span class="font-mono font-bold text-gray-800">$${item.price.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateFooter() {
+            const total = Object.values(selectedItems).reduce((acc, i) => acc + i.price, 0);
+            document.getElementById('footer-total').innerText = '$' + total.toFixed(2);
+            document.getElementById('summary-total').innerText = '$' + total.toFixed(2);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

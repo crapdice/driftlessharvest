@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 5: Bulk Grid Data Entry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .grid-row:hover .grid-actions {
+            opacity: 1;
+        }
+
+        .grid-input {
+            transition: all 0.2s;
+        }
+
+        .grid-input:focus {
+            background: white;
+            box-shadow: 0 0 0 2px #3b82f6;
+            z-index: 10;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 h-screen flex flex-col font-sans overflow-hidden">
+
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-20">
+        <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <span
+                class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-sm font-mono">P5</span>
+            Bulk Grid Entry
+        </h1>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-gray-400 uppercase">Total Value</span>
+                <span id="grid-total" class="font-mono font-bold text-lg text-gray-900">$0.00</span>
+            </div>
+            <button
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-bold shadow hover:bg-indigo-700 transition-colors">
+                Save Changes
+            </button>
+            <a href="box-concept-6.html"
+                class="ml-4 text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors">Next Concept
+                &rarr;</a>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-auto p-8 custom-scroll">
+        <div class="bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden min-w-[800px]">
+            <!-- Toolbar -->
+            <div class="bg-gray-50 border-b border-gray-300 p-2 flex gap-2 sticky top-0 z-10">
+                <div class="relative">
+                    <i class="ri-search-line absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Filter rows..." onkeyup="filterRows(this.value)"
+                        class="pl-8 pr-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-indigo-500 w-64">
+                </div>
+                <div class="h-8 w-px bg-gray-300 mx-2"></div>
+                <button
+                    class="px-3 py-1.5 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50 font-medium text-gray-600">
+                    <i class="ri-filter-3-line mr-1"></i> Category
+                </button>
+                <div class="flex-1"></div>
+                <div class="text-xs text-gray-500 flex items-center px-2 italic">
+                    Use &uarr;&darr; keys to navigate, Tab to enter Qty
+                </div>
+            </div>
+
+            <!-- Grid Header -->
+            <div
+                class="grid grid-cols-[60px_1fr_120px_120px_100px_100px] bg-gray-100 border-b border-gray-300 text-xs font-bold text-gray-500 uppercase tracking-wider sticky top-[53px] z-10">
+                <div class="p-3 text-center border-r border-gray-300">#</div>
+                <div class="p-3 border-r border-gray-300">Product Name</div>
+                <div class="p-3 border-r border-gray-300">Category</div>
+                <div class="p-3 text-right border-r border-gray-300">Unit Price</div>
+                <div class="p-3 text-center border-r border-gray-300 bg-indigo-50/50 text-indigo-800">Qty</div>
+                <div class="p-3 text-right bg-indigo-50/50 text-indigo-800">Subtotal</div>
+            </div>
+
+            <!-- Grid Body -->
+            <div id="grid-body" class="divide-y divide-gray-200">
+                <!-- Rows injected JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Organic Carrots", cat: "Vegetables", price: 2.99 },
+            { id: 2, name: "Red Potatoes", cat: "Vegetables", price: 3.49 },
+            { id: 3, name: "Kale Bunch", cat: "Vegetables", price: 1.99 },
+            { id: 4, name: "Honeycrisp Apple", cat: "Fruits", price: 0.89 },
+            { id: 5, name: "Bananas", cat: "Fruits", price: 0.69 },
+            { id: 6, name: "Sourdough Bread", cat: "Pantry", price: 5.99 },
+            { id: 7, name: "Free Range Eggs", cat: "Pantry", price: 4.99 },
+            { id: 8, name: "Avocado", cat: "Vegetables", price: 1.50 },
+            { id: 9, name: "Blueberries", cat: "Fruits", price: 3.99 },
+            { id: 10, name: "Raw Honey", cat: "Pantry", price: 12.99 },
+            { id: 11, name: "Almond Milk", cat: "Pantry", price: 4.49 },
+            { id: 12, name: "Spinach Bag", cat: "Vegetables", price: 2.50 },
+            { id: 13, name: "Greek Yogurt", cat: "Pantry", price: 1.25 },
+            { id: 14, name: "Granola", cat: "Pantry", price: 6.99 },
+            { id: 15, name: "Lemon", cat: "Fruits", price: 0.50 },
+
+        ];
+
+        function renderRows(items) {
+            const container = document.getElementById('grid-body');
+            container.innerHTML = items.map((p, idx) => `
+                <div class="grid-row grid grid-cols-[60px_1fr_120px_120px_100px_100px] group hover:bg-gray-50 transition-colors text-sm" data-id="${p.id}">
+                    <div class="p-2 text-center text-gray-400 border-r border-gray-200 flex items-center justify-center font-mono text-xs">${p.id}</div>
+                    <div class="p-2 border-r border-gray-200 flex items-center font-medium text-gray-900">${p.name}</div>
+                    <div class="p-2 border-r border-gray-200 flex items-center text-gray-500 text-xs uppercase badge">${p.cat}</div>
+                    <div class="p-2 border-r border-gray-200 flex items-center justify-end font-mono text-gray-600">$${p.price.toFixed(2)}</div>
+                    
+                    <!-- Editable Qty -->
+                    <div class="p-1 border-r border-gray-200 bg-indigo-50/10 group-hover:bg-white transition-colors">
+                        <input type="number" min="0" value="0" data-price="${p.price}" 
+                            class="grid-input w-full h-full px-2 text-center border border-transparent rounded focus:border-indigo-500 font-bold text-gray-900 bg-transparent placeholder-gray-300"
+                            oninput="updateSubtotal(this)">
+                    </div>
+
+                    <div class="p-2 flex items-center justify-end font-mono font-bold text-indigo-600 bg-indigo-50/10 subtotal-cell">$0.00</div>
+                </div>
+            `).join('');
+        }
+
+        function updateSubtotal(input) {
+            const row = input.closest('.grid-row');
+            const price = parseFloat(input.dataset.price);
+            const qty = parseInt(input.value) || 0;
+            const subtotalCell = row.querySelector('.subtotal-cell');
+
+            // UI Update
+            const sub = price * qty;
+            subtotalCell.innerText = '$' + sub.toFixed(2);
+
+            if (qty > 0) {
+                row.classList.add('bg-indigo-50');
+                input.classList.add('text-indigo-700');
+            } else {
+                row.classList.remove('bg-indigo-50');
+                input.classList.remove('text-indigo-700');
+            }
+
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('.grid-row').forEach(row => {
+                const sub = parseFloat(row.querySelector('.subtotal-cell').innerText.replace('$', ''));
+                total += sub;
+            });
+            document.getElementById('grid-total').innerText = '$' + total.toFixed(2);
+        }
+
+        function filterRows(term) {
+            const rows = document.querySelectorAll('.grid-row');
+            term = term.toLowerCase();
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(term) ? 'grid' : 'none';
+            });
+        }
+
+        renderRows(products);
+    </script>
+</body>
+
+</html>

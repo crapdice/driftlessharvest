@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 1: Dual-Pane Composer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm z-10">
+        <div>
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span
+                    class="bg-gray-900 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm font-mono">P1</span>
+                Dual-Pane Composer
+            </h1>
+            <p class="text-xs text-gray-500 mt-1">Efficiency-focused split view for rapid box assembly.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="box-concept-2.html"
+                class="text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors">Next Concept &rarr;</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden max-w-7xl mx-auto w-full p-6 gap-6">
+
+        <!-- LEFT PANE: CATALOG -->
+        <div class="w-3/5 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col overflow-hidden">
+            <!-- Search & Filters -->
+            <div class="p-4 border-b border-gray-100 bg-gray-50/50 space-y-3">
+                <div class="relative">
+                    <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="catalog-search" onkeyup="filterCatalog()" placeholder="Search ingredients..."
+                        class="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-harvest-500 focus:border-harvest-500 outline-none transition-all shadow-sm">
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+                    <button class="px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium shadow-sm">All</button>
+                    <button
+                        class="px-3 py-1.5 bg-white border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-medium transition-colors">Vegetables</button>
+                    <button
+                        class="px-3 py-1.5 bg-white border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-medium transition-colors">Fruits</button>
+                    <button
+                        class="px-3 py-1.5 bg-white border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-medium transition-colors">Pantry</button>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div id="catalog-list" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
+                <!-- Items injected by JS -->
+            </div>
+        </div>
+
+        <!-- RIGHT PANE: BOX CONTENTS -->
+        <div class="w-2/5 flex flex-col gap-4">
+
+            <div
+                class="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col overflow-hidden flex-1 relative">
+                <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                        <i class="ri-box-3-line text-harvest-600"></i> Current Box
+                    </h3>
+                    <span id="item-count-badge"
+                        class="bg-harvest-100 text-harvest-700 text-xs font-bold px-2 py-0.5 rounded-full">0
+                        Items</span>
+                </div>
+
+                <!-- Box Items List -->
+                <div id="box-list" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-2 bg-gray-50/30">
+                    <div id="empty-state"
+                        class="h-full flex flex-col items-center justify-center text-gray-400 text-sm">
+                        <i class="ri-inbox-line text-3xl mb-2 opacity-30"></i>
+                        <p>Box is empty</p>
+                        <p class="text-xs opacity-60">Click items on the left to add</p>
+                    </div>
+                </div>
+
+                <!-- Summary Footer -->
+                <div class="p-4 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                    <div class="flex justify-between items-end mb-4">
+                        <div class="text-xs text-gray-500">Total Value</div>
+                        <div class="text-2xl font-bold text-gray-900" id="total-price">$0.00</div>
+                    </div>
+                    <button
+                        class="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-bold shadow-lg shadow-gray-200 transition-all flex justify-center items-center gap-2">
+                        <i class="ri-save-line"></i> Save Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mock Data
+        const products = [
+            { id: 1, name: "Organic Carrots", cat: "Vegetables", price: 2.99, img: "https://placehold.co/100x100/orange/white?text=Carrots" },
+            { id: 2, name: "Red Potatoes", cat: "Vegetables", price: 3.49, img: "https://placehold.co/100x100/brown/white?text=Potatoes" },
+            { id: 3, name: "Kale Bunch", cat: "Vegetables", price: 1.99, img: "https://placehold.co/100x100/green/white?text=Kale" },
+            { id: 4, name: "Honeycrisp Apple", cat: "Fruits", price: 0.89, img: "https://placehold.co/100x100/red/white?text=Apple" },
+            { id: 5, name: "Bananas", cat: "Fruits", price: 0.69, img: "https://placehold.co/100x100/yellow/black?text=Bananas" },
+            { id: 6, name: "Sourdough Bread", cat: "Pantry", price: 5.99, img: "https://placehold.co/100x100/burlywood/white?text=Bread" },
+            { id: 7, name: "Free Range Eggs", cat: "Pantry", price: 4.99, img: "https://placehold.co/100x100/white/black?text=Eggs" },
+            { id: 8, name: "Avocado", cat: "Vegetables", price: 1.50, img: "https://placehold.co/100x100/darkgreen/white?text=Avocado" },
+            { id: 9, name: "Blueberries", cat: "Fruits", price: 3.99, img: "https://placehold.co/100x100/blue/white?text=Berries" },
+            { id: 10, name: "Raw Honey", cat: "Pantry", price: 12.99, img: "https://placehold.co/100x100/goldenrod/white?text=Honey" },
+        ];
+
+        let boxItems = [];
+
+        function renderCatalog(items = products) {
+            const list = document.getElementById('catalog-list');
+            list.innerHTML = items.map(p => `
+                <div onclick="addToBox(${p.id})" class="group flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors border border-transparent hover:border-blue-100 relative">
+                    <img src="${p.img}" class="w-10 h-10 rounded-md object-cover bg-gray-100">
+                    <div class="flex-1">
+                        <div class="font-medium text-sm text-gray-800">${p.name}</div>
+                        <div class="text-xs text-gray-400">$${p.price.toFixed(2)} • ${p.cat}</div>
+                    </div>
+                    <button class="w-8 h-8 rounded-full bg-white text-blue-600 shadow-sm border border-gray-100 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all hover:bg-blue-600 hover:text-white">
+                        <i class="ri-add-line"></i>
+                    </button>
+                    <div class="absolute right-12 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-xs font-bold text-blue-600 transition-opacity">Add</div>
+                </div>
+            `).join('');
+        }
+
+        function addToBox(id) {
+            const product = products.find(p => p.id === id);
+            const existing = boxItems.find(i => i.id === id);
+
+            if (existing) {
+                existing.qty++;
+            } else {
+                boxItems.push({ ...product, qty: 1 });
+            }
+            renderBox();
+        }
+
+        function removeFromBox(id) {
+            // boxItems = boxItems.filter(i => i.id !== id);
+            const existing = boxItems.find(i => i.id === id);
+            if (existing.qty > 1) {
+                existing.qty--;
+            } else {
+                boxItems = boxItems.filter(i => i.id !== id);
+            }
+            renderBox();
+        }
+
+        function renderBox() {
+            const list = document.getElementById('box-list');
+            const empty = document.getElementById('empty-state');
+            const totalEl = document.getElementById('total-price');
+            const countEl = document.getElementById('item-count-badge');
+
+            if (boxItems.length === 0) {
+                list.innerHTML = '';
+                list.appendChild(empty);
+                empty.style.display = 'flex';
+                totalEl.textContent = '$0.00';
+                countEl.textContent = '0 Items';
+                return;
+            }
+
+            empty.style.display = 'none';
+
+            list.innerHTML = boxItems.map(item => `
+                <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                    <img src="${item.img}" class="w-10 h-10 rounded-md object-cover bg-gray-100 grayscale-[0.2]">
+                    <div class="flex-1">
+                        <div class="font-bold text-sm text-gray-800">${item.name}</div>
+                        <div class="text-xs text-gray-500">$${item.price.toFixed(2)}</div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                        <button onclick="removeFromBox(${item.id})" class="w-6 h-6 flex items-center justify-center hover:bg-white rounded-md shadow-sm text-gray-600 transition-all">-</button>
+                        <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+                        <button onclick="addToBox(${item.id})" class="w-6 h-6 flex items-center justify-center hover:bg-white rounded-md shadow-sm text-gray-600 transition-all">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = boxItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            totalEl.textContent = '$' + total.toFixed(2);
+            countEl.textContent = boxItems.reduce((acc, i) => acc + i.qty, 0) + ' Items';
+        }
+
+        function filterCatalog() {
+            const term = document.getElementById('catalog-search').value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(term));
+            renderCatalog(filtered);
+        }
+
+        // Init
+        renderCatalog();
+    </script>
+</body>
+
+</html>

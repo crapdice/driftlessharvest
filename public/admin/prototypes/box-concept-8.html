@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Concept 8: Visual Slot Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { harvest: { 500: '#10B981', 600: '#059669', 900: '#064E3B' } } } }
+        }
+    </script>
+    <style>
+        .slot-card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .slot-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .filled-slot {
+            animation: popIn 0.3s ease-out forwards;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 h-screen flex flex-col font-sans overflow-hidden text-gray-100">
+
+    <header class="bg-gray-800 border-b border-gray-700 px-8 py-5 flex justify-between items-center shadow-lg z-20">
+        <div>
+            <h1 class="text-2xl font-bold flex items-center gap-3">
+                <span
+                    class="w-10 h-10 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-xl flex items-center justify-center text-lg font-bold shadow-lg">P8</span>
+                Slot Builder
+            </h1>
+            <p class="text-gray-400 text-xs mt-1 uppercase tracking-widest pl-1">Capacity Planning Mode</p>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="text-right">
+                <div class="text-xs text-gray-400 uppercase font-bold">Box Capacity</div>
+                <div class="text-xl font-bold font-mono"><span id="filled-count" class="text-rose-400">0</span> / 6
+                    Slots</div>
+            </div>
+            <button
+                class="bg-rose-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-rose-600 transition-colors shadow-lg shadow-rose-900/50">
+                Finish Box
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- LEFT: SLOTS VIEW -->
+        <div class="flex-1 p-10 flex items-center justify-center bg-gray-900 relative">
+            <!-- Decorative BG -->
+            <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800 to-gray-900 -z-10">
+            </div>
+
+            <div class="grid grid-cols-3 gap-6 w-full max-w-4xl" id="slots-container">
+                <!-- Slots injected JS -->
+            </div>
+        </div>
+
+        <!-- RIGHT: CATALOG -->
+        <div class="w-96 bg-gray-800 border-l border-gray-700 flex flex-col shadow-2xl z-10">
+            <div class="p-4 border-b border-gray-700">
+                <input type="text" placeholder="Search items..."
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-gray-200 focus:ring-2 focus:ring-rose-500 outline-none">
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll" id="catalog-list">
+                <!-- Items -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const capacity = 6;
+        let filledSlots = 0;
+        let slots = Array(capacity).fill(null); // Array of product objects or null
+
+        const products = [
+            { id: 1, name: "Organic Carrots", price: 2.99, img: "https://placehold.co/100x100/orange/white?text=C" },
+            { id: 2, name: "Red Potatoes", price: 3.49, img: "https://placehold.co/100x100/brown/white?text=P" },
+            { id: 3, name: "Kale Bunch", price: 1.99, img: "https://placehold.co/100x100/green/white?text=K" },
+            { id: 4, name: "Honeycrisp Apple", price: 0.89, img: "https://placehold.co/100x100/red/white?text=A" },
+            { id: 5, name: "Bananas", price: 0.69, img: "https://placehold.co/100x100/yellow/black?text=B" },
+            { id: 8, name: "Avocado", price: 1.50, img: "https://placehold.co/100x100/darkgreen/white?text=Av" },
+        ];
+
+        function init() {
+            renderSlots();
+            renderCatalog();
+        }
+
+        function renderSlots() {
+            const container = document.getElementById('slots-container');
+            container.innerHTML = slots.map((item, idx) => {
+                if (item) {
+                    return `
+                    <div class="aspect-[4/3] bg-gray-800 rounded-2xl border border-gray-600 relative group filled-slot overflow-hidden flex flex-col shadow-xl">
+                        <img src="${item.img}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4 w-full">
+                             <div class="font-bold text-white text-lg">${item.name}</div>
+                             <div class="text-rose-400 font-mono">$${item.price}</div>
+                        </div>
+                        <button onclick="removeSlot(${idx})" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 hover:bg-rose-600 text-white flex items-center justify-center transition-colors backdrop-blur-sm">
+                            <i class="ri-close-line"></i>
+                        </button>
+                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/50 text-xs font-mono text-gray-400 backdrop-blur-sm">Slot ${idx + 1}</div>
+                    </div>
+                    `;
+                } else {
+                    return `
+                    <div class="aspect-[4/3] bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-700 flex items-center justify-center relative hover:border-rose-500/50 hover:bg-gray-800 transition-all group">
+                         <div class="text-center">
+                            <i class="ri-add-circle-line text-4xl text-gray-600 group-hover:text-rose-500 transition-colors mb-2 block"></i>
+                            <span class="text-sm font-bold text-gray-600 group-hover:text-gray-400">Empty Slot ${idx + 1}</span>
+                         </div>
+                    </div>
+                    `;
+                }
+            }).join('');
+
+            document.getElementById('filled-count').innerText = slots.filter(x => x !== null).length;
+        }
+
+        function renderCatalog() {
+            const list = document.getElementById('catalog-list');
+            list.innerHTML = products.map(p => `
+                <div class="bg-gray-700 p-3 rounded-lg flex items-center gap-3 hover:bg-gray-600 cursor-pointer transition-colors group" onclick="fillNextSlot(${p.id})">
+                    <img src="${p.img}" class="w-10 h-10 rounded bg-gray-800 object-cover">
+                    <div class="flex-1">
+                        <div class="font-bold text-gray-200 text-sm group-hover:text-white">${p.name}</div>
+                        <div class="text-xs text-gray-400 group-hover:text-rose-300">$${p.price}</div>
+                    </div>
+                    <button class="w-8 h-8 rounded-full bg-gray-800 text-gray-400 group-hover:bg-rose-500 group-hover:text-white flex items-center justify-center transition-all">
+                        <i class="ri-add-line"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.fillNextSlot = (id) => {
+            const firstEmpty = slots.findIndex(x => x === null);
+            if (firstEmpty === -1) {
+                alert("Box is full!");
+                return;
+            }
+            slots[firstEmpty] = products.find(p => p.id === id);
+            renderSlots();
+        }
+
+        window.removeSlot = (idx) => {
+            slots[idx] = null;
+            renderSlots();
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
