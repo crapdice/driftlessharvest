@@ -167,7 +167,7 @@ export async function cleanAnalytics() {
 export async function seedUsers() {
     const confirmed = await confirmChoice({
         title: 'Initialize Test Signal',
-        message: 'This will create 20 test customer accounts with real Vernon County addresses.',
+        message: 'This will create 40 test customer accounts with real Vernon County addresses.',
         confirmText: 'Spawn Users',
         icon: '👤'
     });
