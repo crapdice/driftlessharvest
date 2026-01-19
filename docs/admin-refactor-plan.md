@@ -2,8 +2,8 @@
 
 > Created: 2026-01-17
 > Last Updated: 2026-01-19
-> Last Verified: 2026-01-19 17:30 CST (TDD verified)
-> Status: Phases 1, 2, 3, 7 Complete | Phase 4 Next
+> Last Verified: 2026-01-19 17:55 CST (TDD verified)
+> Status: Phases 1, 2, 3, 7 Complete | Phase 4 In Progress
 
 ## Executive Summary
 
@@ -89,9 +89,15 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 
 ---
 
-### Phase 4: Reduce Window Pollution (3-4 hours)
+### Phase 4: Reduce Window Pollution (3-4 hours) 🔄 IN PROGRESS
 
-- [ ] Implement `ActionDispatcher.js` or standard event delegation to remove `window.*` reliance.
+> **Status (2026-01-19):** ActionDispatcher infrastructure complete. Products module actions registered. Window bindings kept as fallback until HTML templates migrated.
+
+- [x] Create `core/ActionDispatcher.js` (event delegation system)
+- [x] Initialize dispatcher in `app.js`
+- [x] Register products actions (18 actions)
+- [ ] Migrate HTML templates to use `data-action` attributes
+- [ ] Register orders, users, settings, delivery module actions
 
 ---
 
@@ -115,7 +121,7 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 | Phase 1: Quick Cleanup | **✅ Complete** | 2026-01-17 | 2026-01-19 |
 | Phase 2: API Consolidation | **✅ Complete** | 2026-01-17 | 2026-01-19 |
 | Phase 3: Split God Modules | **✅ Complete** | 2026-01-19 | 2026-01-19 |
-| Phase 4: Reduce Window Pollution | Not Started | - | - |
+| Phase 4: Reduce Window Pollution | **🔄 In Progress** | 2026-01-19 | - |
 | Phase 5: Standardize Views | Not Started | - | - |
 | Phase 6: Build Tooling | Not Started | - | - |
 | **Phase 7: Backend Routes** | **✅ Complete** | 2026-01-18 | 2026-01-18 |

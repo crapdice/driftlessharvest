@@ -15,6 +15,7 @@ import { api } from '../api.js';
 import { showToast, formatCurrency } from '../utils.js';
 import { AdminBoxCard } from '../../components/AdminBoxCard.js';
 import { ImageDropZone } from '../../components/ImageDropZone.js';
+import { registerActions } from '../../core/ActionDispatcher.js';
 
 // Import shared state
 import { state } from './state.js';
@@ -873,4 +874,45 @@ document.addEventListener('click', (e) => {
     if (dropdown && !dropdown.classList.contains('hidden') && trigger && !trigger.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.classList.add('hidden');
     }
+});
+
+// ============================================================
+// ACTION DISPATCHER REGISTRATION (Phase 4)
+// ============================================================
+// Register products actions for data-action pattern
+// window.* bindings remain as fallback until all templates are migrated
+
+registerActions('products', {
+    // Product list actions
+    toggleStatus: async (data) => {
+        const currentStatus = data.active === 'true';
+        await window.toggleProductStatus(data.id, currentStatus);
+    },
+    edit: (data) => window.editProduct(data.id),
+    archive: (data) => window.archiveProduct(data.id),
+
+    // Archived product actions
+    restore: (data) => window.restoreProduct(data.id),
+    permanentDelete: (data) => window.permanentDeleteProduct(data.id),
+
+    // Modal actions
+    openModal: (data) => openProductModal(data.id ? state.findProduct(data.id) : null),
+    closeModal: () => closeProductModal(),
+    save: () => saveProduct(),
+
+    // Template actions
+    openTemplateModal: (data) => openTemplateModal(data.id ? state.findTemplate(data.id) : null),
+    closeTemplateModal: () => closeTemplateModal(),
+    saveTemplate: () => saveTemplate(),
+    addTemplateItem: () => addTemplateItem(),
+    removeTemplateItem: (data) => removeTemplateItem(parseInt(data.index)),
+    deleteTemplate: (data) => window.deleteTemplate(data.id),
+
+    // Inventory actions
+    sort: (data) => window.sortInventory(data.column),
+    updateStock: (data) => window.updateStock(data.id, parseInt(data.delta)),
+
+    // Dropdown actions
+    toggleDropdown: () => window.toggleProductDropdown(),
+    selectOption: (data) => window.selectProductOption(data.id, data.name, data.image)
 });

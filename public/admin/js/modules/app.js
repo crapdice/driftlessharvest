@@ -15,6 +15,7 @@ import {
 import { initUtilities } from './utilities.js';
 import { initCategories } from './categories.js';
 import { initAnalytics } from './analytics.js';
+import { init as initActionDispatcher } from '../core/ActionDispatcher.js';
 
 // State
 let currentTab = 'dashboard';
@@ -48,6 +49,7 @@ window.redoLayout = redoLayout;
 
 // Init
 document.addEventListener('DOMContentLoaded', async () => {
+    initActionDispatcher(); // Initialize event delegation system
     initAuth();
     initMobileMenu();
     initTheme();
