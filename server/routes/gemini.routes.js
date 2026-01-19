@@ -6,13 +6,13 @@ const { checkRole } = require('../middleware/auth');
 // POST /api/gemini/generate
 router.post('/gemini/generate', checkRole(['admin', 'super_admin']), async (req, res) => {
     try {
-        const { prompt, context } = req.body;
+        const { prompt, context, imageSource } = req.body;
 
         if (!prompt) {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        const text = await geminiService.generateContent(prompt, context);
+        const text = await geminiService.generateContent(prompt, context, 'gemini-2.5-flash', imageSource);
         res.json({ text });
 
     } catch (error) {
@@ -127,6 +127,21 @@ router.get('/gemini/proxy-media', checkRole(['admin', 'super_admin']), async (re
     } catch (error) {
         console.error('Gemini Proxy Route Error:', error);
         res.status(502).json({ error: error.message || 'Failed to proxy media' });
+    }
+});
+
+// POST /api/gemini/enhance-image
+router.post('/gemini/enhance-image', checkRole(['admin', 'super_admin']), async (req, res) => {
+    try {
+        const { imageSource, type, contextData } = req.body;
+        if (!imageSource) return res.status(400).json({ error: 'Image source is required' });
+        if (!type) return res.status(400).json({ error: 'Type (product/box) is required' });
+
+        const result = await geminiService.enhanceImage(imageSource, type, contextData);
+        res.json(result);
+    } catch (error) {
+        console.error('Gemini Image Enhance Route Error:', error);
+        res.status(502).json({ error: error.message || 'Image enhancement failed' });
     }
 });
 

@@ -6,7 +6,7 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 const DATA_FILE = path.join(DATA_DIR, 'config.json');
 
 class GeminiService {
-    async generateContent(prompt, context = '', model = 'gemini-2.5-flash') {
+    async generateContent(prompt, context = '', model = 'gemini-2.5-flash', imageSource = null) {
         try {
             // Load API Key from config
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
@@ -25,6 +25,20 @@ class GeminiService {
             // Use confirmed working model
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
 
+            const parts = [{ text: fullPrompt }];
+
+            if (imageSource) {
+                const isUrl = imageSource.startsWith('http');
+                if (isUrl) {
+                    const imgRes = await fetch(imageSource);
+                    const buffer = await imgRes.arrayBuffer();
+                    const b64 = Buffer.from(buffer).toString('base64');
+                    parts.push({ inlineData: { mimeType: imgRes.headers.get('content-type') || 'image/jpeg', data: b64 } });
+                } else {
+                    parts.push({ inlineData: { mimeType: 'image/jpeg', data: imageSource.split(',')[1] || imageSource } });
+                }
+            }
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -32,7 +46,7 @@ class GeminiService {
                 },
                 body: JSON.stringify({
                     contents: [{
-                        parts: [{ text: fullPrompt }]
+                        parts: parts
                     }]
                 })
             });
@@ -244,6 +258,90 @@ class GeminiService {
             console.error('Gemini Get Op Error:', error);
             throw error;
         }
+    }
+
+    async enhanceImage(imageSource, type, contextData = {}) {
+        try {
+            // Step 1: Generate an Enhancement Prompt using Gemini 1.5 Flash (Vision)
+            let analysisPrompt = '';
+            if (type === 'product') {
+                analysisPrompt = `Analyze this product image of "${contextData.name || 'a product'}" in the category "${contextData.category || 'General'}". 
+                Generate a highly detailed, professional photography prompt for Google Imagen to create an ENHANCED version of this EXACT product.
+                The enhanced version should:
+                1. Feature vibrant, organic colors and perfect outdoor lighting.
+                2. Have a shallow depth of field (blurred background).
+                3. Look premium, appetizing, and fresh.
+                4. Maintain the core identity of the product shown.
+                Return ONLY the prompt text.`;
+            } else {
+                analysisPrompt = `Analyze this box template image for "${contextData.name || 'a subscription box'}". Description: ${contextData.description || 'N/A'}.
+                Generate a highly detailed, professional prompt for Google Imagen to create an ENHANCED lifestyle version of this EXACT box.
+                The enhanced version should:
+                1. Show the box in a beautiful, natural setting (e.g., a rustic wooden table).
+                2. Feature warm, inviting lighting.
+                3. Look premium and high-end.
+                4. Maintain the brand identity of the box.
+                Return ONLY the prompt text.`;
+            }
+
+            const enhancementPrompt = await this.generateImageAnalysis(imageSource, analysisPrompt);
+            console.log('Generated Enhancement Prompt:', enhancementPrompt);
+
+            // Step 2: Generate the Enhanced Image using Imagen
+            const result = await this.generateImage(enhancementPrompt);
+            return {
+                ...result,
+                promptUsed: enhancementPrompt
+            };
+
+        } catch (error) {
+            console.error('Gemini Enhance Image Error:', error);
+            throw error;
+        }
+    }
+
+    async generateImageAnalysis(imageSource, prompt) {
+        const configStr = await fs.readFile(DATA_FILE, 'utf8');
+        const apiKey = JSON.parse(configStr).apiKeys?.gemini;
+        if (!apiKey) throw new Error('Gemini API key not configured');
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`;
+
+        const isUrl = imageSource.startsWith('http');
+        const body = {
+            contents: [{
+                parts: [
+                    { text: prompt },
+                    isUrl ? { fileData: { mimeType: 'image/jpeg', fileUri: imageSource } } : { inlineData: { mimeType: 'image/jpeg', data: imageSource.split(',')[1] || imageSource } }
+                ]
+            }]
+        };
+
+        // If it's a URL, Gemini might not be able to fetch it directly via fileData unless it's a Google Cloud Storage URI.
+        // For public URLs, it's better to download it first or use a different part type. 
+        // Actually, for public URLs, we can just pass the URL if the model supports it, but standard Gemini API usually expects inlineData or GCS URIs.
+        // Let's download the image if it's a URL to be safe.
+
+        if (isUrl) {
+            const imgRes = await fetch(imageSource);
+            const buffer = await imgRes.arrayBuffer();
+            const b64 = Buffer.from(buffer).toString('base64');
+            body.contents[0].parts[1] = { inlineData: { mimeType: imgRes.headers.get('content-type') || 'image/jpeg', data: b64 } };
+        }
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gemini Analysis Failed: ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Professional food photography of a fresh product';
     }
 
     async proxyMedia(fileUrl, rangeHeader) {

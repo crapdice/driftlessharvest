@@ -22,13 +22,22 @@ We use **Railway** to host this application because it supports our backend data
 ## Technical Overview
 
 -   **Frontend**: Modular ES6 Architecture.
-    -   `js/modules/orders/`: MVC structure for the Orders tab.
-    -   `js/modules/api.js`: Centralized API Client.
+    -   `js/modules/`: Domain-specific UI controllers (Products, Orders, Gemini).
+    -   `js/services/`: Pure API clients (centralized logic and authentication).
+    -   `js/core/`: Application-wide background services (Inventory Alerts).
 -   **Backend**: Node.js + Express (Modular Route/Controller Architecture).
 -   **Database**: SQLite (`harvest.db`) managed by **Strict Migrations**.
-    -   See `server/db/migrations/` for schema history.
-    -   Run `node scripts/maintenance/make_migration.js <name>` to create changes.
--   **Auth**: JWT-based authentication.
+-   **AI Integration**: Google Gemini API for generative content and vision tasks.
+
+## AI Capabilities (Gemini)
+
+This application uses **Google Gemini 2.5 Flash** and **Imagen 3** to provide premium administrative tools:
+
+1.  **Image Enhancement**: High-fidelity re-rendering of product and packaging images using Imagen 3, guided by artistic analysis from Gemini Flash.
+2.  **Vision-Based Generation**: Creative context-aware text generation. The AI "sees" the product image when suggesting names or writing appetizing descriptions.
+3.  **Artisanal Branding**: Curated "Expert Personas" for prompt engineering to ensure all generated content aligns with the Harvest premium farm-to-table brand.
+
+👉 **[Evaluate Image Enhancement Quality](./public/admin/enhance-demo.html)** (Admin required)
 
 ## How to Edit Content
 
