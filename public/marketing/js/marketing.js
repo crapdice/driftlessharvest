@@ -3,30 +3,42 @@ import { api } from '../../admin/js/modules/api.js';
 let isRefreshing = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Token is in HttpOnly cookie - check for user object to verify session
-    const userStr = localStorage.getItem('harvest_user');
-    if (!userStr) {
-        window.location.href = '/admin/index.html?redirect=/marketing';
-        return;
-    }
-
+    // Validate session via API - do NOT rely on localStorage for auth decisions
+    // (deprecated per frontend_architecture_assessment.md)
     try {
+        // Verify admin session by fetching user profile (requires valid cookie)
+        const profileRes = await fetch('/api/user/profile', {
+            credentials: 'include'
+        });
+
+        if (!profileRes.ok) {
+            throw new Error('Unauthorized');
+        }
+
+        const user = await profileRes.json();
+
+        // Check if user has admin role
+        if (!['admin', 'super_admin', 'superadmin'].includes(user.role)) {
+            throw new Error('Insufficient permissions');
+        }
+
+        // Session is valid, proceed with dashboard initialization
         const config = await api.getConfig();
-        renderUser(userStr);
+        renderUser(user);
         initDashboard(config);
     } catch (e) {
         console.error('Portal Auth failed', e);
+        // Redirect to admin login with redirect param
         window.location.href = '/admin/index.html?redirect=/marketing';
     }
 });
 
-function renderUser(userStr) {
+function renderUser(user) {
     const avatar = document.getElementById('user-avatar');
     try {
-        const user = JSON.parse(userStr);
-        const initial = (user.email || 'A').charAt(0).toUpperCase();
+        const initial = (user?.email || 'A').charAt(0).toUpperCase();
         avatar.innerText = initial;
-        avatar.title = user.email;
+        avatar.title = user?.email || 'Admin';
     } catch {
         avatar.innerText = 'AD';
     }
@@ -271,7 +283,7 @@ async function fetchApi(url, options = {}) {
             'Content-Type': 'application/json'
         }
     });
-    if (res.status === 401) window.location.href = '/admin/index.html';
+    if (res.status === 401) window.location.href = '/admin/index.html?redirect=/marketing';
     if (!res.ok) throw new Error('API Error');
     if (res.status === 204) return null;
     return res.json();

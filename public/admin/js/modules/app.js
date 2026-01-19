@@ -71,14 +71,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTab(currentTab);
 });
 
-function initAuth() {
+async function initAuth() {
     setLoginHandler(showLoginModal);
-    // Token is in HttpOnly cookie - check for user object to know if session exists
-    const userStr = localStorage.getItem('harvest_user');
-    if (!userStr) {
-        window.location.href = '/login.html';
+
+    // Validate session via API - HttpOnly cookie is sent automatically
+    // Do NOT rely on localStorage for auth decisions (deprecated per frontend_architecture_assessment.md)
+    try {
+        const res = await fetch('/api/user/profile', {
+            credentials: 'include'
+        });
+
+        if (res.ok) {
+            const user = await res.json();
+            // Update localStorage for UI display purposes only (not for auth)
+            localStorage.setItem('harvest_user', JSON.stringify(user));
+            renderHeaderUser();
+        } else {
+            // Session invalid - show login
+            localStorage.removeItem('harvest_user');
+            handleAuthFailure();
+        }
+    } catch (e) {
+        console.error('Auth validation failed:', e);
+        handleAuthFailure();
+    }
+}
+
+function handleAuthFailure() {
+    // Check if we have a redirect parameter - if so, show modal instead of redirecting
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectPath = urlParams.get('redirect');
+    if (redirectPath) {
+        // Show login modal for users coming from /marketing or other protected pages
+        showLoginModal();
     } else {
-        renderHeaderUser();
+        showLoginModal(); // Show modal instead of redirecting to non-existent login.html
     }
 }
 
@@ -178,6 +205,15 @@ async function handleLogin(e) {
             localStorage.setItem('harvest_user', JSON.stringify(data.user));
             document.getElementById('login-modal').style.display = 'none';
             renderHeaderUser(); // Update UI
+
+            // Check for redirect parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectPath = urlParams.get('redirect');
+            if (redirectPath && redirectPath.startsWith('/')) {
+                window.location.href = redirectPath;
+                return;
+            }
+
             setTab(currentTab);
         } else {
             alert("Login Failed: " + (data.error || "Unknown"));
