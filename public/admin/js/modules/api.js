@@ -28,15 +28,14 @@ export async function request(endpoint, method = 'GET', body = null) {
         };
         if (body) options.body = JSON.stringify(body);
 
-        const res = await fetch(`/api/admin${endpoint}`, options);
+        const url = endpoint.startsWith('/api') ? endpoint : `/api/admin${endpoint}`;
+        const res = await fetch(url, options);
 
         if (res.status === 401) {
             loginHandler();
-            if (!res.ok) {
-                const text = await res.text();
-                console.error(`API Error (${endpoint}):`, res.status, text);
-                throw new Error(`Request failed: ${res.status} ${text}`);
-            }
+            const text = await res.text();
+            console.error(`API Error (${endpoint}):`, res.status, text);
+            throw new Error(`Unauthorized: ${res.status} ${text}`);
         }
 
         if (res.status === 403) {
@@ -188,4 +187,19 @@ export const api = {
     verifyDatabase: () => request('/utilities/verify-database'),
     cleanTempFiles: () => request('/utilities/clean-temp-files', 'POST'),
     queryTable: (tableName) => request(`/utilities/query/${tableName}`),
+
+    // Auth & Profile
+    getProfile: () => request('/api/user/profile'),
+    login: (credentials) => fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(credentials)
+    }).then(async r => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Login failed');
+        return data;
+    }),
+    logout: () => fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
 };
+

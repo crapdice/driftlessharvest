@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin API Diagnostic</title>
+    <style>
+        body {
+            font-family: system-ui;
+            padding: 2rem;
+            background: #f9f9f9;
+        }
+
+        .test-case {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .pass {
+            border-left: 5px solid #22c55e;
+        }
+
+        .fail {
+            border-left: 5px solid #ef4444;
+        }
+
+        .status {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        pre {
+            background: #eee;
+            padding: 0.5rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Admin API Diagnostic Suite</h1>
+    <div id="results">Running tests...</div>
+
+    <script type="module">
+        import { api } from './js/modules/api.js';
+
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+
+            const tests = [
+                { name: 'api.getConfig()', fn: () => api.getConfig() },
+                { name: 'api.getProducts()', fn: () => api.getProducts() },
+                { name: 'api.getProfile()', fn: () => api.getProfile() }
+            ];
+
+            for (const test of tests) {
+                const el = document.createElement('div');
+                el.className = 'test-case';
+                el.innerHTML = `<h3>${test.name}</h3><span class="status">Running...</span>`;
+                results.appendChild(el);
+
+                try {
+                    const data = await test.fn();
+                    el.classList.add('pass');
+                    el.querySelector('.status').innerText = 'PASS';
+                    el.innerHTML += `<pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>`;
+                } catch (e) {
+                    el.classList.add('fail');
+                    el.querySelector('.status').innerText = 'FAIL';
+                    el.innerHTML += `<p style="color:red">${e.message}</p>`;
+                }
+            }
+        }
+
+        runTests();
+    </script>
+</body>
+
+</html>

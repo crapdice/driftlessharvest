@@ -1,4 +1,4 @@
-import { request } from './api.js';
+import { api, request } from './api.js';
 import { showToast } from './utils.js';
 
 let currentLayout = [];
@@ -105,9 +105,7 @@ if (typeof window !== 'undefined') {
 export async function loadLayouts() {
     try {
         // Fetch fresh config - use direct fetch since /api/config is not under /api/admin
-        const res = await fetch('/api/config');
-        if (!res.ok) throw new Error('Failed to load config');
-        const data = await res.json();
+        const data = await api.getConfig();
 
         // Fallback default layout
         const defaultLayout = [
@@ -229,8 +227,7 @@ export async function openComponentModal(index) {
     editingCompIndex = index;
     const item = currentLayout[index];
     currentCompId = item.id;
-    const res = await fetch('/api/config');
-    const data = await res.json();
+    const data = await api.getConfig();
 
     // 1. Setup Title
     document.getElementById('cm-title').innerText = `Edit ${item.id.replace('_', ' ')}`;
@@ -413,12 +410,7 @@ export async function saveComponentContent() {
         currentLayout[editingCompIndex].styles = styleObj;
 
         // 4. Save to Server (cookie-based auth)
-        await fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(fullConfig)
-        });
+        await api.updateConfig(fullConfig);
         showToast('Component updated!');
         closeComponentModal();
 
@@ -474,20 +466,14 @@ export function toggleLayoutItem(index) {
 export async function saveLayout() {
     try {
         // Get full config first to preserve other settings
-        const res = await fetch('/api/config');
-        const fullConfig = await res.json();
+        const fullConfig = await api.getConfig();
 
         // Patch layouts
         fullConfig.meta = fullConfig.meta || {};
         fullConfig.meta.layouts = fullConfig.meta.layouts || {};
         fullConfig.meta.layouts.home = currentLayout;
 
-        await fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(fullConfig)
-        });
+        await api.updateConfig(fullConfig);
         showToast("Layout saved! Check the Home page.");
 
     } catch (e) {

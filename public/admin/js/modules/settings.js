@@ -95,26 +95,13 @@ const THEME_PRESETS = {
 
 export async function loadSettings() {
     try {
-        // Fetch config
-
-        // Actually api.js doesn't expose getConfig directly? It exposes endpoints.
-        // I need to update api.js or use request.
         // In api.js I defined `api.getStats`, `api.getUsers` etc.
-        // I'll assume we add `getConfig` to api.js or use raw request if exported.
-        // For now I'll use a local helper if api.js isn't updated yet.
-
-        // Wait, I can't easily update api.js without overwriting.
-        // I'll make a request wrapper here or assume I'll update api.js later.
-        // Actually I can just import `api` and use what's there... but `getConfig` wasn't added.
-        // I'll use the raw fetch for now or add it.
-        // Let's add it to this file as a private helper using headers from localStorage.
+        // We now use api.getConfig() and api.updateConfig().
 
         // Load dynamic options first so values can be set
         await loadFeaturedOptions();
 
-        const res = await fetch('/api/config');
-        if (!res.ok) throw new Error("Failed to load");
-        currentConfig = await res.json();
+        currentConfig = await api.getConfig();
 
         populateForm(currentConfig);
 
@@ -401,16 +388,10 @@ export async function saveSettings() {
     if (heroImg && heroImg.value) currentConfig.pages.home.hero.image = heroImg.value;
 
     try {
-        const res = await fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(currentConfig)
-        });
+        const result = await api.updateConfig(currentConfig);
 
-        if (res.ok) {
+        if (result.success) {
             showToast("Settings Saved");
-
             // Update global config with new values
             window.globalConfig = currentConfig;
 
@@ -424,15 +405,19 @@ export async function saveSettings() {
             } else {
                 inventoryAlertService.stop();
             }
+        } else {
+            showToast(result.error || "Failed to save", "error");
         }
-        else showToast("Failed to save", "error");
-    } catch (e) { showToast("Error", "error"); }
+    } catch (e) {
+        console.error(e);
+        showToast("Error saving settings", "error");
+    }
 }
 
 export async function restoreDefaults() {
     if (!confirm("Restore defaults?")) return;
     try {
-        await fetch('/api/config/restore', { method: 'POST', credentials: 'include' });
+        await api.restoreConfig();
         showToast("Restored");
         setTimeout(() => window.location.reload(), 1000);
     } catch (e) { showToast("Error", "error"); }
@@ -576,21 +561,12 @@ export async function saveRawConfig() {
 
     try {
         const data = JSON.parse(editor.value);
-        const res = await fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        });
+        await api.updateConfig(data);
 
-        if (res.ok) {
-            showToast("Raw JSON Saved");
-            currentConfig = data;
-            populateForm(data); // Refresh the UI form
-            window.toggleAdvancedConfig(); // Close editor
-        } else {
-            showToast("Failed to save raw JSON", "error");
-        }
+        showToast("Raw JSON Saved");
+        currentConfig = data;
+        populateForm(data); // Refresh the UI form
+        window.toggleAdvancedConfig(); // Close editor
     } catch (e) {
         showToast("Invalid JSON format", "error");
     }
