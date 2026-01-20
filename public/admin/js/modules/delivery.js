@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { showToast, formatDate, formatCurrency } from './utils.js';
+import { ensureOrderModalsLoaded } from './orders/controller.js';
 
 // Global Actions
 window.toggleWindow = async (id, currentStatus) => {
@@ -157,6 +158,7 @@ function renderSchedule(schedule, totalsMap) {
 }
 
 export async function showDayOrders(dateStr) {
+    await ensureOrderModalsLoaded();
     try {
         const allOrders = await api.getOrders();
         // Filter: Pending OR Packed orders only for this date

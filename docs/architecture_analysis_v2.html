@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest App Architecture Analysis Report v2</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-yellow: #eab308;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--bg-card);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-resolved {
+            border-color: var(--accent-green);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-resolved {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .badge-improved {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .badge-remaining {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--accent-orange);
+            border: 1px solid var(--accent-orange);
+        }
+
+        .executive-summary {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-card);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .before,
+        .after {
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .before {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+        }
+
+        .after {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--accent-green);
+        }
+
+        .before h4 {
+            color: var(--accent-red);
+        }
+
+        .after h4 {
+            color: var(--accent-green);
+        }
+
+        ul,
+        ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ Harvest App Architecture Analysis v2</h1>
+            <p class="meta">Updated: January 19, 2026 | Post-Refactoring Assessment</p>
+        </header>
+
+        <div class="executive-summary">
+            <h2 style="margin-top: 0; border: none;">Executive Summary</h2>
+            <p>Significant progress made on admin panel refactoring. The frontend codebase has been substantially
+                improved through module splitting, view extraction, and reduced global pollution.</p>
+            <div class="summary-stats">
+                <div class="stat">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Phases Defined</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--accent-green);">4</div>
+                    <div class="stat-label">Phases Complete</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" style="color: var(--accent-blue);">2</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">-51%</div>
+                    <div class="stat-label">index.html Size</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">40</div>
+                    <div class="stat-label">TDD Tests Pass</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPLETED WORK -->
+        <h2>✅ Completed Refactoring</h2>
+
+        <div class="card card-resolved">
+            <div class="card-header">
+                <span class="badge badge-resolved">✅ Complete</span>
+                <span class="card-title">Phase 1 & 2: API Standardization</span>
+            </div>
+            <p>Unified API client with typed method documentation. Reduced frontend route mappings to single source of
+                truth.</p>
+            <div class="before-after">
+                <div class="before">
+                    <h4>Before</h4>
+                    <ul>
+                        <li>Scattered fetch() calls</li>
+                        <li>Inconsistent error handling</li>
+                        <li>Duplicate route definitions</li>
+                    </ul>
+                </div>
+                <div class="after">
+                    <h4>After</h4>
+                    <ul>
+                        <li>Centralized <code>api.js</code> (320 lines)</li>
+                        <li>Unified error handling</li>
+                        <li>JSDoc typed methods</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-resolved">
+            <div class="card-header">
+                <span class="badge badge-resolved">✅ Complete</span>
+                <span class="card-title">Phase 3: Orders Module Split</span>
+            </div>
+            <p>Monolithic <code>orders.js</code> (900+ lines) split into focused submodules following
+                state/controller/UI pattern.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                        <th>Lines</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>orders.js</code></td>
+                        <td>Entry point / exports</td>
+                        <td>33</td>
+                    </tr>
+                    <tr>
+                        <td><code>orders/state.js</code></td>
+                        <td>Reactive state container</td>
+                        <td>46</td>
+                    </tr>
+                    <tr>
+                        <td><code>orders/controller.js</code></td>
+                        <td>Business logic, API calls</td>
+                        <td>271</td>
+                    </tr>
+                    <tr>
+                        <td><code>orders/ui.js</code></td>
+                        <td>DOM rendering</td>
+                        <td>445</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Pattern established</strong> for future module splits (products, users, etc.)</p>
+        </div>
+
+        <div class="card card-resolved">
+            <div class="card-header">
+                <span class="badge badge-resolved">✅ Complete</span>
+                <span class="card-title">Phase 4: ActionDispatcher Infrastructure</span>
+            </div>
+            <p>Created centralized action dispatch system to reduce <code>window.*</code> pollution.</p>
+            <pre><code>// Before: 50+ window.* bindings scattered across files
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
+
+// After: Centralized registration
+registerActions('products', {
+    editProduct,
+    deleteProduct,
+});</code></pre>
+        </div>
+
+        <div class="card card-resolved">
+            <div class="card-header">
+                <span class="badge badge-resolved">✅ Complete</span>
+                <span class="card-title">Phase 5: Modal Extraction & View Standardization</span>
+            </div>
+            <p>Extracted embedded modals from <code>index.html</code> into separate view files with on-demand loading.
+            </p>
+            <div class="before-after">
+                <div class="before">
+                    <h4>Before</h4>
+                    <ul>
+                        <li><code>index.html</code>: 1,392 lines</li>
+                        <li>7 embedded modals</li>
+                        <li>No dynamic loading</li>
+                    </ul>
+                </div>
+                <div class="after">
+                    <h4>After</h4>
+                    <ul>
+                        <li><code>index.html</code>: 679 lines (-51%)</li>
+                        <li>16 separate view files</li>
+                        <li>On-demand fetch() loading</li>
+                    </ul>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>View File</th>
+                        <th>Contents</th>
+                        <th>Lines</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>product-modals.html</code></td>
+                        <td>Product + Template modals</td>
+                        <td>381</td>
+                    </tr>
+                    <tr>
+                        <td><code>order-modals.html</code></td>
+                        <td>Schedule, Date, Edit, Cart, Reschedule</td>
+                        <td>300</td>
+                    </tr>
+                    <tr>
+                        <td><code>settings.html</code></td>
+                        <td>Configuration tabs</td>
+                        <td>691</td>
+                    </tr>
+                    <tr>
+                        <td><code>users.html</code></td>
+                        <td>User management</td>
+                        <td>141</td>
+                    </tr>
+                    <tr>
+                        <td><code>utilities.html</code></td>
+                        <td>Admin utilities</td>
+                        <td>374</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card card-resolved">
+            <div class="card-header">
+                <span class="badge badge-resolved">✅ Complete</span>
+                <span class="card-title">Phase 7: Backend Route Refactoring</span>
+            </div>
+            <p>Monolithic <code>admin.routes.js</code> (752 lines) split into 7 domain-specific route files.</p>
+            <pre><code>server/routes/admin/
+├── index.js            # Aggregator (28 lines)
+├── stats.routes.js     # Dashboard (23 lines)
+├── inventory.routes.js # Stock, carts (67 lines)
+├── users.routes.js     # User CRUD (180 lines)
+├── orders.routes.js    # Order mgmt (261 lines)
+├── delivery.routes.js  # Windows (180 lines)
+└── categories.routes.js # Categories (47 lines)</code></pre>
+        </div>
+
+        <!-- IN PROGRESS -->
+        <h2>🔄 In Progress</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-improved">In Progress</span>
+                <span class="card-title">Products Module Split</span>
+            </div>
+            <p><code>products/index.js</code> remains at 940 lines. Infrastructure in place but needs submodule
+                extraction.</p>
+            <ul>
+                <li>✅ <code>state.js</code> extracted (51 lines)</li>
+                <li>⬜ Modal functions to separate file</li>
+                <li>⬜ Template builder to separate file</li>
+                <li>⬜ Inventory view to separate file</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-improved">In Progress</span>
+                <span class="card-title">Dynamic Loading Pattern</span>
+            </div>
+            <p>Implemented for modals. Needs extension to other views.</p>
+            <pre><code>async function ensureOrderModalsLoaded() {
+    if (orderModalsLoaded) return;
+    const container = document.getElementById('order-modals-container');
+    const response = await fetch('views/order-modals.html');
+    if (response.ok) {
+        container.innerHTML = await response.text();
+        orderModalsLoaded = true;
+    }
+}</code></pre>
+        </div>
+
+        <!-- REMAINING ISSUES -->
+        <h2>⚠️ Remaining Architectural Issues</h2>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-remaining">Remaining</span>
+                <span class="card-title">Backend: Runtime Schema Detection</span>
+            </div>
+            <p>Still using <code>PRAGMA table_info()</code> at runtime. Should be handled by migrations.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-remaining">Remaining</span>
+                <span class="card-title">Backend: Incomplete Repository Pattern</span>
+            </div>
+            <p>Only <code>UserRepository</code> exists. Orders, products, addresses still use raw
+                <code>db.prepare()</code>.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-remaining">Remaining</span>
+                <span class="card-title">Frontend: settings.js Size</span>
+            </div>
+            <p><code>settings.js</code> at 596 lines. Duplicates theme presets from <code>themes.js</code>.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="badge badge-remaining">Remaining</span>
+                <span class="card-title">No Pagination</span>
+            </div>
+            <p>List endpoints return all records. Will cause performance issues as data grows.</p>
+        </div>
+
+        <!-- METRICS -->
+        <h2>📊 Metrics Summary</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Before</th>
+                    <th>After</th>
+                    <th>Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>index.html</td>
+                    <td>1,392 lines</td>
+                    <td>679 lines</td>
+                    <td style="color: var(--accent-green);">-51%</td>
+                </tr>
+                <tr>
+                    <td>admin.routes.js</td>
+                    <td>752 lines</td>
+                    <td>56 lines</td>
+                    <td style="color: var(--accent-green);">-93%</td>
+                </tr>
+                <tr>
+                    <td>orders.js</td>
+                    <td>900+ lines</td>
+                    <td>33 lines (entry)</td>
+                    <td style="color: var(--accent-green);">-96% (split)</td>
+                </tr>
+                <tr>
+                    <td>View files</td>
+                    <td>0</td>
+                    <td>16</td>
+                    <td style="color: var(--accent-green);">+16</td>
+                </tr>
+                <tr>
+                    <td>TDD Tests</td>
+                    <td>0</td>
+                    <td>40</td>
+                    <td style="color: var(--accent-green);">+40</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>🎯 Recommended Next Steps</h2>
+
+        <ol>
+            <li><strong>Complete Products Split</strong> - Extract modal, template, inventory submodules from
+                <code>products/index.js</code></li>
+            <li><strong>Reduce window.* Pollution</strong> - Convert remaining onclick handlers to ActionDispatcher</li>
+            <li><strong>Build Tooling</strong> - Add bundler (Vite/esbuild) for production optimization</li>
+            <li><strong>Backend Repositories</strong> - Create OrderRepository, ProductRepository</li>
+            <li><strong>Remove Schema Detection</strong> - Rely on migrations, not runtime PRAGMA checks</li>
+        </ol>
+
+    </div>
+</body>
+
+</html>
+</code></pre>

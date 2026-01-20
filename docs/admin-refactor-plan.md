@@ -101,10 +101,17 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 
 ---
 
-### Phase 5: Standardize Views (3-4 hours)
+### Phase 5: Standardize Views (2-3 hours) 🔄 IN PROGRESS
 
-- [ ] **Extract embedded views from index.html** to `views/*.html`.
-- [ ] Standardize `dataset.loaded` check for deferred loading.
+> **Status (2026-01-19):** Modal extraction complete. index.html reduced from 1392 to 727 lines (-48%).
+
+- [x] Extract Product Modal → `product-modals.html` (already existed)
+- [x] Extract Template Modal → `product-modals.html` (already included)
+- [x] Create `order-modals.html` (schedule, date, order-edit, cart, reschedule)
+- [x] Remove embedded modals from `index.html`
+- [x] Add container placeholders for dynamic loading
+- [ ] Add dynamic fetch() loading in module init functions (optional)
+- [ ] Extract remaining embedded views if anydardize `dataset.loaded` check for deferred loading.
 
 ---
 
@@ -122,7 +129,7 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 | Phase 2: API Consolidation | **✅ Complete** | 2026-01-17 | 2026-01-19 |
 | Phase 3: Split God Modules | **✅ Complete** | 2026-01-19 | 2026-01-19 |
 | Phase 4: Reduce Window Pollution | **🔄 In Progress** | 2026-01-19 | - |
-| Phase 5: Standardize Views | Not Started | - | - |
+| Phase 5: Standardize Views | **🔄 In Progress** | 2026-01-19 | - |
 | Phase 6: Build Tooling | Not Started | - | - |
 | **Phase 7: Backend Routes** | **✅ Complete** | 2026-01-18 | 2026-01-18 |
 

@@ -26,6 +26,26 @@ import { state } from './state.js';
 // These modify the state object instead of module-level vars
 let currentTemplateItems = [];
 let pollInterval = null;
+let productModalsLoaded = false;
+
+// Ensure product modals are loaded into the DOM
+async function ensureProductModalsLoaded() {
+    if (productModalsLoaded) return;
+    const container = document.getElementById('product-modals-container');
+    if (!container) {
+        console.error('product-modals-container not found');
+        return;
+    }
+    try {
+        const response = await fetch('views/product-modals.html');
+        if (response.ok) {
+            container.innerHTML = await response.text();
+            productModalsLoaded = true;
+        }
+    } catch (e) {
+        console.error('Failed to load product modals:', e);
+    }
+}
 
 // Sync local vars to state on load
 function syncToState() {
@@ -437,6 +457,7 @@ window.deleteTemplate = async (id) => {
 // ============================================================
 
 export async function openProductModal(p = null) {
+    await ensureProductModalsLoaded();
     const modal = document.getElementById('product-modal');
     document.getElementById('p-modal-title').innerText = p ? 'Edit Product' : 'Add Product';
 
@@ -510,7 +531,8 @@ export async function saveProduct() {
 // TEMPLATE BUILDER
 // ============================================================
 
-export function openTemplateModal(t = null) {
+export async function openTemplateModal(t = null) {
+    await ensureProductModalsLoaded();
     const modal = document.getElementById('template-modal');
     document.getElementById('tmpl-modal-title').innerText = t ? 'Edit Template' : 'New Box Template';
     document.getElementById('t-id').value = t ? t.id : '';

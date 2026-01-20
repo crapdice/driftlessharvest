@@ -6,6 +6,29 @@ import { showToast } from '../utils.js';
 import { state } from './state.js';
 import * as UI from './ui.js';
 
+// Order modals loader (fired once on first modal open)
+let orderModalsLoaded = false;
+async function ensureOrderModalsLoaded() {
+    if (orderModalsLoaded) return;
+    const container = document.getElementById('order-modals-container');
+    if (!container) {
+        console.error('order-modals-container not found');
+        return;
+    }
+    try {
+        const response = await fetch('views/order-modals.html');
+        if (response.ok) {
+            container.innerHTML = await response.text();
+            orderModalsLoaded = true;
+        }
+    } catch (e) {
+        console.error('Failed to load order modals:', e);
+    }
+}
+
+// Export so delivery.js can use it
+export { ensureOrderModalsLoaded };
+
 export const controller = {
     // ------------------------------------
     // Initialization
@@ -60,6 +83,7 @@ export const controller = {
     // Order Editing
     // ------------------------------------
     async openEditOrderModal(orderId) {
+        await ensureOrderModalsLoaded();
         const order = state.findOrder(orderId);
         if (!order) return;
 
@@ -177,6 +201,7 @@ export const controller = {
     },
 
     async openDateModal(orderId) {
+        await ensureOrderModalsLoaded();
         document.getElementById('reschedule-order-id').value = orderId;
         const container = document.getElementById('reschedule-options');
         container.innerHTML = '<div class="text-sm text-gray-400">Loading windows...</div>';
