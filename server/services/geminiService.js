@@ -6,7 +6,7 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 const DATA_FILE = path.join(DATA_DIR, 'config.json');
 
 class GeminiService {
-    async generateContent(prompt, context = '', model = 'gemini-2.5-flash', imageSource = null) {
+    async generateContent(prompt, context = '', model = 'gemini-1.5-flash', imageSource = null) {
         try {
             // Load API Key from config
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
@@ -113,7 +113,7 @@ class GeminiService {
         }
     }
 
-    async generateImage(prompt, model = 'imagen-4.0-fast-generate-001') {
+    async generateImage(prompt, model = 'imagen-3.0-generate-002') {
         try {
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
             const apiKey = JSON.parse(configStr).apiKeys?.gemini;
@@ -189,6 +189,22 @@ class GeminiService {
         }
     }
 
+    /**
+     * Checks if a specific feature category is available for the current API key/billing status
+     * @param {string} feature - 'text' | 'vision' | 'image' | 'video'
+     */
+    async checkFeatureAvailability(feature) {
+        try {
+            if (feature === 'text' || feature === 'vision') return true; // Usually free tier
+
+            // For image/video, we might need to check the billing state
+            // As a simple heuristic, we can remember if we've hit a billing error before
+            return !this._billingRestricted;
+        } catch (e) {
+            return false;
+        }
+    }
+
     _handleError(response, errorText) {
         let errorData;
         try {
@@ -201,6 +217,7 @@ class GeminiService {
 
         // Specific helpful message for "limit: 0" or billing errors
         if (msg.includes('limit: 0') || msg.includes('billed users')) {
+            this._billingRestricted = true;
             throw new Error(`Media Generation (Image/Video) is restricted: ${msg}. TIP: Google often requires a linked Billing Account (even for free tier) to enable these advanced models.`);
         }
 
@@ -305,7 +322,7 @@ class GeminiService {
         const apiKey = JSON.parse(configStr).apiKeys?.gemini;
         if (!apiKey) throw new Error('Gemini API key not configured');
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
 
         const isUrl = imageSource.startsWith('http');
         const body = {
