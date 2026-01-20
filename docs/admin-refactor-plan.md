@@ -1,13 +1,13 @@
 # Admin Panel Refactoring Plan
 
 > Created: 2026-01-17
-> Last Updated: 2026-01-19
-> Last Verified: 2026-01-19 17:55 CST (TDD verified)
-> Status: Phases 1, 2, 3, 7 Complete | Phase 4 In Progress
+> Last Updated: 2026-01-20
+> Last Verified: 2026-01-20 00:00 CST (TDD verified)
+> Status: Phases 1, 2, 3, 4, 7 Complete | Phase 5 In Progress
 
 ## Executive Summary
 
-The admin codebase is evolving towards a modular, API-driven architecture. Phase 2 (API Consolidation) and Phase 7 (Backend Refactoring) are fully complete and verified. The modularization of `orders.js` into an MVC pattern is also complete. We are now entering Phase 3, targeting the `products.js` "God Module."
+The admin codebase has been significantly modernized. Phases 1-4 and 7 are complete. The `ActionDispatcher` now handles all UI events via `data-action` attributes, eliminating 63 inline `onclick` handlers. Next priority is Phase 5 (View Standardization) or Phase 6 (Build Tooling).
 
 ---
 
@@ -103,6 +103,7 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 - [x] Migrate `settings.html` (19 handlers)
 - [x] Migrate `users.html` (4 handlers)
 - [x] Migrate `templates.html` (1 handler)
+- [x] Remove redundant `window.*` bindings from `app.js` (7 removed)
 
 #### Manual Testing Checklist (Phase 4)
 
@@ -145,7 +146,7 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 | Phase 1: Quick Cleanup | **✅ Complete** | 2026-01-17 | 2026-01-19 |
 | Phase 2: API Consolidation | **✅ Complete** | 2026-01-17 | 2026-01-19 |
 | Phase 3: Split God Modules | **✅ Complete** | 2026-01-19 | 2026-01-19 |
-| Phase 4: Reduce Window Pollution | **🔄 In Progress** | 2026-01-19 | - |
+| Phase 4: Reduce Window Pollution | **✅ Complete** | 2026-01-19 | 2026-01-20 |
 | Phase 5: Standardize Views | **🔄 In Progress** | 2026-01-19 | - |
 | Phase 6: Build Tooling | Not Started | - | - |
 | **Phase 7: Backend Routes** | **✅ Complete** | 2026-01-18 | 2026-01-18 |
@@ -161,11 +162,13 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 | 2026-01-19 | Finalized Phase 2 Sweep | Cleaned up remaining fetch calls and resolved server startup issues |
 | 2026-01-19 | Restored User Modal files | User requested restoration after audit; identified as active dependency |
 | 2026-01-19 | Pushed Complete Codebase | Synchronized local refactor state with remote development branch |
+| 2026-01-20 | Completed ActionDispatcher migration | 63 onclick handlers converted to data-action, 4 action modules created |
+| 2026-01-20 | Removed redundant window bindings | 7 duplicate bindings removed from app.js |
 
 ---
 
 ## Notes
 
-- Keep this document updated as work progresses
-- Phase 3 is the current immediate priority
-- Phase 4 should follow to consolidate event handling
+- Phase 4 complete — all UI events now use ActionDispatcher
+- Phase 5 is the next priority for HTML standardization
+- Consider Phase 6 (Vite/Rollup) for production bundling
