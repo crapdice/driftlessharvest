@@ -5,7 +5,7 @@
         <h2 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">System Utilities</h2>
         <p class="text-sm text-gray-500 dark:text-gray-400">Database maintenance, seeding, and diagnostic tools.</p>
     </div>
-    <button onclick="refreshQuickStats()"
+    <button data-action="utilities:refreshStats"
         class="w-full md:w-auto text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-bold px-5 py-2.5 border border-blue-100 dark:border-blue-900/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2">
         <span>🔄</span> Refresh Stats
     </button>
@@ -27,9 +27,9 @@
                     </p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="seedUsers()"
+                    <button data-action="utilities:seedUsers"
                         class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-[11px] font-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">USERS</button>
-                    <button onclick="seedOrders()"
+                    <button data-action="utilities:seedOrders"
                         class="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg text-[11px] font-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">ORDERS</button>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                     <p class="text-xs text-blue-600/70 dark:text-blue-400/60 mt-0.5">Scan database for orphans and
                         structural errors.</p>
                 </div>
-                <button onclick="verifyDatabase()"
+                <button data-action="utilities:verifyDatabase"
                     class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95">RUN
                     DIAGNOSTIC</button>
             </div>
@@ -60,7 +60,7 @@
                     <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Orders</p>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400">Delete all transaction records.</p>
                 </div>
-                <button onclick="cleanOrders()"
+                <button data-action="utilities:cleanOrders"
                     class="px-4 py-2 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
             </div>
             <div class="flex items-center justify-between p-1">
@@ -68,7 +68,7 @@
                     <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Customers</p>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400">Clear all non-admin user data.</p>
                 </div>
-                <button onclick="cleanUsers()"
+                <button data-action="utilities:cleanUsers"
                     class="px-4 py-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
             </div>
             <div class="flex items-center justify-between p-1">
@@ -76,7 +76,7 @@
                     <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Analytics</p>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400">Delete all tracking data.</p>
                 </div>
-                <button onclick="cleanAnalytics()"
+                <button data-action="utilities:cleanAnalytics"
                     class="px-4 py-2 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
             </div>
             <div class="flex items-center justify-between p-1">
@@ -84,7 +84,7 @@
                     <p class="font-bold text-gray-900 dark:text-white text-sm">Purge Delivery Windows</p>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400">Delete all delivery window options.</p>
                 </div>
-                <button onclick="cleanDeliveryWindows()"
+                <button data-action="utilities:cleanDeliveryWindows"
                     class="px-4 py-2 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 rounded-lg text-[11px] font-black transition-all">PURGE</button>
             </div>
             <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
@@ -93,7 +93,7 @@
                     <p class="text-[10px] text-gray-400 dark:text-gray-500 italic mt-0.5">Wipe database but keep
                         structure.</p>
                 </div>
-                <button onclick="cleanDatabase()"
+                <button data-action="utilities:cleanDatabase"
                     class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-black shadow-lg shadow-red-500/30 transition-all active:scale-95 leading-none">TOTAL
                     NUKE</button>
             </div>
@@ -192,15 +192,15 @@
                     <span class="hifi-section-label">Channel A: Data Seeding</span>
                     <div class="flex gap-12 mt-6">
                         <div class="hifi-knob-container">
-                            <button onclick="seedUsers()" class="hifi-knob">👤</button>
+                            <button data-action="utilities:seedUsers" class="hifi-knob">👤</button>
                             <span class="label-tag">Seed Users</span>
                         </div>
                         <div class="hifi-knob-container">
-                            <button onclick="seedOrders()" class="hifi-knob">🛒</button>
+                            <button data-action="utilities:seedOrders" class="hifi-knob">🛒</button>
                             <span class="label-tag">Seed Orders</span>
                         </div>
                         <div class="hifi-knob-container">
-                            <button onclick="verifyDatabase()" class="hifi-knob">🔍</button>
+                            <button data-action="utilities:verifyDatabase" class="hifi-knob">🔍</button>
                             <span class="label-tag">Scan DB</span>
                         </div>
                     </div>
@@ -222,7 +222,7 @@
                             <span class="text-gray-500">PRD:</span>
                             <span class="backlit-orange text-lg font-bold stat-count-products">--</span>
                         </div>
-                        <button onclick="refreshQuickStats()"
+                        <button data-action="utilities:refreshStats"
                             class="ml-4 hover:translate-y-[-1px] active:translate-y-[1px] transition-transform">🔄</button>
                     </div>
                 </div>
@@ -234,19 +234,19 @@
                     <span class="hifi-section-label">Channel B: Cleanup Core</span>
                     <div class="flex gap-12 mt-6">
                         <div class="hifi-toggle-container">
-                            <div onclick="cleanOrders(event)" class="hifi-toggle"></div>
+                            <div data-action="utilities:cleanOrders" class="hifi-toggle"></div>
                             <span class="label-tag bg-orange-700">Purge Orders</span>
                         </div>
                         <div class="hifi-toggle-container">
-                            <div onclick="cleanUsers(event)" class="hifi-toggle"></div>
+                            <div data-action="utilities:cleanUsers" class="hifi-toggle"></div>
                             <span class="label-tag bg-red-700">Purge Users</span>
                         </div>
                         <div class="hifi-toggle-container">
-                            <div onclick="cleanDatabase(event)" class="hifi-toggle"></div>
+                            <div data-action="utilities:cleanDatabase" class="hifi-toggle"></div>
                             <span class="label-tag bg-red-900 shadow-[0_0_10px_rgba(153,27,27,0.4)]">Total Nuke</span>
                         </div>
                         <div class="hifi-toggle-container">
-                            <div onclick="cleanDeliveryWindows(event)" class="hifi-toggle"></div>
+                            <div data-action="utilities:cleanDeliveryWindows" class="hifi-toggle"></div>
                             <span class="label-tag bg-amber-700">Purge Windows</span>
                         </div>
                     </div>
@@ -266,7 +266,7 @@
 
         <div class="mt-12 flex justify-end">
             <div class="hifi-knob-container">
-                <button onclick="cleanTempFiles()"
+                <button data-action="utilities:cleanTempFiles"
                     class="w-10 h-10 rounded-full bg-gray-400 border-2 border-gray-500 shadow-sm hover:bg-gray-300 transition-colors">🧹</button>
                 <span class="text-[8px] font-bold text-gray-500 uppercase">Clear Temp</span>
             </div>
@@ -282,61 +282,61 @@
     </h3>
 
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <button onclick="viewAllUsers()"
+        <button data-action="utilities:viewAllUsers"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">👥</span> Users
         </button>
-        <button onclick="viewAllOrders()"
+        <button data-action="utilities:viewAllOrders"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📦</span> Orders
         </button>
-        <button onclick="viewAllProducts()"
+        <button data-action="utilities:viewAllProducts"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🍎</span> Products
         </button>
-        <button onclick="viewDeliveryWindows()"
+        <button data-action="utilities:viewDeliveryWindows"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🚛</span> Delivery
         </button>
-        <button onclick="viewAddresses()"
+        <button data-action="utilities:viewAddresses"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📍</span> Addresses
         </button>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <button onclick="viewCategories()"
+        <button data-action="utilities:viewCategories"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🏷️</span> Categories
         </button>
-        <button onclick="viewFarms()"
+        <button data-action="utilities:viewFarms"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-green-500 hover:text-green-600 dark:hover:text-green-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🚜</span> Farms
         </button>
-        <button onclick="viewPayments()"
+        <button data-action="utilities:viewPayments"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">💳</span> Payments
         </button>
-        <button onclick="viewOrderItems()"
+        <button data-action="utilities:viewOrderItems"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📜</span> Items
         </button>
-        <button onclick="viewAnalyticsEvents()"
+        <button data-action="utilities:viewAnalyticsEvents"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📈</span> Analytics
         </button>
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <button onclick="viewBoxTemplates()"
+        <button data-action="utilities:viewBoxTemplates"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-orange-500 hover:text-orange-600 dark:hover:text-orange-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">📝</span> Templates
         </button>
-        <button onclick="viewBoxItems()"
+        <button data-action="utilities:viewBoxItems"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🍱</span> Box Items
         </button>
-        <button onclick="viewLaunchSignups()"
+        <button data-action="utilities:viewLaunchSignups"
             class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 px-3 py-3 rounded-xl text-xs font-black shadow-sm transition-all group">
             <span class="block text-lg mb-1 group-hover:scale-110 transition-transform">🚀</span> Signups
         </button>

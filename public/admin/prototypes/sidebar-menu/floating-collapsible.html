@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype: Floating Collapsible Sidebar | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: calc(100vh - 2rem);
+            margin: 1rem;
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: width var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 50;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        /* Header / Logo */
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 1.125rem;
+            white-space: nowrap;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .brand-name {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Navigation Links */
+        .nav-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            display: flex;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-label {
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .nav-label {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+            z-index: 60;
+        }
+
+        .sidebar.collapsed .toggle-btn {
+            right: 50%;
+            transform: translateX(50%) rotate(180deg);
+        }
+
+        /* Content Area */
+        .main-content {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Tooltips for Collapsed State */
+        .nav-item[data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 90px;
+            background: #1e293b;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        .sidebar.collapsed .nav-item:hover[data-tooltip]::after {
+            opacity: 1;
+            visibility: visible;
+            left: 85px;
+        }
+    </style>
+</head>
+
+<body>
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">H</div>
+            <span class="brand-name">Harvest Admin</span>
+        </div>
+
+        <nav class="nav-content">
+            <a href="#" class="nav-item active" data-tooltip="Dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-tooltip="Orders">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">Orders</span>
+            </a>
+            <a href="#" class="nav-item" data-tooltip="Inventory">
+                <span class="nav-icon">🔢</span>
+                <span class="nav-label">Inventory</span>
+            </a>
+            <a href="#" class="nav-item" data-tooltip="Products">
+                <span class="nav-icon">🍎</span>
+                <span class="nav-label">Products</span>
+            </a>
+            <a href="#" class="nav-item" data-tooltip="Customers">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">Customers</span>
+            </a>
+            <div style="margin: 1.5rem 0; height: 1px; background: #f1f5f9;"></div>
+            <a href="#" class="nav-item" data-tooltip="Settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+
+        <button class="toggle-btn" onclick="toggleSidebar()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0;">Floating Collapsible</h1>
+            <p style="color: #64748b;">A minimalist approach to maximizing canvas real estate.</p>
+        </header>
+
+        <div class="glass-card">
+            <h2>Design Principles</h2>
+            <ul style="color: #64748b; line-height: 1.8;">
+                <li><strong>Spatial Economy</strong>: Returns 180px of horizontal space when collapsed.</li>
+                <li><strong>Context Persistence</strong>: Tooltips ensure navigation remains clear even without labels.
+                </li>
+                <li><strong>Floating Aesthetic</strong>: Margin around the sidebar creates a lighter, modern feel
+                    compared to edge-to-edge layouts.</li>
+            </ul>
+            <div
+                style="margin-top: 2rem; padding: 2rem; border: 2px dashed #e2e8f0; border-radius: 1rem; text-align: center; color: #94a3b8;">
+                Main Data Grid Area (Inventory / Orders / Reports)
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+
+            // Persist state
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebar-collapsed', isCollapsed);
+        }
+
+        // Restore state on load
+        window.addEventListener('load', () => {
+            const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+            if (isCollapsed) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Prototype: Glassmorphic Command | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="header-prototypes.css">
+</head>
+
+<body class="header-prototype-body">
+
+    <!-- Header -->
+    <header class="glass-header">
+        <div class="header-left">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div
+                    style="width: 36px; height: 36px; background: #10b981; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900;">
+                    H</div>
+                <span style="font-weight: 800; font-size: 1.125rem; color: #1e293b;">Harvest<span
+                        style="color: #10b981;">Admin</span></span>
+            </div>
+        </div>
+
+        <div class="command-search">
+            <div class="command-input-wrapper">
+                <span style="font-size: 1.25rem; opacity: 0.4;">🔍</span>
+                <input type="text" class="command-input" placeholder="Search orders, customers, or ask AI..."
+                    id="omnisearch">
+                <div class="ai-status-hint">
+                    <div class="pulse-dot"></div>
+                    <span>AI Engine Ready</span>
+                </div>
+                <div class="cmd-key">⌘ K</div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="action-widget" data-tooltip="Notifications">
+                    <span style="font-size: 1.25rem;">🔔</span>
+                    <span class="badge">3</span>
+                </div>
+
+                <div class="profile-pill">
+                    <div class="profile-avatar">S</div>
+                    <span class="profile-name">Super Admin</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Area Placeholder -->
+    <main style="padding: 2.5rem; flex: 1;">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <div style="margin-bottom: 3rem;">
+                <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem;">Command Center
+                </h1>
+                <p style="color: #64748b; font-size: 1.125rem;">Press <kbd
+                        style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 600;">⌘ K</kbd>
+                    to focus the unified search bar. AI-driven context detection will suggest actions based on your
+                    input.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div
+                    style="background: white; padding: 2rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0;">Feature: Omnisearch</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">The header acts as a universal entry point. Typing
+                        starts a global search across all entities.</p>
+                </div>
+                <div
+                    style="background: white; padding: 2rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0;">Feature: Glassmorphism</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">Translucent design ensures the content below remains
+                        partially visible, creating depth and a premium feel.</p>
+                </div>
+                <div
+                    style="background: white; padding: 2rem; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0;">Feature: AI Presence</h3>
+                    <p style="color: #64748b; font-size: 0.9rem;">Subtle pulse indicator and status text shift the
+                        experience from static search to dynamic AI assistance.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Command + K listener
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('omnisearch').focus();
+            }
+        });
+
+        // Search feedback
+        document.getElementById('omnisearch').addEventListener('input', (e) => {
+            const hint = document.querySelector('.ai-status-hint span');
+            if (e.target.value.length > 0) {
+                hint.textContent = 'Thinking...';
+                hint.style.color = '#3b82f6';
+            } else {
+                hint.textContent = 'AI Engine Ready';
+                hint.style.color = '#10b981';
+            }
+        });
+    </script>
+</body>
+
+</html>

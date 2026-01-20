@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Admin Dashboard | Harvest Admin Prototype</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        :root {
+            --bg-accent: #f8fafc;
+            --ai-glow: rgba(139, 92, 246, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-accent);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Mockup (Simplified for context) */
+        .mock-sidebar {
+            width: 260px;
+            background: #1e293b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            flex-shrink: 0;
+        }
+
+        /* Main Canvas */
+        .dashboard-container {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2.5rem;
+        }
+
+        /* Metric Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+            color: #1e293b;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-trend {
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up {
+            color: #10b981;
+        }
+
+        .trend-down {
+            color: #f43f5e;
+        }
+
+        .metric-sparkline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            opacity: 0.15;
+        }
+
+        /* Main Chart Area */
+        .chart-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2.5rem;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(to bottom, #f1f5f9 0%, transparent 100%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            border: 1px dashed #e2e8f0;
+            margin-top: 1.5rem;
+        }
+
+        /* AI Suggestion Rail */
+        .ai-rail {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .ai-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 6px -1px var(--ai-glow);
+            position: relative;
+        }
+
+        .ai-card::before {
+            content: "✨";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .ai-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #4c1d95;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-description {
+            font-size: 0.8125rem;
+            color: #6d28d9;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .ai-action {
+            width: 100%;
+            padding: 0.625rem;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ai-action:hover {
+            background: #6d28d9;
+        }
+
+        /* Real-time Carts Feed */
+        .realtime-feed {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .feed-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="mock-sidebar">
+        <div style="font-weight: 800; font-size: 1.25rem; margin-bottom: 3rem;">Harvest Admin</div>
+        <nav style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Overview</div>
+            <a href="ultimate-dashboard.html" style="color: white; font-weight: 600; text-decoration: none;">📊 Control
+                Center</a>
+            <a href="views/orders-dispatch.html" style="color: #94a3b8; text-decoration: none;">📦 Order Dispatch</a>
+            <a href="views/customer-pulse.html" style="color: #94a3b8; text-decoration: none;">👥 Customer Pulse</a>
+            <a href="views/logistics-hub.html" style="color: #94a3b8; text-decoration: none;">🚛 Logistics Hub</a>
+            <a href="views/stock-mastery.html" style="color: #94a3b8; text-decoration: none;">🍎 Stock Mastery</a>
+            <a href="views/permissions-matrix.html" style="color: #94a3b8; text-decoration: none;">🛡️ Security
+                Matrix</a>
+            <a href="views/config-center.html" style="color: #94a3b8; text-decoration: none;">⚙️ Config Center</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-container">
+        <!-- Main Content Column -->
+        <main>
+            <header style="margin-bottom: 2.5rem;">
+                <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0; color: #1e293b;">Control Center
+                </h1>
+                <p style="color: #64748b; font-size: 1rem;">Good morning, Zack. Your harvest projections are looking
+                    strong.</p>
+            </header>
+
+            <!-- KPI Grid -->
+            <div class="kpi-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Daily Revenue</div>
+                    <div class="metric-value">$4,285.50</div>
+                    <div class="metric-trend trend-up">
+                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        12.4% vs prev. Mon
+                    </div>
+                    <svg class="metric-sparkline" preserveAspectRatio="none" viewBox="0 0 100 40">
+                        <path d="M0,35 Q20,10 40,25 T80,5 T100,20" fill="none" stroke="#10b981" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Active Subscriptions</div>
+                    <div class="metric-value">142</div>
+                    <div class="metric-trend trend-up">
+                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        +3 new today
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Harvest Utilization</div>
+                    <div class="metric-value">94.2%</div>
+                    <div class="metric-trend trend-down">
+                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        -0.5% waste risk
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Interactive Chart -->
+            <section class="chart-section">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.25rem;">Order Momentum</h2>
+                        <span style="font-size: 0.8125rem; color: #94a3b8;">Real-time checkout velocity (hourly)</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Last
+                            24h</button>
+                        <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">7
+                            Days</button>
+                    </div>
+                </div>
+                <div class="chart-placeholder">
+                    [ Interactive SVG Momentum Chart (Mockup) ]
+                </div>
+            </section>
+
+            <!-- Real-time Carts -->
+            <section class="realtime-feed">
+                <h2 style="margin: 0 0 1.5rem; font-size: 1.25rem;">Live Activity</h2>
+                <div class="feed-item">
+                    <div class="user-tag">
+                        <div class="user-avatar" style="background: #e0f2fe; color: #0369a1;">JD</div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 600;">Jane Doe</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">Added Heirloom Tomatoes (2lb)</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8125rem; font-weight: 700; color: var(--primary);">$42.50 Cart</div>
+                </div>
+                <div class="feed-item">
+                    <div class="user-tag">
+                        <div class="user-avatar" style="background: #fef2f2; color: #991b1b;">MS</div>
+                        <div>
+                            <div style="font-size: 0.875rem; font-weight: 600;">Mark Smith</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">Initiated Checkout</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8125rem; font-weight: 700; color: #10b981;">Ready to Ship</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Rail Column (AI Sidekick) -->
+        <aside class="ai-rail">
+            <h2
+                style="font-family: var(--font-serif); font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                ✨ Harvest AI
+            </h2>
+
+            <div class="ai-card">
+                <div class="ai-title">Inventory Optimization</div>
+                <div class="ai-description">Kale supply is exceeding 30-day average demand by 15%. Suggest creating a
+                    "Green Harvest" bundle for this weekend.</div>
+                <button class="ai-action" onclick="alert('Bundle Drafted!')">Auto-Draft Bundle</button>
+            </div>
+
+            <div class="ai-card">
+                <div class="ai-title">Fraud Prevention</div>
+                <div class="ai-description">High-value order (SKU-BOX-42) flagged for review. Unusual delivery address
+                    detected for Customer #812.</div>
+                <button class="ai-action" style="background: #f43f5e;" onclick="alert('Reviewing...')">Review
+                    Order</button>
+            </div>
+
+            <div class="ai-card" style="border-style: dashed; background: transparent;">
+                <div class="ai-title" style="color: #94a3b8;">Learning Patterns...</div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">AI is analyzing this week's sales to predict next
+                    week's planting schedule.</div>
+            </div>
+        </aside>
+    </div>
+</body>
+
+</html>

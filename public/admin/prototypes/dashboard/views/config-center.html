@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Config Center | Ultimate Admin Prototype</title>
+    <link rel="stylesheet" href="../../shared.css">
+    <style>
+        :root {
+            --bg-accent: #f8fafc;
+            --ai-glow: rgba(139, 92, 246, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-accent);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Shared Dashboard Layout */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .dashboard-container {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2.5rem;
+        }
+
+        /* Config Card Layout */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .config-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .config-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-icon {
+            width: 40px;
+            height: 40px;
+            background: #f1f5f9;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .setting-row {
+            padding: 1rem 0;
+            border-bottom: 1px solid #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .setting-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* API Connectivity Mock */
+        .api-status {
+            padding: 4px 10px;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .status-on {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-off {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* AI Sidekick (Shared Pattern) */
+        .ai-rail {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .ai-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+        }
+
+        .ai-card::before {
+            content: "✨";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #4c1d95;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-description {
+            font-size: 0.8125rem;
+            color: #6d28d9;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .ai-action {
+            width: 100%;
+            padding: 0.625rem;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        /* Sidebar Navigation */
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 0.75rem 0;
+            transition: color 0.2s;
+            display: block;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            border-left: 2px solid var(--primary);
+            padding-left: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div style="font-weight: 800; font-size: 1.25rem; margin-bottom: 3rem;">Harvest Admin</div>
+        <nav style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <div
+                style="color: #64748b; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem;">
+                Overview</div>
+            <a href="../ultimate-dashboard.html" class="nav-link">📊 Control Center</a>
+            <a href="orders-dispatch.html" class="nav-link">📦 Order Dispatch</a>
+            <a href="customer-pulse.html" class="nav-link">👥 Customer Pulse</a>
+            <a href="logistics-hub.html" class="nav-link">🚛 Logistics Hub</a>
+            <a href="stock-mastery.html" class="nav-link">🍎 Stock Mastery</a>
+            <a href="permissions-matrix.html" class="nav-link">🛡️ Security Matrix</a>
+            <a href="config-center.html" class="nav-link active">⚙️ Config Center</a>
+        </nav>
+    </aside>
+
+    <div class="dashboard-container">
+        <main>
+            <header style="margin-bottom: 2.5rem;">
+                <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0; color: #1e293b;">Config Center
+                </h1>
+                <p style="color: #64748b;">Modular system settings and API health monitoring.</p>
+            </header>
+
+            <div class="config-grid">
+                <!-- Branding Card -->
+                <div class="config-card">
+                    <div class="config-header">
+                        <div class="config-icon">🎨</div>
+                        <div>
+                            <div style="font-weight: 800; color: #1e293b;">Identity & Branding</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">Manage logos, colors, and fonts.</div>
+                        </div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Primary Color</div>
+                            <div class="setting-desc">Currently Harvest Green (#10b981)</div>
+                        </div>
+                        <div style="width: 24px; height: 24px; background: #10b981; border-radius: 4px;"></div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Favicon & Logo</div>
+                            <div class="setting-desc">Last updated 12 days ago.</div>
+                        </div>
+                        <button class="btn-secondary"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Update</button>
+                    </div>
+                </div>
+
+                <!-- API Connectivity -->
+                <div class="config-card">
+                    <div class="config-header">
+                        <div class="config-icon">🔌</div>
+                        <div>
+                            <div style="font-weight: 800; color: #1e293b;">Service Connectivity</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">Live status of core integrations.</div>
+                        </div>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">Google Gemini AI</div>
+                        <span class="api-status status-on">Connected</span>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">Stripe Payments</div>
+                        <span class="api-status status-on">Connected</span>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">Resend Email</div>
+                        <span class="api-status status-off">Restricted</span>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">Cloudflare R2</div>
+                        <span class="api-status status-on">Connected</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="ai-rail">
+            <h2
+                style="font-family: var(--font-serif); font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                ✨ System AI
+            </h2>
+
+            <div class="ai-card">
+                <div class="ai-title">Latency Drift</div>
+                <div class="ai-description">AI detected a 150ms increase in Stripe response times. Recommends switching
+                    to Edge-Runtime for checkout routes.</div>
+                <button class="ai-action">Optimize Routes</button>
+            </div>
+
+            <div class="ai-card">
+                <div class="ai-title">Key Rotation</div>
+                <div class="ai-description">Cloudflare R2 keys haven't been rotated in 90 days. High-security policy
+                    recommends refresh.</div>
+                <button class="ai-action" style="background: #1e293b;">Start Rotation</button>
+            </div>
+        </aside>
+    </div>
+</body>
+
+</html>

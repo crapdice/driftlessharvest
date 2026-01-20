@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Component TDD Verification</title>
+    <link rel="stylesheet" href="../css/components/sidebar.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #sidebar-container {
+            flex-shrink: 0;
+        }
+
+        #test-content {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .event-log {
+            background: #1e293b;
+            color: #10b981;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar-container"></div>
+
+    <main id="test-content">
+        <header style="margin-bottom: 2rem;">
+            <h1>Sidebar Component TDD</h1>
+            <p>Verifying the <strong>FloatingSidebar</strong> in isolation.</p>
+        </header>
+
+        <section class="test-card">
+            <h3>Test Case 1: Active Tab Mapping</h3>
+            <p>Current Active Tab: <span id="active-tab-display" class="status-badge status-pass">None</span></p>
+            <div id="log" class="event-log"></div>
+        </section>
+
+        <section class="test-card">
+            <h3>Test Case 2: State Persistence</h3>
+            <p>State: <span id="collapse-state-display">Expanded</span></p>
+            <button onclick="location.reload()" class="btn-secondary"
+                style="background: #e2e8f0; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">Reload
+                Page</button>
+            <small style="display: block; margin-top: 1rem; color: #64748b;">Collapse the sidebar, then reload. The
+                state should persist.</small>
+        </section>
+    </main>
+
+    <script src="../js/components/Sidebar.js"></script>
+    <script>
+        // Mock setTab function (Legacy compatibility test)
+        window.setTab = (tabId) => {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.textContent = `[EVENT] legacy setTab called with: ${tabId} at ${new Date().toLocaleTimeString()}`;
+            log.prepend(entry);
+
+            document.getElementById('active-tab-display').textContent = tabId;
+        };
+
+        // Modern Event listener test
+        document.addEventListener('tabChanged', (e) => {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.textContent = `[EVENT] tabChanged custom event emitted: ${e.detail.tabId}`;
+            log.prepend(entry);
+        });
+
+        // Initialize Sidebar
+        window.onload = () => {
+            const config = Sidebar.getDefaultConfig();
+            const sidebar = new Sidebar('sidebar-container', config);
+
+            // Check initial collapse state display
+            const updateStateDisplay = () => {
+                const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+                document.getElementById('collapse-state-display').textContent = isCollapsed ? 'Collapsed' : 'Expanded';
+            };
+
+            updateStateDisplay();
+
+            // Wrap toggle to update display
+            const originalToggle = sidebar.toggle.bind(sidebar);
+            sidebar.toggle = () => {
+                originalToggle();
+                updateStateDisplay();
+            };
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype 2: Inventory Pro | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            padding: 0;
+        }
+
+        .main-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-left: 1px solid var(--gray-medium);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .data-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-grid th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: var(--gray-medium);
+            color: #666;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-grid td {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+
+        .data-grid tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        .editable-cell:focus {
+            outline: 2px solid var(--primary);
+            background: white;
+        }
+
+        .active-row {
+            background-color: #f1f5f9 !important;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stock-input {
+            width: 60px;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .stock-input:focus {
+            background: white;
+            border-color: var(--gray-medium);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-layout">
+        <div class="content-area">
+            <header class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 style="font-size: 1.5rem; margin: 0; font-weight: 700;">Inventory Pro</h1>
+                    <div style="font-size: 0.875rem; color: #666;">
+                        <span style="color: var(--primary); font-weight: 600;">42</span> Products Selected | Bulk
+                        Actions:
+                        <select
+                            style="font-size: 0.75rem; border: none; background: transparent; color: var(--primary); cursor: pointer;">
+                            <option>Change Status</option>
+                            <option>Adjust Price</option>
+                            <option>Archive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Filter ID, Name, or SKU..."
+                        style="padding: 0.5rem 1rem; border: 1px solid var(--gray-medium); border-radius: 0.5rem; width: 250px;">
+                    <button class="btn-primary">Save Changes</button>
+                </div>
+            </header>
+
+            <div class="glass" style="border-radius: 0.5rem; overflow: hidden;">
+                <table class="data-grid">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox"></th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>In Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="active-row" onclick="selectRow(this)">
+                            <td><input type="checkbox" checked></td>
+                            <td class="editable-cell" contenteditable="true">Heirloom Tomatoes</td>
+                            <td>Vegetables</td>
+                            <td>$<span contenteditable="true">4.50</span></td>
+                            <td><input type="number" value="24" class="stock-input"></td>
+                            <td><span class="badge badge-success">Active</span></td>
+                        </tr>
+                        <tr onclick="selectRow(this)">
+                            <td><input type="checkbox"></td>
+                            <td class="editable-cell" contenteditable="true">Seasonal Harvest Box</td>
+                            <td>Curated Boxes</td>
+                            <td>$<span contenteditable="true">35.00</span></td>
+                            <td><input type="number" value="12" class="stock-input"></td>
+                            <td><span class="badge badge-blue">Scheduled</span></td>
+                        </tr>
+                        <tr onclick="selectRow(this)">
+                            <td><input type="checkbox"></td>
+                            <td class="editable-cell" contenteditable="true">Tuscan Dino Kale</td>
+                            <td>Vegetables</td>
+                            <td>$<span contenteditable="true">3.00</span></td>
+                            <td><input type="number" value="5" class="stock-input"
+                                    style="color: var(--accent); font-weight: 700;"></td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                        </tr>
+                        <!-- More dummy rows to simulate density -->
+                        <tr onclick="selectRow(this)">
+                            <td><input type="checkbox"></td>
+                            <td class="editable-cell" contenteditable="true">Red Radish Bunch</td>
+                            <td>Vegetables</td>
+                            <td>$<span contenteditable="true">2.50</span></td>
+                            <td><input type="number" value="30" class="stock-input"></td>
+                            <td><span class="badge badge-success">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <h2 style="font-size: 1.125rem; margin: 0;">Quick Inspector</h2>
+            <div
+                style="background: var(--gray-light); height: 160px; border-radius: 0.5rem; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--gray-medium);">
+                <img id="inspector-image" src="../assets/images/heirloom_tomatoes.jpg" alt="Product Image"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: #999; text-transform: uppercase;">SKU</label>
+                <div id="inspector-sku" style="font-weight: 600;">TOM-HL-01</div>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: #999; text-transform: uppercase;">Total Sales
+                    (30d)</label>
+                <div style="font-weight: 600; color: var(--primary);">$1,240.50</div>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: #999; text-transform: uppercase;">Lead
+                    Source</label>
+                <div style="font-style: italic;">Viroqua Local Coop</div>
+            </div>
+            <hr style="border: none; border-top: 1px solid var(--gray-medium); margin: 0.5rem 0;">
+            <button class="btn-secondary" style="width: 100%;">View Full Details</button>
+        </aside>
+    </div>
+
+    <script>
+        const productData = {
+            'Heirloom Tomatoes': { image: '../assets/images/heirloom_tomatoes.jpg', sku: 'TOM-HL-01' },
+            'Seasonal Harvest Box': { image: '../assets/images/harvest_box.jpg', sku: 'BOX-SEA-02' },
+            'Tuscan Dino Kale': { image: '../assets/images/fresh_kale.jpg', sku: 'KALE-TUS-03' },
+            'Red Radish Bunch': { image: '../assets/images/harvest_box.jpg', sku: 'RAD-RED-04' } // Fallback to box for dummy
+        };
+
+        function selectRow(el) {
+            document.querySelectorAll('tr').forEach(r => r.classList.remove('active-row'));
+            el.classList.add('active-row');
+
+            const name = el.cells[1].textContent.trim();
+            const data = productData[name];
+
+            if (data) {
+                document.getElementById('inspector-image').src = data.image;
+                document.getElementById('inspector-sku').textContent = data.sku;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -20,6 +20,7 @@
     </script>
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/components/sidebar.css">
 </head>
 
 <body
@@ -98,7 +99,7 @@
 
 
             <!-- 3-State Theme Toggle -->
-            <button onclick="cycleTheme()"
+            <button data-action="app:cycleTheme"
                 class="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-all border border-gray-700 shadow-sm group relative overflow-hidden"
                 id="theme-toggle-btn" title="Cycle Theme: Default > Minimal > Dark">
 
@@ -137,7 +138,7 @@
             </button>
 
             <!-- Logout -->
-            <button onclick="logout()"
+            <button data-action="app:logout"
                 class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg border border-red-500/20 transition-all font-medium">
                 Logout
             </button>
@@ -147,79 +148,8 @@
     <!-- Main Layout -->
     <div class="flex flex-1 overflow-hidden">
 
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r flex flex-col shrink-0">
-            <nav class="sidebar-menu flex-1 p-4 space-y-2 overflow-y-auto">
-                <button onclick="setTab('dashboard')" id="nav-dashboard"
-                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span>📊</span> <span class="font-medium">Dashboard</span>
-                </button>
-                <button onclick="setTab('orders')" id="nav-orders"
-                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span>📦</span> <span class="font-medium">Orders</span>
-                </button>
-                <button onclick="setTab('customers')" id="nav-customers"
-                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span>👥</span> <span class="font-medium">Customers</span>
-                </button>
-                <button onclick="setTab('delivery')" id="nav-delivery"
-                    class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                    <span>🚛</span> <span class="font-medium">Delivery</span>
-                </button>
-
-                <div class="border-t border-gray-200 my-2 pt-2 space-y-2">
-
-                    <button onclick="setTab('inventory')" id="nav-inventory"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🔢</span> <span class="font-medium">Inventory</span>
-                    </button>
-
-                    <button onclick="setTab('products')" id="nav-products"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🍎</span> <span class="font-medium">Products</span>
-                    </button>
-                    <button onclick="setTab('templates')" id="nav-templates"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🎁</span> <span class="font-medium">Box Templates</span>
-                    </button>
-                    <button onclick="setTab('categories')" id="nav-categories"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🏷️</span> <span class="font-medium">Categories</span>
-                    </button>
-                    <button onclick="setTab('archived')" id="nav-archived"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-gray-50 transition-colors">
-                        <span>🗑️</span> <span class="font-medium">Archived</span>
-                    </button>
-
-                </div>
-                <div class="border-t border-gray-200 my-2 pt-2 space-y-2">
-                    <button onclick="setTab('users')" id="nav-users"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>🛡️</span> <span class="font-medium">User Management</span>
-                    </button>
-                    <button onclick="setTab('settings')" id="nav-settings"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>⚙️</span> <span class="font-medium">Admin Configuration</span>
-                    </button>
-                    <button onclick="setTab('analytics')" id="nav-analytics"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <span>📊</span> <span class="font-medium">Analytics</span>
-                    </button>
-                    <button onclick="setTab('utilities')" id="nav-utilities"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-transparent cursor-not-allowed transition-colors"
-                        disabled title="Requires Super Admin">
-                        <span>🛠️</span> <span class="font-medium">Admin Utilities</span>
-                    </button>
-
-                    <!-- Page Layout (Super Admin Only) -->
-                    <button onclick="setTab('layouts')" id="nav-layouts"
-                        class="w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 text-gray-400 hover:bg-transparent cursor-not-allowed transition-colors"
-                        disabled title="Requires Super Admin">
-                        <span>🎨</span> <span class="font-medium">Page Layout</span>
-                    </button>
-                </div>
-            </nav>
-        </aside>
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
 
         <!-- Content -->
         <main class="flex-1 overflow-auto bg-gray-50 p-8">
@@ -244,24 +174,24 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <table class="w-full text-left">
                         <thead class="bg-gray-50 border-b border-gray-100">
-                            <th onclick="window.sortInventory('id')"
+                            <th data-action="inventory:sort" data-field="id"
                                 class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
                                 ID <span id="sort-arrow-id" class="invisible group-hover:visible ml-1">↕</span>
                             </th>
-                            <th onclick="window.sortInventory('name')"
+                            <th data-action="inventory:sort" data-field="name"
                                 class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
                                 Product <span id="sort-arrow-name" class="invisible group-hover:visible ml-1">↕</span>
                             </th>
-                            <th onclick="window.sortInventory('farm_id')"
+                            <th data-action="inventory:sort" data-field="farm_id"
                                 class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
                                 Farm ID <span id="sort-arrow-farm_id"
                                     class="invisible group-hover:visible ml-1">↕</span>
                             </th>
-                            <th onclick="window.sortInventory('price')"
+                            <th data-action="inventory:sort" data-field="price"
                                 class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
                                 Price <span id="sort-arrow-price" class="invisible group-hover:visible ml-1">↕</span>
                             </th>
-                            <th onclick="window.sortInventory('stock')"
+                            <th data-action="inventory:sort" data-field="stock"
                                 class="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none group">
                                 Stock <span id="sort-arrow-stock" class="invisible group-hover:visible ml-1">↕</span>
                             </th>
@@ -344,7 +274,7 @@
                             <div class="flex gap-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
                                 <input type="date" id="new-win-label"
                                     class="border-none bg-transparent text-xs px-2 py-1 outline-none w-36 text-gray-600 font-bold uppercase">
-                                <button onclick="addDeliveryWindow()"
+                                <button data-action="delivery:addWindow"
                                     class="bg-gray-900 text-white p-1 rounded hover:bg-black transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -664,9 +594,30 @@
     </script>
     <script type="module" src="/admin/js/components/ChoiceModal.js"></script>
 
+    <!-- Sidebar Component -->
+    <script src="js/components/Sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const config = Sidebar.getDefaultConfig();
+            window.sidebar = new Sidebar('sidebar-container', config);
 
+            // Sync active state if tab is set via hash on load
+            const hash = window.location.hash.slice(1);
+            if (hash) {
+                window.sidebar.activeTabId = hash;
+                window.sidebar.updateActiveState();
+            }
+        });
 
-
+        // Sync sidebar on external setTab calls (via hashchange)
+        window.addEventListener('hashchange', () => {
+            const tabName = window.location.hash.slice(1);
+            if (tabName && window.sidebar) {
+                window.sidebar.activeTabId = tabName;
+                window.sidebar.updateActiveState();
+            }
+        });
+    </script>
 
     <!-- Gemini AI Logic -->
     <script type="module">

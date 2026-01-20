@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin UI Prototypes | Showcase</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #f7f5f0 0%, #e0e0d6 100%);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            margin: 0;
+            color: var(--gray-dark);
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 1rem auto 0;
+        }
+
+        .proto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .proto-link-card {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .proto-link-card:nth-child(2) .icon-box {
+            background: #E0E7FF;
+            color: #4338CA;
+        }
+
+        .proto-link-card:nth-child(3) .icon-box {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            transition: gap 0.2s;
+        }
+
+        .proto-link-card:hover .arrow {
+            gap: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>UI/UX Prototypes</h1>
+            <p>Exploring high-performance design patterns for the next generation of Harvest App administration.</p>
+        </header>
+
+        <div class="proto-grid">
+            <!-- Flagship Prototype -->
+            <a href="dashboard/ultimate-dashboard.html" class="proto-link-card proto-card"
+                style="grid-column: 1 / -1; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="icon-box" style="background: #e0f2fe; color: #0369a1;">💎</div>
+                        <h3 style="margin: 0 0 0.5rem; font-size: 1.5rem;">The "Ultimate" Dashboard</h3>
+                        <p style="font-size: 1rem; color: #666; max-width: 600px; margin: 0;">Our vision for the future
+                            of
+                            farm management. A high-performance command center with integrated AI insights,
+                            real-time momentum tracking, and interactive metrics.</p>
+                    </div>
+                    <div
+                        style="background: var(--primary); color: white; padding: 4px 12px; border-radius: 2rem; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Flagship</div>
+                </div>
+                <div class="arrow" style="color: #0369a1;">Enter Command Center <span>→</span></div>
+            </a>
+
+            <!-- Prototype 1 -->
+            <a href="products/catalog.html" class="proto-link-card proto-card">
+                <div class="icon-box">🖼️</div>
+                <h3 style="margin: 0 0 0.5rem;">Visual Catalog</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">An image-first experience focused
+                    on branding, premium presentation, and intuitive status badges.</p>
+                <div class="arrow">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Prototype 2 -->
+            <a href="products/inventory.html" class="proto-link-card proto-card">
+                <div class="icon-box">⚡</div>
+                <h3 style="margin: 0 0 0.5rem;">Inventory Pro</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">A high-density data grid built for
+                    speed. Features inline editing and a quick-action inspector sidebar.</p>
+                <div class="arrow" style="color: #4338CA;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Prototype 3 -->
+            <a href="products/insights.html" class="proto-link-card proto-card">
+                <div class="icon-box">📊</div>
+                <h3 style="margin: 0 0 0.5rem;">Insight-Driven</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">Optimized for results. Integrated
+                    performance sparklines and proactive AI suggestions for demand forecasting.</p>
+                <div class="arrow" style="color: #92400E;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Prototype 4 -->
+            <a href="drawer.html" class="proto-link-card proto-card">
+                <div class="icon-box">📂</div>
+                <h3 style="margin: 0 0 0.5rem;">Interaction Drawer</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">A non-disruptive slide-over
+                    surface
+                    for deep browsing and secondary actions. An alternative to modals.</p>
+                <div class="arrow" style="color: #0d9488;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Sidebar 1 -->
+            <a href="sidebar-menu/floating-collapsible.html" class="proto-link-card proto-card">
+                <div class="icon-box">🫧</div>
+                <h3 style="margin: 0 0 0.5rem;">Floating Sidebar</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">Maximizes canvas space by
+                    collapsing into an icon-only floating bar with tooltips.</p>
+                <div class="arrow" style="color: #6366f1;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Sidebar 2 -->
+            <a href="sidebar-menu/hierarchical-drawer.html" class="proto-link-card proto-card">
+                <div class="icon-box">🗂️</div>
+                <h3 style="margin: 0 0 0.5rem;">Hierarchical Menu</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">Organizes complex lists into
+                    logical, nested categories using accordion mechanics.</p>
+                <div class="arrow" style="color: #10b981;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Sidebar 3 -->
+            <a href="sidebar-menu/command-centric.html" class="proto-link-card proto-card">
+                <div class="icon-box">⌨️</div>
+                <h3 style="margin: 0 0 0.5rem;">Command Sidebar</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">A keyboard-first approach using
+                    Universal Command (⌘K) for instant navigation speed.</p>
+                <div class="arrow" style="color: #f59e0b;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Header 1 -->
+            <a href="header/glassmorphic-command.html" class="proto-link-card proto-card">
+                <div class="icon-box">🌌</div>
+                <h3 style="margin: 0 0 0.5rem;">Glassmorphic Command</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">A search-first header using
+                    translucency and AI hints to unify navigation and actions.</p>
+                <div class="arrow" style="color: #10b981;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Header 2 -->
+            <a href="header/minimal-context.html" class="proto-link-card proto-card">
+                <div class="icon-box">🏔️</div>
+                <h3 style="margin: 0 0 0.5rem;">Minimal Context</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">Focuses on deep breadcrumb
+                    hierarchy and real-time contextual gauges for clarity.</p>
+                <div class="arrow" style="color: #3b82f6;">View Prototype <span>→</span></div>
+            </a>
+
+            <!-- Header 3 -->
+            <a href="header/modular-utility.html" class="proto-link-card proto-card">
+                <div class="icon-box">📟</div>
+                <h3 style="margin: 0 0 0.5rem;">Modular Utility</h3>
+                <p style="font-size: 0.875rem; color: #666; height: 3rem; margin: 0;">A mission-centric design featuring
+                    a real-time status ticker and pinned utility widgets.</p>
+                <div class="arrow" style="color: #1e293b;">View Prototype <span>→</span></div>
+            </a>
+        </div>
+
+        <footer style="margin-top: 4rem; text-align: center; font-size: 0.875rem; color: #999;">
+            &copy; 2026 Harvest App Design Labs
+        </footer>
+    </div>
+</body>
+
+</html>

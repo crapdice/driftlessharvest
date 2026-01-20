@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDD: ActionDispatcher Verification</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: #10b981;
+        }
+
+        .test-section {
+            background: #1e293b;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .test-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .test-result {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .pass {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+        }
+
+        .fail {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+        }
+
+        .pending {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #fbbf24;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #e2e8f0;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        button:hover {
+            background: #334155;
+        }
+
+        #summary {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+        }
+
+        .summary-pass {
+            background: #10b981;
+            color: white;
+        }
+
+        .summary-fail {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 ActionDispatcher TDD Verification</h1>
+    <p>This page validates the ActionDispatcher event delegation system before and after HTML migration.</p>
+
+    <div class="test-section">
+        <div class="test-title">Test Controls (Using data-action)</div>
+        <button data-action="test:click" data-id="123" data-name="Test Product">Click Action</button>
+        <button data-action="test:archive" data-id="456">Archive Action</button>
+        <select data-action-change="test:select">
+            <option value="">Select...</option>
+            <option value="opt1">Option 1</option>
+            <option value="opt2">Option 2</option>
+        </select>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">Test Results</div>
+        <div id="results"></div>
+    </div>
+
+    <div id="summary"></div>
+
+    <script type="module">
+        import { registerActions, init, dispatch, getHandlers, clearHandlers } from '../js/core/ActionDispatcher.js';
+
+        const results = [];
+        const resultsEl = document.getElementById('results');
+        const summaryEl = document.getElementById('summary');
+
+        function log(name, passed, details = '') {
+            results.push({ name, passed });
+            const cls = passed ? 'pass' : 'fail';
+            const icon = passed ? '✅' : '❌';
+            resultsEl.innerHTML += `<div class="test-result ${cls}">${icon} ${name}${details ? ` — ${details}` : ''}</div>`;
+        }
+
+        function updateSummary() {
+            const passed = results.filter(r => r.passed).length;
+            const total = results.length;
+            const allPassed = passed === total;
+            summaryEl.className = allPassed ? 'summary-pass' : 'summary-fail';
+            summaryEl.textContent = `${passed}/${total} tests passed`;
+        }
+
+        // =====================
+        // TEST 1: Init Works
+        // =====================
+        try {
+            init();
+            log('ActionDispatcher.init() executes', true);
+        } catch (e) {
+            log('ActionDispatcher.init() executes', false, e.message);
+        }
+
+        // =====================
+        // TEST 2: Register Actions
+        // =====================
+        let clickData = null;
+        let archiveData = null;
+        let selectData = null;
+
+        registerActions('test', {
+            click: (data) => { clickData = data; },
+            archive: (data) => { archiveData = data; },
+            select: (data) => { selectData = data; }
+        });
+
+        const handlers = getHandlers();
+        const testHandlers = handlers.get('test');
+        log('registerActions() registers namespace', !!testHandlers);
+        log('Handler "click" registered', typeof testHandlers?.click === 'function');
+        log('Handler "archive" registered', typeof testHandlers?.archive === 'function');
+        log('Handler "select" registered', typeof testHandlers?.select === 'function');
+
+        // =====================
+        // TEST 3: Dispatch Works
+        // =====================
+        dispatch('test', 'click', { id: '999', name: 'Direct Dispatch' });
+        log('dispatch() calls handler', clickData?.id === '999', `Received id: ${clickData?.id}`);
+
+        // =====================
+        // TEST 4: Click Delegation
+        // =====================
+        clickData = null; // Reset
+        const clickBtn = document.querySelector('[data-action="test:click"]');
+        clickBtn.click();
+
+        // Use setTimeout to allow event to propagate
+        setTimeout(() => {
+            log('Click delegation works', clickData?.id === '123', `Received id: ${clickData?.id}`);
+            log('Click passes all data-* attrs', clickData?.name === 'Test Product', `Received name: ${clickData?.name}`);
+
+            // =====================
+            // TEST 5: Archive Button
+            // =====================
+            const archiveBtn = document.querySelector('[data-action="test:archive"]');
+            archiveBtn.click();
+            setTimeout(() => {
+                log('Archive action works', archiveData?.id === '456', `Received id: ${archiveData?.id}`);
+
+                // =====================
+                // TEST 6: Select Change
+                // =====================
+                const selectEl = document.querySelector('[data-action-change="test:select"]');
+                selectEl.value = 'opt2';
+                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                setTimeout(() => {
+                    log('Change event delegation works', selectData?.value === 'opt2', `Received value: ${selectData?.value}`);
+                    updateSummary();
+                }, 50);
+            }, 50);
+        }, 50);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype 3: Insight-Driven | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .ai-alert {
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            border: 1px solid #d4c0ab;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .sparkline {
+            width: 80px;
+            height: 30px;
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .stat-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .optimization-panel {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--gray-medium);
+            font-size: 0.875rem;
+        }
+
+        .ai-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="mb-8">
+        <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0;">Insight Dashboard</h1>
+        <p style="color: #666;">Optimizing your harvest through performance data.</p>
+    </header>
+
+    <div class="ai-alert">
+        <div style="font-size: 1.5rem;">✨</div>
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <strong style="color: #854D0E;">Demand Forecast Alert</strong>
+                <span class="ai-badge">AI INSIGHT</span>
+            </div>
+            <p style="margin: 0; font-size: 0.875rem; color: #5c4a38;">
+                "Heirloom Tomatoes" demand is projected to increase by 40% next weekend due to the local Food Festival.
+                Consider increasing harvest targets by 15% to avoid stockouts.
+            </p>
+            <div class="flex gap-3 mt-3">
+                <button class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                    onclick="alert('Adjusted!')">Apply Suggestion</button>
+                <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                    onclick="alert('Hidden')">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="insight-grid">
+        <!-- Heirloom Tomatoes -->
+        <div class="proto-card" style="padding: 0; overflow: hidden;">
+            <div style="height: 120px; background: url('../assets/images/heirloom_tomatoes.jpg') center/cover;"></div>
+            <div style="padding: 1.5rem;">
+                <div class="stat-card mb-4">
+                    <div>
+                        <h3 style="margin: 0;">Heirloom Tomatoes</h3>
+                        <span style="font-size: 0.75rem; color: #999;">30-Day Velocity</span>
+                    </div>
+                    <svg class="sparkline" viewBox="0 0 80 30">
+                        <polyline points="0,25 10,20 20,28 30,10 40,15 50,5 60,12 70,8 80,18"></polyline>
+                    </svg>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700;">$2,450.00</div>
+                        <div style="font-size: 0.75rem; color: #22c55e;">+12.5% from last month</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">$4.50/lb</div>
+                        <span class="badge badge-success">High Margin</span>
+                    </div>
+                </div>
+                <div class="optimization-panel">
+                    <div
+                        style="font-weight: 600; font-size: 0.75rem; color: var(--primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1.5rem;">
+                        💡 OPTIMIZATION TIP
+                    </div>
+                    <p style="margin: 0; font-size: 0.8125rem;">Consider bundling with "Fresh Basil" to increase average
+                        order value by ~18%.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Harvest Box -->
+        <div class="proto-card" style="padding: 0; overflow: hidden;">
+            <div style="height: 120px; background: url('../assets/images/harvest_box.jpg') center/cover;"></div>
+            <div style="padding: 1.5rem;">
+                <div class="stat-card mb-4">
+                    <div>
+                        <h3 style="margin: 0;">Harvest Box</h3>
+                        <span style="font-size: 0.75rem; color: #999;">Retention Rate</span>
+                    </div>
+                    <svg class="sparkline" viewBox="0 0 80 30" style="stroke: var(--accent);">
+                        <polyline points="0,5 10,8 20,4 30,12 40,10 50,15 60,20 70,25 80,22"></polyline>
+                    </svg>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700;">84%</div>
+                        <div style="font-size: 0.75rem; color: var(--accent);">-2.1% churn risk</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">$35.00</div>
+                        <span class="badge badge-blue">Main Revenue Driver</span>
+                    </div>
+                </div>
+                <div class="optimization-panel">
+                    <div style="font-weight: 600; font-size: 0.75rem; color: var(--accent); margin-bottom: 0.5rem;">
+                        ⚠️ PRICE AT RISK
+                    </div>
+                    <p style="margin: 0; font-size: 0.8125rem;">Competitor prices for similar boxes decreased to $32.00.
+                        Monitor conversion closely.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fresh Kale -->
+        <div class="proto-card" style="padding: 0; overflow: hidden;">
+            <div style="height: 120px; background: url('../assets/images/fresh_kale.jpg') center/cover;"></div>
+            <div style="padding: 1.5rem;">
+                <div class="stat-card mb-4">
+                    <div>
+                        <h3 style="margin: 0;">Dino Kale</h3>
+                        <span style="font-size: 0.75rem; color: #999;">Waste Tracking</span>
+                    </div>
+                    <svg class="sparkline" viewBox="0 0 80 30" style="stroke: #94a3b8;">
+                        <polyline points="0,20 10,18 20,22 30,15 40,18 50,20 60,15 70,12 80,10"></polyline>
+                    </svg>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700;">4.2%</div>
+                        <div style="font-size: 0.75rem; color: #22c55e;">-0.8% reduction in waste</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">$3.00/bu</div>
+                        <span class="badge badge-warning">Optimized Yield</span>
+                    </div>
+                </div>
+                <div class="optimization-panel">
+                    <div style="font-weight: 600; font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem;">
+                        🌱 HARVEST SUGGESTION
+                    </div>
+                    <p style="margin: 0; font-size: 0.8125rem;">Harvest at 5:00 AM tomorrow for maximum leaf turgidity
+                        and
+                        shelf life.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

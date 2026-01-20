@@ -16,24 +16,22 @@ import { initUtilities } from './utilities.js';
 import { initCategories } from './categories.js';
 import { initAnalytics } from './analytics.js';
 import { init as initActionDispatcher } from '../core/ActionDispatcher.js';
+import { registerAppActions } from '../core/AppActions.js';
+import { registerUtilitiesActions } from '../core/UtilitiesActions.js';
+import { registerSettingsActions } from '../core/SettingsActions.js';
+import { registerUsersActions } from '../core/UsersActions.js';
 
 // State
 let currentTab = 'dashboard';
 
-// Global Exports (Immediate Scope)
+// Global Exports - Core functions still needed for direct JS calls
+// NOTE: Many bindings moved to domain modules (users.js, settings.js, etc.)
+// ActionDispatcher delegates to window.* so those modules must still export
 window.setTab = setTab;
-window.saveProduct = saveProduct;
-window.openProductModal = openProductModal;
-window.editTemplate = window.editTemplate || function () { }; // Handled in products.js but ensuring stub
-window.saveUser = saveUser;
-window.openUserModal = openUserModal;
-window.addDeliveryWindow = addDeliveryWindow;
-window.saveSettings = saveSettings;
-window.restoreDefaults = restoreDefaults;
 window.showLoginModal = showLoginModal;
 window.handleLogin = handleLogin;
 
-// Layouts Global Exports
+// Layouts Global Exports (still needed for drag-drop events in HTML)
 window.saveLayout = saveLayout;
 window.toggleLayoutItem = toggleLayoutItem;
 window.handleDragStart = handleDragStart;
@@ -50,6 +48,10 @@ window.redoLayout = redoLayout;
 // Init
 document.addEventListener('DOMContentLoaded', async () => {
     initActionDispatcher(); // Initialize event delegation system
+    registerAppActions();   // Register app-level actions for data-action handlers
+    registerUtilitiesActions(); // Register utilities module actions
+    registerSettingsActions();  // Register settings module actions
+    registerUsersActions();     // Register users module actions
     initAuth();
     initMobileMenu();
     initTheme();

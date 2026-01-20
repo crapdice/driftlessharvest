@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype: Slide-Over Drawer | Admin</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .drawer-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-medium);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .drawer-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--gray-medium);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            background: var(--gray-light);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--primary);
+        }
+
+        .demo-page {
+            padding: 4rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--gray-medium);
+            border-radius: 0.5rem;
+            font-family: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-page">
+        <header class="mb-8 text-center">
+            <h1 style="font-family: var(--font-serif); font-size: 3rem; margin: 0;">Interaction Prototypes</h1>
+            <p style="color: #666;">Exploring non-disruptive secondary surfaces for the Harvest App.</p>
+        </header>
+
+        <div class="proto-card text-center" style="padding: 4rem;">
+            <h2 style="margin-bottom: 1rem;">Action Drawer</h2>
+            <p style="margin-bottom: 2rem; color: #666;">The drawer pattern keeps the user in their current context
+                while allowing for deep-dive editing or complex data entry.</p>
+            <button class="btn-primary" onclick="openDrawer()">Open Edit Drawer</button>
+        </div>
+
+        <div class="info-grid">
+            <div class="proto-card">
+                <h3>Context Preservation</h3>
+                <p style="font-size: 0.875rem; color: #666;">Unlike modals, drawers (especially on desktop) allow the
+                    user to see part of the underlying data, maintaining spatial awareness.</p>
+            </div>
+            <div class="proto-card">
+                <h3>Mobile Friendly</h3>
+                <p style="font-size: 0.875rem; color: #666;">On smaller screens, the drawer naturally occupies 100% of
+                    the screen, behaving like a nested view.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Component -->
+    <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+    <div id="drawer" class="drawer">
+        <div class="drawer-header">
+            <h2 style="margin: 0; font-family: var(--font-serif);">Edit Product</h2>
+            <button class="close-btn" onclick="closeDrawer()">&times;</button>
+        </div>
+        <div class="drawer-content">
+            <div style="margin-bottom: 2rem;">
+                <div
+                    style="height: 200px; background: url('../assets/images/heirloom_tomatoes.jpg') center/cover; border-radius: 0.75rem; margin-bottom: 1.5rem; border: 1px solid var(--gray-medium);">
+                </div>
+                <button class="btn-secondary" style="width: 100%;">Update Product Photo</button>
+            </div>
+
+            <div class="field mb-4">
+                <label>Product Name</label>
+                <input type="text" value="Heirloom Tomatoes">
+            </div>
+
+            <div class="flex gap-4 mb-4">
+                <div class="field" style="flex: 1;">
+                    <label>Price</label>
+                    <input type="text" value="4.50">
+                </div>
+                <div class="field" style="flex: 1;">
+                    <label>Inventory Unit</label>
+                    <select>
+                        <option>Pound (lb)</option>
+                        <option>Bunch (bu)</option>
+                        <option>Each (ea)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field mb-4">
+                <label>Inventory Count</label>
+                <input type="number" value="24">
+            </div>
+
+            <div class="field mb-4">
+                <label>Description</label>
+                <textarea
+                    rows="4">Vibrant, rainbow varieties picked fresh this morning from the north field. High juice content and excellent flavor profile.</textarea>
+            </div>
+
+            <div class="field mb-4">
+                <label>Visibility</label>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" checked id="visibility-toggle">
+                    <span style="font-size: 0.875rem;">Show in Public Webshop</span>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button class="btn-secondary" onclick="closeDrawer()">Cancel</button>
+            <button class="btn-primary" onclick="alert('Changes Saved!'); closeDrawer()">Save Changes</button>
+        </div>
+    </div>
+
+    <script>
+        function openDrawer() {
+            document.getElementById('drawerOverlay').classList.add('open');
+            document.getElementById('drawer').classList.add('open');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('open');
+            document.getElementById('drawer').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Handle Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDrawer();
+        });
+    </script>
+</body>
+
+</html>

@@ -89,15 +89,32 @@ The admin codebase is evolving towards a modular, API-driven architecture. Phase
 
 ---
 
-### Phase 4: Reduce Window Pollution (3-4 hours) 🔄 IN PROGRESS
+### Phase 4: Reduce Window Pollution (3-4 hours) ✅ COMPLETE (2026-01-19)
 
-> **Status (2026-01-19):** ActionDispatcher infrastructure complete. Products module actions registered. Window bindings kept as fallback until HTML templates migrated.
+> **Status:** All view template migrations finished. 63 `onclick` handlers converted to `data-action` across 5 files. TDD verified.
 
 - [x] Create `core/ActionDispatcher.js` (event delegation system)
-- [x] Initialize dispatcher in `app.js`
-- [x] Register products actions (18 actions)
-- [ ] Migrate HTML templates to use `data-action` attributes
-- [ ] Register orders, users, settings, delivery module actions
+- [x] Create `core/AppActions.js` (app, inventory, delivery)
+- [x] Create `core/UtilitiesActions.js` (21 actions)
+- [x] Create `core/SettingsActions.js` (11 actions)
+- [x] Create `core/UsersActions.js` (3 actions)
+- [x] Migrate `index.html` (8 handlers)
+- [x] Migrate `utilities.html` (31 handlers)
+- [x] Migrate `settings.html` (19 handlers)
+- [x] Migrate `users.html` (4 handlers)
+- [x] Migrate `templates.html` (1 handler)
+
+#### Manual Testing Checklist (Phase 4)
+
+| Test | Action | Expected Result |
+|------|--------|-----------------|
+| ✅ Theme Toggle | Click the sun/moon button (top-right header) | Theme cycles. |
+| ✅ Logout | Click "Logout" button | Session ends, login modal appears. |
+| ✅ Inventory Sort | Click any column header | Data re-sorts, arrow appears. |
+| ✅ Settings Tabs | Click tab buttons (General, Branding, etc.) | Content switches. |
+| ✅ Utilities Actions | Click seed/purge buttons | Actions trigger (API 401 if unauthenticated). |
+
+**TDD Page**: [action-dispatcher-tdd.html](http://localhost:3000/admin/test/action-dispatcher-tdd.html)
 
 ---
 

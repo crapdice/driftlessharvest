@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Prototype: Minimal Context | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="header-prototypes.css">
+    <style>
+        .slim-header {
+            height: 64px;
+            background: white;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body class="header-prototype-body">
+
+    <!-- Header -->
+    <header class="slim-header">
+        <div class="header-left">
+            <nav class="breadcrumb-nav">
+                <span class="breadcrumb-item">Admin</span>
+                <span style="opacity: 0.3;">/</span>
+                <span class="breadcrumb-item">Inventory</span>
+                <span style="opacity: 0.3;">/</span>
+                <span class="breadcrumb-item active">Heirloom Tomatoes</span>
+            </nav>
+        </div>
+
+        <div class="header-center">
+            <div style="display: flex; gap: 2.5rem;">
+                <div class="context-gauge">
+                    <span class="gauge-label">Stock Status</span>
+                    <div class="gauge-bar-bg">
+                        <div class="gauge-bar-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+                <div class="context-gauge">
+                    <span class="gauge-label">Demand Velocity</span>
+                    <div class="gauge-bar-bg">
+                        <div class="gauge-bar-fill" style="width: 40%; background: #3b82f6;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button
+                    style="padding: 0.5rem 1rem; border-radius: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.8rem; font-weight: 600; color: #64748b; cursor: pointer;">History</button>
+                <button
+                    style="padding: 0.5rem 1rem; border-radius: 0.5rem; background: #10b981; border: none; font-size: 0.8rem; font-weight: 600; color: white; cursor: pointer;">Save
+                    Changes</button>
+                <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 0.5rem;"></div>
+                <div
+                    style="width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                    ⚙️</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Area Placeholder -->
+    <main style="padding: 2.5rem; flex: 1;">
+        <div
+            style="max-width: 1000px; margin: 0 auto; height: 200vh; background: white; border-radius: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 3rem; border: 1px solid #f1f5f9;">
+            <h2 style="margin-top: 0;">Minimalist Context Pattern</h2>
+            <p style="color: #64748b; margin-bottom: 2rem;">This approach replaces branding with deep contextual
+                hierarchy and real-time page-specific metrics.</p>
+
+            <div style="padding: 2rem; background: #f8fafc; border-radius: 1rem; border-left: 4px solid #10b981;">
+                <strong>UX Principle: Focus</strong>
+                <p style="margin-bottom: 0; color: #64748b;">The header and breadcrumbs tell the story of where the user
+                    is and how that specific item is performing, reducing the need to look elsewhere for status.</p>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

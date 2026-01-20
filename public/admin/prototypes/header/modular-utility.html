@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Prototype: Modular Utility | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="header-prototypes.css">
+    <style>
+        .utility-header {
+            height: 72px;
+            background: #1e293b;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            color: white;
+        }
+
+        .utility-widget {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .utility-widget:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .widget-value {
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        .ticker-container {
+            flex: 1;
+            margin: 0 3rem;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .ticker-text {
+            display: inline-block;
+            animation: ticker 25s linear infinite;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
+</head>
+
+<body class="header-prototype-body">
+
+    <!-- Header -->
+    <header class="utility-header">
+        <div class="header-left">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div
+                    style="width: 32px; height: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #1e293b; font-weight: 900;">
+                    H</div>
+                <span style="font-weight: 700; font-size: 1rem;">Harvest Console</span>
+            </div>
+        </div>
+
+        <div class="ticker-container">
+            <div class="ticker-text">
+                🚨 LOW STOCK: Organic Kale (Chicago) • 🚛 ROUTE DELAY: Aurora Sector 4 • 📦 NEW ORDER: ID #5592 • 🛡️
+                SECURITY: Admin login from new IP • ☁️ CLOUDFLARE: Healthy
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="utility-widget">
+                    <span>🚛 Fleet</span>
+                    <span class="widget-value">12/14</span>
+                </div>
+                <div class="utility-widget">
+                    <span>💳 Stripe</span>
+                    <span class="widget-value">ACTIVE</span>
+                </div>
+                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.1); margin: 0 0.5rem;"></div>
+                <div class="action-widget" style="color: white;">
+                    <span style="font-size: 1.25rem;">🔔</span>
+                    <span class="badge" style="border: 2px solid #1e293b;">5</span>
+                </div>
+                <div class="profile-avatar"
+                    style="margin-left: 0.5rem; width: 36px; height: 36px; border: 2px solid rgba(255,255,255,0.2);">A
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Area Placeholder -->
+    <main style="padding: 2.5rem; flex: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <div
+                style="background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; padding: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <h2 style="margin-top: 0;">Modular Utility Pattern</h2>
+                <p style="color: #64748b;">The header acts as a real-time status ticker and widget bar. It's designed
+                    for mission-critical awareness.</p>
+                <div
+                    style="height: 400px; border: 2px dashed #e2e8f0; border-radius: 1rem; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                    Main Operations Dashboard
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div
+                    style="background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h4 style="margin: 0; margin-bottom: 1rem;">Widget Customization</h4>
+                    <p style="font-size: 0.85rem; color: #64748b;">Admins can pin specific services or metrics to the
+                        header for instant visibility.</p>
+                </div>
+                <div
+                    style="background: #1e293b; color: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0; margin-bottom: 1rem; color: #10b981;">Operational Health</h4>
+                    <ul style="padding-left: 1rem; font-size: 0.8rem; color: #94a3b8; line-height: 1.6;">
+                        <li>All API services responding < 200ms</li>
+                        <li>Fleet efficiency at 92%</li>
+                        <li>No critical security exceptions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

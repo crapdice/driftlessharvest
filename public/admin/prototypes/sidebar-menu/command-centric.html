@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype: Command-Centric Sidebar | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e293b;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Command Bar */
+        .command-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.625rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-bar:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .command-bar kbd {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: inherit;
+            margin-left: auto;
+        }
+
+        /* Navigation Content */
+        .nav-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem;
+        }
+
+        .nav-section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0.5rem 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            margin-bottom: 0.125rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item kbd {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: inherit;
+        }
+
+        .active kbd {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Command Menu (Overlay) */
+        .command-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 10vh;
+            z-index: 1000;
+        }
+
+        .command-menu {
+            width: 100%;
+            max-width: 600px;
+            background: #1e293b;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .command-input-container {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .command-input {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.125rem;
+            width: 100%;
+            outline: none;
+        }
+
+        .command-results {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.75rem;
+        }
+
+        .result-item {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .result-item:hover,
+        .result-item.selected {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .result-item strong {
+            color: white;
+        }
+
+        /* Content Area */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="flex items-center gap-3">
+                <div
+                    style="width: 32px; height: 32px; background: var(--primary); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 800;">
+                    H</div>
+                <span style="font-weight: 700;">Harvest App</span>
+            </div>
+
+            <!-- Command Bar Trigger -->
+            <div class="command-bar" onclick="openCommandMenu()">
+                <span>🔍</span>
+                <span style="font-size: 0.8rem; color: #64748b;">Search or action...</span>
+                <kbd>⌘K</kbd>
+            </div>
+        </div>
+
+        <nav class="nav-content">
+            <div class="nav-section-label">General</div>
+            <a href="#" class="nav-item active">
+                <span>📊 Dashboard</span>
+                <kbd>G D</kbd>
+            </a>
+            <a href="#" class="nav-item">
+                <span>📦 Orders</span>
+                <kbd>G O</kbd>
+            </a>
+            <a href="#" class="nav-item">
+                <span>👥 Customers</span>
+                <kbd>G C</kbd>
+            </a>
+
+            <div class="nav-section-label">Inventory</div>
+            <a href="#" class="nav-item">
+                <span>🔢 Stock Check</span>
+                <kbd>I S</kbd>
+            </a>
+            <a href="#" class="nav-item">
+                <span>🍎 Product List</span>
+                <kbd>I P</kbd>
+            </a>
+            <a href="#" class="nav-item">
+                <span>🏷️ Categories</span>
+                <kbd>I C</kbd>
+            </a>
+
+            <div class="nav-section-label">Quick Actions</div>
+            <a href="#" class="nav-item" onclick="openCommandMenu('create-product')">
+                <span>➕ New Product</span>
+                <kbd>N P</kbd>
+            </a>
+            <a href="#" class="nav-item" onclick="openCommandMenu('sync-inventory')">
+                <span>🔄 Sync Inventory</span>
+                <kbd>S I</kbd>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0; color: #1e293b;">Command-Centric
+                Sidebar</h1>
+            <p style="color: #64748b;">Optimized for speed and efficiency using a "Keyboard-First" philosophy.</p>
+        </header>
+
+        <div class="proto-card">
+            <h3>Power User Experience</h3>
+            <p style="color: #64748b; line-height: 1.8;">
+                The Command-Centric design acknowledges that frequent users of the Harvest Admin prefer keyboard
+                shortcuts over mouse clicks.
+                It introduces a "Universal Command" interface (⌘K) that allows admins to jump to specific products,
+                customers, or actions instantly.
+            </p>
+
+            <div
+                style="margin-top: 2rem; background: #0f172a; border-radius: 1rem; padding: 2rem; color: #94a3b8; font-family: monospace;">
+                <div style="color: #22c55e;">// Keyboard Shortcut Map</div>
+                <div style="margin-top: 1rem;">[G D] -> Go to Dashboard</div>
+                <div>[G O] -> Go to Orders</div>
+                <div>[N P] -> New Product Action</div>
+                <div>[/] -> Focus Search</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Command Menu Overlay -->
+    <div id="commandOverlay" class="command-overlay" onclick="closeCommandMenu()">
+        <div class="command-menu" onclick="event.stopPropagation()">
+            <div class="command-input-container">
+                <span>🔍</span>
+                <input type="text" id="commandInput" class="command-input" placeholder="Type a command or search..."
+                    autofocus>
+            </div>
+            <div class="command-results" id="commandResults">
+                <div class="result-item selected">
+                    <span>🍎</span>
+                    <div>Search <strong>Products...</strong></div>
+                </div>
+                <div class="result-item">
+                    <span>👥</span>
+                    <div>Search <strong>Customers...</strong></div>
+                </div>
+                <div class="result-item">
+                    <span>➕</span>
+                    <div>Create <strong>New Template</strong></div>
+                </div>
+                <div class="result-item">
+                    <span>🚛</span>
+                    <div>Check <strong>Route Status</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCommandMenu(preset = null) {
+            document.getElementById('commandOverlay').style.display = 'flex';
+            const input = document.getElementById('commandInput');
+            input.focus();
+            if (preset) input.value = preset;
+        }
+
+        function closeCommandMenu() {
+            document.getElementById('commandOverlay').style.display = 'none';
+        }
+
+        // Global Key Listener
+        document.addEventListener('keydown', (e) => {
+            // Cmd + K or Ctrl + K
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                openCommandMenu();
+            }
+
+            // Escape to close
+            if (e.key === 'Escape') {
+                closeCommandMenu();
+            }
+
+            // [G] [D] for Dashboard etc.
+            // Simplified logic for prototype representation
+        });
+    </script>
+</body>
+
+</html>

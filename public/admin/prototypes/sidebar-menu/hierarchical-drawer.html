@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype: Hierarchical Drawer Sidebar | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: #fdfcfb;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--gray-medium);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+
+        .nav-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        /* Accordion Styling */
+        .nav-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-trigger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1.5rem;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .nav-trigger:hover {
+            color: var(--primary);
+            background: #f8fafc;
+        }
+
+        .nav-trigger svg {
+            transition: transform 0.3s;
+            color: #94a3b8;
+        }
+
+        .nav-group.open .nav-trigger svg {
+            transform: rotate(90deg);
+            color: var(--primary);
+        }
+
+        .nav-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #fcfcfc;
+        }
+
+        .nav-group.open .nav-items {
+            max-height: 300px;
+        }
+
+        .sub-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 2.5rem;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sub-link:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .sub-link.active {
+            color: var(--primary);
+            font-weight: 600;
+            border-left-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-medium);
+            background: var(--gray-light);
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Content Area */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2 style="font-family: var(--font-serif); margin: 0; color: var(--primary);">Harvest Admin</h2>
+            <p style="font-size: 0.75rem; color: #999; margin: 0.25rem 0 0;">Management Suite v2.0</p>
+        </div>
+
+        <nav class="nav-content">
+            <!-- Insights Group -->
+            <div class="nav-group">
+                <button class="nav-trigger" onclick="toggleGroup(this)">
+                    <span class="flex items-center gap-3">📊 Intelligence</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <div class="nav-items">
+                    <a href="#" class="sub-link active">Sales Overview</a>
+                    <a href="#" class="sub-link">Inventory Wealth</a>
+                    <a href="#" class="sub-link">Performance Metrics</a>
+                </div>
+            </div>
+
+            <!-- Operations Group -->
+            <div class="nav-group open">
+                <button class="nav-trigger" onclick="toggleGroup(this)">
+                    <span class="flex items-center gap-3">🚜 Operations</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <div class="nav-items">
+                    <a href="#" class="sub-link">Order Triage</a>
+                    <a href="#" class="sub-link">Delivery Routing</a>
+                    <a href="#" class="sub-link">Customer Service</a>
+                </div>
+            </div>
+
+            <!-- Catalog Group -->
+            <div class="nav-group">
+                <button class="nav-trigger" onclick="toggleGroup(this)">
+                    <span class="flex items-center gap-3">🍎 Catalog</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <div class="nav-items">
+                    <a href="#" class="sub-link">Live Products</a>
+                    <a href="#" class="sub-link">Box Templates</a>
+                    <a href="#" class="sub-link">Categories</a>
+                    <a href="#" class="sub-link">Archived Items</a>
+                </div>
+            </div>
+
+            <!-- Config Group -->
+            <div class="nav-group">
+                <button class="nav-trigger" onclick="toggleGroup(this)">
+                    <span class="flex items-center gap-3">⚙️ System</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <div class="nav-items">
+                    <a href="#" class="sub-link">User Roles</a>
+                    <a href="#" class="sub-link">API Configuration</a>
+                    <a href="#" class="sub-link">Site Layout</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            Logged in as <strong>zackf@harvest.farm</strong>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header style="margin-bottom: 2rem;">
+            <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0;">Hierarchical Drawer</h1>
+            <p style="color: #64748b;">Solving information density through logical grouping.</p>
+        </header>
+
+        <div class="proto-card">
+            <h3>Why Hierarchy Matters</h3>
+            <p style="color: #64748b; line-height: 1.8;">
+                As the Harvest App grows, a flat list of 20+ navigation items creates "choice paralysis."
+                By grouping links into high-level domains (Intelligence, Operations, Catalog), users navigate based on
+                their current "mission."
+            </p>
+            <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div style="padding: 1.5rem; background: #f8fafc; border-radius: 1rem;">
+                    <h4 style="margin: 0 0 0.5rem; color: var(--primary);">Progressive Disclosure</h4>
+                    <p style="font-size: 0.875rem; color: #666; margin: 0;">Only show the details when the category is
+                        relevant to the task.</p>
+                </div>
+                <div style="padding: 1.5rem; background: #fdf2f8; border-radius: 1rem;">
+                    <h4 style="margin: 0 0 0.5rem; color: #be185d;">Reduced Clutter</h4>
+                    <p style="font-size: 0.875rem; color: #666; margin: 0;">Maintains a clean unified interface
+                        regardless of the total feature count.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleGroup(btn) {
+            const group = btn.parentElement;
+
+            // Close other groups optionally
+            // document.querySelectorAll('.nav-group').forEach(g => {
+            //    if (g !== group) g.classList.remove('open');
+            // });
+
+            group.classList.toggle('open');
+        }
+    </script>
+</body>
+
+</html>

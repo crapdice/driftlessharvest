@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools & Features | CSA North Star</title>
+    <link rel="stylesheet" href="../../admin/prototypes/shared.css">
+    <style>
+        body {
+            background: #fdfcf9;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: #064e3b;
+            margin-bottom: 2rem;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            border-left: 4px solid #059669;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .tool-name {
+            font-weight: 800;
+            color: #1e293b;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .tool-details {
+            font-size: 0.95rem;
+            color: #475569;
+        }
+
+        .nav-links {
+            margin-top: 4rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: #059669;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #059669;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #059669;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="overview.html" style="color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 600;">← Back
+        to Overview</a>
+    <h1 style="margin-top: 1rem;">Tools & Features</h1>
+
+    <div class="tool-grid">
+        <div class="tool-card">
+            <span class="tool-name">Subscription Apps</span>
+            <p class="tool-details">Integrate industry-leading tools like Loop Subscriptions for advanced recurring
+                order management and customer self-service.</p>
+        </div>
+
+        <div class="tool-card">
+            <span class="tool-name">E-commerce Marketing</span>
+            <p class="tool-details">Leverage integrated Email systems and social media connectors to promote your CSA
+                and retain members.</p>
+        </div>
+
+        <div class="tool-card" style="grid-column: 1 / -1;">
+            <span class="tool-name">Advanced Management</span>
+            <p class="tool-details">Comprehensive features for inventory tracking, customer data intelligence, and
+                delivery routing optimization to ensure zero-waste operations.</p>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a href="overview.html">← Back to Overview</a>
+        <a href="workflow.html">Review Workflow</a>
+    </div>
+</body>
+
+</html>

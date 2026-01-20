@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype 1: Visual Catalog | Admin</title>
+    <link rel="stylesheet" href="../shared.css">
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .category-pill {
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+            background: white;
+            border: 1px solid var(--gray-medium);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="flex justify-between items-center mb-8">
+        <div>
+            <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin: 0;">Visual Catalog</h1>
+            <p style="color: #666;">A premium, image-first management experience.</p>
+        </div>
+        <button class="btn-primary" onclick="alert('Add product modal would open here')">+ New Product</button>
+    </header>
+
+    <div class="filter-bar">
+        <div class="category-pill active">All Products</div>
+        <div class="category-pill">Vegetables</div>
+        <div class="category-pill">Fruit</div>
+        <div class="category-pill">Curated Boxes</div>
+        <div class="category-pill">Dairy & Eggs</div>
+    </div>
+
+    <div class="grid-container">
+        <!-- Heirloom Tomatoes -->
+        <div class="proto-card">
+            <img src="../assets/images/heirloom_tomatoes.jpg" alt="Heirloom Tomatoes" class="product-img">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem;">Heirloom Tomatoes</h3>
+                    <span class="badge badge-success">In Stock</span>
+                </div>
+                <span style="font-weight: 700; color: var(--primary);">$4.50/lb</span>
+            </div>
+            <p style="font-size: 0.875rem; color: #666; margin-bottom: 1.5rem;">Vibrant, rainbow varieties picked fresh
+                this morning.</p>
+            <div class="flex gap-2">
+                <button class="btn-secondary" style="flex: 1;" onclick="alert('Quick Edit')">Edit</button>
+                <button class="btn-secondary" onclick="alert('Context Menu')">•••</button>
+            </div>
+        </div>
+
+        <!-- Harvest Box -->
+        <div class="proto-card">
+            <img src="../assets/images/harvest_box.jpg" alt="Seasonal Harvest Box" class="product-img">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem;">Seasonal Harvest Box</h3>
+                    <span class="badge badge-blue">Limited Edition</span>
+                </div>
+                <span style="font-weight: 700; color: var(--primary);">$35.00</span>
+            </div>
+            <p style="font-size: 0.875rem; color: #666; margin-bottom: 1.5rem;">A mixed variety of our best seasonal
+                veggies for the week.</p>
+            <div class="flex gap-2">
+                <button class="btn-secondary" style="flex: 1;" onclick="alert('Quick Edit')">Edit</button>
+                <button class="btn-secondary" onclick="alert('Context Menu')">•••</button>
+            </div>
+        </div>
+
+        <!-- Fresh Kale -->
+        <div class="proto-card">
+            <img src="../assets/images/fresh_kale.jpg" alt="Dino Kale" class="product-img">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem;">Tuscan Dino Kale</h3>
+                    <span class="badge badge-warning">Low Stock (5)</span>
+                </div>
+                <span style="font-weight: 700; color: var(--primary);">$3.00/bu</span>
+            </div>
+            <p style="font-size: 0.875rem; color: #666; margin-bottom: 1.5rem;">Deep green, textured leaves perfect for
+                salads or chips.</p>
+            <div class="flex gap-2">
+                <button class="btn-secondary" style="flex: 1;" onclick="alert('Quick Edit')">Edit</button>
+                <button class="btn-secondary" onclick="alert('Context Menu')">•••</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactive mock script
+        document.querySelectorAll('.category-pill').forEach(pill => {
+            pill.onclick = () => {
+                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+            };
+        });
+    </script>
+</body>
+
+</html>

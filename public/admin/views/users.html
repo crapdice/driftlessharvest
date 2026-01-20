@@ -12,7 +12,7 @@
                     oninput="window.searchUsers(this.value)" readonly onfocus="this.removeAttribute('readonly');"
                     class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
             </div>
-            <button onclick="openUserModal()" id="btn-add-user"
+            <button data-action="users:openModal" id="btn-add-user"
                 class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-all hidden">
                 + Add User
             </button>
@@ -45,7 +45,7 @@
         <!-- Header -->
         <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
             <h3 class="text-xl font-bold text-gray-900" id="u-modal-title">Edit User</h3>
-            <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">
+            <button data-action="users:closeModal" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
@@ -128,11 +128,11 @@
 
         <!-- Footer -->
         <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
-            <button onclick="closeUserModal()"
+            <button data-action="users:closeModal"
                 class="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors">
                 Cancel
             </button>
-            <button onclick="saveUser()"
+            <button data-action="users:save"
                 class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                 Save User
             </button>
