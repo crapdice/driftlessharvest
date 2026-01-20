@@ -21,6 +21,20 @@ window.deleteWindow = async (id) => {
 window.showDayOrders = showDayOrders;
 
 export async function loadDelivery() {
+    // Dynamic view loading
+    const container = document.getElementById('view-delivery');
+    if (container && !container.dataset.loaded) {
+        try {
+            const response = await fetch('views/delivery.html');
+            if (response.ok) {
+                container.innerHTML = await response.text();
+                container.dataset.loaded = 'true';
+            }
+        } catch (e) {
+            console.error('[Delivery] Failed to load view:', e);
+        }
+    }
+
     try {
         const [windows, schedule, allOrders] = await Promise.all([
             api.getDeliveryWindows(),

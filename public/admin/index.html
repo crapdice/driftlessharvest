@@ -253,44 +253,10 @@
 
             <!-- DELIVERY VIEW -->
             <div id="view-delivery" class="hidden space-y-8">
-                <div class="grid grid-cols-12 gap-8 w-full">
-
-                    <!-- LEFT COLUMN: Upcoming Schedule -->
-                    <div class="col-span-12 xl:col-span-7 space-y-4">
-                        <h2 class="text-xl font-bold text-gray-800">Upcoming Delivery Schedule</h2>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                            <div id="delivery-calendar" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <!-- Dynamic Schedule Cards -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- RIGHT COLUMN: Delivery Windows -->
-                    <div class="col-span-12 xl:col-span-5 space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-xl font-bold text-gray-800">Delivery Windows</h2>
-
-                            <!-- Add Window Inline Form -->
-                            <div class="flex gap-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
-                                <input type="date" id="new-win-label"
-                                    class="border-none bg-transparent text-xs px-2 py-1 outline-none w-36 text-gray-600 font-bold uppercase">
-                                <button data-action="delivery:addWindow"
-                                    class="bg-gray-900 text-white p-1 rounded hover:bg-black transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 7-col Micro Grid Container -->
-                        <!-- xl:grid-cols-7 ensures it fits 7 items in this 5-column space -->
-                        <div id="delivery-windows-grid" class="grid grid-cols-4 md:grid-cols-7 gap-2">
-                            <!-- Injected by delivery.js -->
-                        </div>
-                    </div>
-
+                <!-- Content loaded dynamically from views/delivery.html -->
+                <div class="flex items-center justify-center p-12 text-gray-400">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                    <span>Loading Delivery Schedule...</span>
                 </div>
             </div>
 
