@@ -3,10 +3,47 @@ const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
 const { checkRole } = require('../middleware/auth');
+const geminiService = require('../services/geminiService');
+const cloudflareService = require('../services/cloudflareService');
+const resendService = require('../services/ResendService');
+const stripeService = require('../services/StripeService');
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 const DATA_FILE = path.join(DATA_DIR, 'config.json');
 const DEFAULTS_FILE = path.join(__dirname, '../data/config.defaults.json');
+
+// GET /api/config/test/:provider
+router.get('/config/test/:provider', checkRole(['admin', 'super_admin']), async (req, res) => {
+    const { provider } = req.params;
+
+    try {
+        let result;
+        switch (provider) {
+            case 'gemini':
+                result = await geminiService.testConnection();
+                break;
+            case 'cloudflare':
+                result = await cloudflareService.testConnection();
+                break;
+            case 'resend':
+                result = await resendService.testConnection();
+                break;
+            case 'stripe':
+                result = await stripeService.testConnection();
+                break;
+            default:
+                return res.status(400).json({ error: 'Invalid provider' });
+        }
+        // Unified success response structure
+        res.json({
+            success: true,
+            ...result
+        });
+    } catch (error) {
+        console.error(`[Config Test] Error testing ${provider}:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // GET /api/config
 router.get('/config', async (req, res) => {

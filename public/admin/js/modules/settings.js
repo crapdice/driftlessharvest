@@ -1,7 +1,7 @@
 import { api } from './api.js';
 import { showToast } from './utils.js';
 import { inventoryAlertService } from '../core/InventoryAlertService.js';
-import { loadApiKeys, saveApiKey, toggleApiKeyVisibility, testResendConnection, testGeminiConnection } from './api-keys.js';
+import { loadApiKeys } from './api-keys.js';
 
 let currentConfig = {};
 

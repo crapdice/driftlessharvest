@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const fs = require('fs');
 const path = require('path');
@@ -56,6 +56,30 @@ class CloudflareService {
      * @param {string} options.tenantId - The tenant ID for isolation
      * @param {string} options.category - 'products', 'templates', etc.
      */
+    async testConnection() {
+        await this._init();
+        if (!this.client || !this.bucket) {
+            throw new Error('Cloudflare R2 is not configured');
+        }
+
+        try {
+            const command = new HeadBucketCommand({
+                Bucket: this.bucket
+            });
+            await this.client.send(command);
+            return { success: true, bucket: this.bucket };
+        } catch (error) {
+            console.error('[Cloudflare] Connection Test Failed:', error.message);
+            if (error.name === 'NotFound') {
+                throw new Error(`Bucket "${this.bucket}" not found`);
+            }
+            if (error.name === 'AccessDenied' || error.$metadata?.httpStatusCode === 403) {
+                throw new Error('Access Denied: Check your Access Key and Secret');
+            }
+            throw error;
+        }
+    }
+
     async getPresignedUploadUrl({ filename, contentType, tenantId = 'default', category = 'misc' }) {
         await this._init();
 
