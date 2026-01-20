@@ -6,12 +6,12 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 const DATA_FILE = path.join(DATA_DIR, 'config.json');
 
 class GeminiService {
-    async generateContent(prompt, context = '', model = 'gemini-1.5-flash', imageSource = null) {
+    async generateContent(prompt, context = '', model = 'gemini-2.5-flash', imageSource = null) {
         try {
             // Load API Key from config
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
             const config = JSON.parse(configStr);
-            const apiKey = config.apiKeys?.gemini;
+            const apiKey = process.env.GEMINI_API_KEY || config.apiKeys?.gemini;
 
             if (!apiKey) {
                 throw new Error('Gemini API key not configured');
@@ -92,7 +92,7 @@ class GeminiService {
         try {
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
             const config = JSON.parse(configStr);
-            const apiKey = config.apiKeys?.gemini;
+            const apiKey = process.env.GEMINI_API_KEY || config.apiKeys?.gemini;
 
             if (!apiKey) {
                 throw new Error('Gemini API key not configured');
@@ -113,10 +113,10 @@ class GeminiService {
         }
     }
 
-    async generateImage(prompt, model = 'imagen-3.0-generate-002') {
+    async generateImage(prompt, model = 'imagen-4.0-fast-generate-001') {
         try {
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
-            const apiKey = JSON.parse(configStr).apiKeys?.gemini;
+            const apiKey = process.env.GEMINI_API_KEY || JSON.parse(configStr).apiKeys?.gemini;
             if (!apiKey) throw new Error('Gemini API key not configured');
 
             const isGeminiModel = model.toLowerCase().includes('gemini');
@@ -227,7 +227,7 @@ class GeminiService {
     async generateVideo(prompt, model = 'veo-2.0-generate-001') {
         try {
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
-            const apiKey = JSON.parse(configStr).apiKeys?.gemini;
+            const apiKey = process.env.GEMINI_API_KEY || JSON.parse(configStr).apiKeys?.gemini;
             if (!apiKey) throw new Error('Gemini API key not configured');
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predictLongRunning?key=${apiKey.trim()}`;
@@ -258,7 +258,7 @@ class GeminiService {
     async getOperation(name) {
         try {
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
-            const apiKey = JSON.parse(configStr).apiKeys?.gemini;
+            const apiKey = process.env.GEMINI_API_KEY || JSON.parse(configStr).apiKeys?.gemini;
             if (!apiKey) throw new Error('Gemini API key not configured');
 
             // Name is like "operations/12345...", needs to be passed in URL
@@ -319,10 +319,10 @@ class GeminiService {
 
     async generateImageAnalysis(imageSource, prompt) {
         const configStr = await fs.readFile(DATA_FILE, 'utf8');
-        const apiKey = JSON.parse(configStr).apiKeys?.gemini;
+        const apiKey = process.env.GEMINI_API_KEY || JSON.parse(configStr).apiKeys?.gemini;
         if (!apiKey) throw new Error('Gemini API key not configured');
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`;
 
         const isUrl = imageSource.startsWith('http');
         const body = {
@@ -364,7 +364,7 @@ class GeminiService {
     async proxyMedia(fileUrl, rangeHeader) {
         try {
             const configStr = await fs.readFile(DATA_FILE, 'utf8');
-            const apiKey = JSON.parse(configStr).apiKeys?.gemini;
+            const apiKey = process.env.GEMINI_API_KEY || JSON.parse(configStr).apiKeys?.gemini;
             if (!apiKey) throw new Error('Gemini API key not configured');
 
             const url = new URL(fileUrl);

@@ -14,10 +14,12 @@ router.get('/config', async (req, res) => {
         const configStr = await fs.readFile(DATA_FILE, 'utf8');
         const config = JSON.parse(configStr);
 
-        // Filter out sensitive data if any (though config.json is currently mostly public style settings)
+        // Filter out sensitive data
+        const { apiKeys, ...safeConfig } = config;
+
         // Add public keys
         const publicConfig = {
-            ...config,
+            ...safeConfig,
             stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY
         };
 

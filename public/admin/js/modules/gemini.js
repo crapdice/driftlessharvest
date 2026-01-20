@@ -42,13 +42,12 @@ export async function generateContent(targetId, type) {
         if (type === 'product_name') {
             const category = document.getElementById('p-category')?.value || 'General';
             context = `Product Category: ${category}`;
-            prompt = `As an artisanal food branding expert, analyze the attached image (if provided) and generate 3 creative, appetizing, and short names for this local farm-to-table food product. 
-            The names should sound fresh, premium, and highlight the quality visible in the image. 
-            Avoid generic names; aim for something evocative and catchy.`;
+            prompt = `Analyze the image and generate 3 short, creative names for this local food product. 
+            Output ONLY the names, one per line. No intro, no descriptions, no explanations.`;
         } else if (type === 'box_name') {
-            prompt = `As a marketing expert for Harvest, analyze the attached image of the curation (if provided) and generate 3 creative and catchy names for this new curated food box. 
-            The names should evoke a sense of season, community, and abundance. 
-            Keep them under 4 words.`;
+            prompt = `Analyze the image and generate 3 creative names for this curated food box. 
+            Output ONLY the names, one per line. No intro, no explanations. 
+            Keep names under 4 words.`;
         } else if (type === 'box_description') {
             const boxName = document.getElementById('t-name')?.value || 'this box';
             context = `Box Name: ${boxName}`;

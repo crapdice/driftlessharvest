@@ -132,7 +132,17 @@
                         class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
                         <div class="px-6 py-4 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
                             <span class="text-sm font-bold text-blue-700 uppercase tracking-widest">Enhanced ✨</span>
-                            <span class="text-xs text-blue-400" id="enh-size">-</span>
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs text-blue-400" id="enh-size">-</span>
+                                <button id="download-btn" onclick="downloadEnhancedImage()"
+                                    class="hidden text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-1.5 shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Download
+                                </button>
+                            </div>
                         </div>
                         <div id="loading-overlay"
                             class="hidden absolute inset-0 z-10 glass flex flex-col items-center justify-center p-8 text-center text-blue-600">
@@ -184,7 +194,30 @@
         function updateOriginalPreview() {
             const url = document.getElementById('img-url').value;
             const img = document.getElementById('orig-img');
-            img.src = url || 'https://placehold.co/600x600?text=No+Image';
+            const sizeLabel = document.getElementById('orig-size');
+
+            if (!url) {
+                img.src = 'https://placehold.co/600x600?text=No+Image';
+                sizeLabel.innerText = '-';
+                return;
+            }
+
+            img.onload = async function () {
+                const dims = `${img.naturalWidth} x ${img.naturalHeight}`;
+                let sizeText = 'Unknown';
+
+                try {
+                    const res = await fetch(url, { method: 'HEAD' });
+                    const bytes = res.headers.get('content-length');
+                    if (bytes) sizeText = (bytes / 1024).toFixed(1) + ' KB';
+                } catch (e) { }
+
+                sizeLabel.innerText = `${dims} | ${sizeText}`;
+                log(`Source loaded: ${dims} (${sizeText})`);
+            };
+
+            img.crossOrigin = 'anonymous';
+            img.src = url;
         }
 
         async function enhanceImage() {
@@ -211,10 +244,14 @@
             };
 
             try {
+                log('Optimizing image for Gemini Vision (rescaling to 800px)...');
+                const optimizedImage = await getRescaledBase64('orig-img', 800);
+                log(`Optimization complete. Optimized size: ${(optimizedImage.length / 1024).toFixed(1)} KB`);
+
                 const response = await fetch('/api/gemini/enhance-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imageSource, type: currentMode, contextData })
+                    body: JSON.stringify({ imageSource: optimizedImage, type: currentMode, contextData })
                 });
 
                 const data = await response.json();
@@ -224,7 +261,20 @@
                 log(`Success! Enhanced image received.`, 'success');
 
                 const enhImg = document.getElementById('enh-img');
+                const enhSizeLabel = document.getElementById('enh-size');
+
+                enhImg.onload = function () {
+                    const dims = `${enhImg.naturalWidth} x ${enhImg.naturalHeight}`;
+                    const sizeBytes = Math.round((data.b64.length * 3) / 4);
+                    const sizeKB = (sizeBytes / 1024).toFixed(1) + ' KB';
+                    enhSizeLabel.innerText = `${dims} | ${sizeKB}`;
+                };
+
                 enhImg.src = `data:${data.mimeType};base64,${data.b64}`;
+
+                // Enable download
+                const downloadBtn = document.getElementById('download-btn');
+                downloadBtn.classList.remove('hidden');
 
                 document.getElementById('prompt-card').classList.remove('hidden');
                 document.getElementById('used-prompt').innerText = data.promptUsed;
@@ -239,6 +289,47 @@
                 btn.classList.remove('opacity-50');
                 overlay.classList.add('hidden');
             }
+        }
+
+        function downloadEnhancedImage() {
+            const img = document.getElementById('enh-img');
+            if (!img.src || img.src.includes('placehold.co')) return;
+
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = `enhanced-${currentMode}-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            log(`Image downloaded successfully.`, 'success');
+        }
+
+        /**
+         * Rescales an image element to a max dimension using Canvas
+         */
+        async function getRescaledBase64(imgId, maxDim) {
+            const img = document.getElementById(imgId);
+            const canvas = document.createElement('canvas');
+            let width = img.naturalWidth;
+            let height = img.naturalHeight;
+
+            if (width > height) {
+                if (width > maxDim) {
+                    height *= maxDim / width;
+                    width = maxDim;
+                }
+            } else {
+                if (height > maxDim) {
+                    width *= maxDim / height;
+                    height = maxDim;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            return canvas.toDataURL('image/jpeg', 0.85); // High quality JPEG
         }
 
         function log(msg, type = 'info') {

@@ -25,22 +25,25 @@ class CloudflareService {
         }
 
         const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-        const cf = config.apiKeys?.cloudflare;
+        const cf = config.apiKeys?.cloudflare || {};
 
-        if (!cf || !cf.accountId || !cf.accessKeyId || !cf.secretAccessKey || !cf.r2Bucket) {
+        this.accountId = process.env.CLOUDFLARE_ACCOUNT_ID || cf.accountId;
+        this.bucket = process.env.CLOUDFLARE_R2_BUCKET || cf.r2Bucket;
+        this.publicUrl = cf.publicUrl || null;
+
+        const accessKeyId = process.env.CLOUDFLARE_ACCESS_KEY_ID || cf.accessKeyId;
+        const secretAccessKey = process.env.CLOUDFLARE_SECRET_ACCESS_KEY || cf.secretAccessKey;
+
+        if (!this.accountId || !this.bucket || !accessKeyId || !secretAccessKey) {
             throw new Error('Cloudflare R2 is not configured');
         }
 
-        this.accountId = cf.accountId;
-        this.bucket = cf.r2Bucket;
-        this.publicUrl = cf.publicUrl || null;
-
         this.client = new S3Client({
             region: 'auto',
-            endpoint: `https://${cf.accountId}.r2.cloudflarestorage.com`,
+            endpoint: `https://${this.accountId}.r2.cloudflarestorage.com`,
             credentials: {
-                accessKeyId: cf.accessKeyId,
-                secretAccessKey: cf.secretAccessKey,
+                accessKeyId,
+                secretAccessKey,
             },
         });
     }
